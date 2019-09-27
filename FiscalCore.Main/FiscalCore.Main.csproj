@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Version>0.0.1</Version>
+    <Authors>FiscalCore</Authors>
+    <PackageProjectUrl></PackageProjectUrl>
+    <Copyright>@fiscalcore</Copyright>
+    <Company>FiscalCore</Company>
+    <PackageTags>NFe NFCe</PackageTags>
+    <RepositoryUrl>https://github.com/Laranjeiras/FiscalCore</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Zion.Common" Version="1.1.462" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Security.Cryptography.Xml">
+      <HintPath>..\..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\system.security.cryptography.xml\4.5.0\ref\netstandard2.0\System.Security.Cryptography.Xml.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Version>0.0.1</Version>
+    <Authors>FiscalCore</Authors>
+    <Company>FiscalCore</Company>
+    <Copyright>@fiscalcore</Copyright>
+    <RepositoryType>Git</RepositoryType>
+    <PackageTags>NFe NFCe</PackageTags>
+    <RepositoryUrl>https://github.com/Laranjeiras/FiscalCore</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Zion.Common" Version="1.1.462" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FiscalCore.Main\FiscalCore.Main.csproj" />
+  </ItemGroup>
+
+</Project>
