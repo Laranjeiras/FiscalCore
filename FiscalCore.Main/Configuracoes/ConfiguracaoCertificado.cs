@@ -4,14 +4,19 @@ namespace FiscalCore.Main.Configuracoes
 {
     public class ConfiguracaoCertificado
     {
+        public ConfiguracaoCertificado()
+        {
+
+        }
+
         public ConfiguracaoCertificado(eTipoCertificado tipoCertificado, string serial)
         {
             TipoCertificado = tipoCertificado;
             Serial = serial; 
         }
 
-        public eTipoCertificado TipoCertificado { get; private set; }
-        public string Serial { get; private set; }
+        public eTipoCertificado TipoCertificado { get; set; }
+        public string Serial { get; set; }
         public byte[] ArrayBytesArquivo { get; set; }
         public string Arquivo { get; set; }
         public string Senha { get; set; }

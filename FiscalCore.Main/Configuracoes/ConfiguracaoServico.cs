@@ -20,7 +20,7 @@ namespace FiscalCore.Main.Configuracoes
             VersaoAutorizacaoNFe = eVersaoServico.Versao400;
         }
 
-        public ConfiguracaoCertificado Certificado { get; private set; }
+        public ConfiguracaoCertificado Certificado { get; set; }
        
         public eTipoAmbiente TipoAmbiente { get; private set; }
 
@@ -35,9 +35,11 @@ namespace FiscalCore.Main.Configuracoes
         public emit Emitente { get; private set; }
 
         public ConfiguracaoCsc Csc { get; private set; }
-
+        public eTipoImpressao NFeTpImp { get; protected set; }
+        public eTipoImpressao NFCeTpImp { get; protected set; }
         public int TimeOut { get; set; } = 5000;
         public string VersaoProc { get; set; }
+
         public eVersaoServico VersaoInutilizacaoNFe { get; set; }
         public eVersaoServico VersaoCancelamentoNFe { get; set; }
         public eVersaoServico VersaoAutorizacaoNFe { get; set; }

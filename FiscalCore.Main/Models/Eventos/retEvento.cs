@@ -1,7 +1,9 @@
-﻿using System.Xml.Serialization;
+﻿using FiscalCore.Main.Models.Retornos;
+using System.Xml.Serialization;
 
-namespace FiscalCore.Main.Models.Retornos
+namespace FiscalCore.Main.Models.Eventos
 {
+    [XmlRoot(Namespace = "http://www.portalfiscal.inf.br/nfe")]
     public class retEvento
     {
         /// <summary>

@@ -2,11 +2,18 @@
 {
     public abstract class BaseRetorno
     {
-        public BaseRetorno(string xmlRetStr)
+        public BaseRetorno()
         {
-            XmlRetStr = xmlRetStr;
+
         }
 
-        public string XmlRetStr { get; set; }
+        public BaseRetorno(string xmlRecebido)
+        {
+            XmlRecebido = xmlRecebido;
+        }
+
+        public string XmlRecebido { get; set; }
+
+        public string XmlEnviado { get; set; }
     }
 }

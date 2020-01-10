@@ -85,7 +85,7 @@ namespace FiscalCore.Servicos.Servicos
 
             FuncoesXml.SalvarArquivoXml(cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ret-eve.xml", retornoXmlStringLimpa);
 
-            var retEnvEvento = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa);
+            var retEnvEvento = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
             
             return retEnvEvento;
         }

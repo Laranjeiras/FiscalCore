@@ -1,4 +1,5 @@
-﻿using FiscalCore.Main.Models.Eventos;
+﻿using FiscalCore.Main.Models.Consulta;
+using FiscalCore.Main.Models.Eventos;
 using FiscalCore.Main.Models.Retornos;
 using FiscalCore.Main.Utils;
 using System;
@@ -23,9 +24,23 @@ namespace FiscalCore.Main.Extensions
             return FuncoesXml.ClasseParaXmlString<retEnvEvento>(retEnvEvento);
         }
 
-        public static retEnvEvento CarregarDeXmlString(this retEnvEvento retEnvEvento, string xmlString)
+        public static retEnvEvento CarregarDeXmlString(this retEnvEvento retEnvEvento, string xmlRecebido, string xmlEnviado)
         {
-            return FuncoesXml.XmlStringParaClasse<retEnvEvento>(xmlString);
+            var tmp = FuncoesXml.XmlStringParaClasse<retEnvEvento>(xmlRecebido);
+            tmp.XmlEnviado = xmlEnviado;
+            return tmp;
+        }
+
+        public static string ObterXmlString(this consSitNFe consSiteNFe)
+        {
+            return FuncoesXml.ClasseParaXmlString(consSiteNFe);
+        }
+
+        public static retConsSitNFe CarregarDeXmlString(this retConsSitNFe retConsSitNFe, string xmlRecebido, string xmlEnviado)
+        {
+            var tmp = FuncoesXml.XmlStringParaClasse<retConsSitNFe>(xmlRecebido);
+            tmp.XmlEnviado = xmlEnviado;
+            return tmp;
         }
 
         public static evento Assina(this evento evento, X509Certificate2 certificadoDigital, string signatureMethodSignedXml, string digestMethodReference)

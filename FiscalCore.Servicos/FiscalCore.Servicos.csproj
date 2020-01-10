@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <Version>0.0.1</Version>
     <Authors>FiscalCore</Authors>
     <Company>FiscalCore</Company>
@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Zion.Common" Version="1.1.462" />
+    <PackageReference Include="Zion.Common" Version="1.1.464" />
   </ItemGroup>
 
   <ItemGroup>

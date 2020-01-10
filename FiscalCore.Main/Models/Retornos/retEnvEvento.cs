@@ -5,10 +5,10 @@ using System.Xml.Serialization;
 namespace FiscalCore.Main.Models.Retornos
 {
     [XmlRoot(Namespace = "http://www.portalfiscal.inf.br/nfe")]
-    public class retEnvEvento
+    public class retEnvEvento : BaseRetorno
     {
         [XmlAttribute]
-        public string versao { get; set; }
+        public string versao { get; set; } 
         public long idLote { get; set; }
         public eTipoAmbiente tpAmb { get; set; }
         public string verAplic { get; set; }
