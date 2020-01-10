@@ -32,7 +32,7 @@ namespace FiscalCore.Servicos.Servicos
 
             var xmlEvento = consSit.ObterXmlString();
 
-            var modeloDoc = ModeloDocumento(chaveAcesso.Substring(20, 2));
+            var modeloDoc = Conversor.ModeloDocumento(chaveAcesso.Substring(20, 2));
 
             var sefazUrl = ObterSefazUrl.ObterUrl(fcServico.ConsultaSituacaoNFe, _cfgServico.TipoAmbiente, modeloDoc, _cfgServico.UF);
             var envelope = SoapEnvelopes.FabricarEnvelopeConsultarSituacaoNFe(xmlEvento);
@@ -46,14 +46,6 @@ namespace FiscalCore.Servicos.Servicos
             var retEnvEvento = new retConsSitNFe().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 
             return retEnvEvento;
-        }
-
-        private static eModeloDocumento ModeloDocumento(string modelo)
-        {
-            if (modelo != "55" && modelo != "65")
-                throw new Exception("Os modelos válidos são 55 ou 65");
-            var modeloDoc = (eModeloDocumento)Enum.Parse(typeof(eModeloDocumento), modelo);
-            return modeloDoc;
         }
     }
 }
