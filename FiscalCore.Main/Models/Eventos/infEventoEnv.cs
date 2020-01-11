@@ -14,9 +14,31 @@ namespace FiscalCore.Main.Models.Eventos
 
         public eTipoAmbiente tpAmb { get; set; }
 
-        public string CNPJ { get; set; }
-        public string CPF { get; set; }
-        
+        private string _cnpj { get; set; }
+        public string CNPJ 
+        {
+            get { return _cnpj; }
+            set {
+                if (Zion.Common.ValueObjects.CpfCnpj.IsValid(value))
+                    _cnpj = Zion.Common.Helpers.StringHelper.OnlyNumbers(value);
+                else
+                    _cnpj = null;
+            }
+        }
+
+        private string _cpf;
+        public string CPF
+        {
+            get { return _cpf; }
+            set
+            {
+                if (Zion.Common.ValueObjects.CpfCnpj.IsValid(value))
+                    _cpf = Zion.Common.Helpers.StringHelper.OnlyNumbers(value);
+                else
+                    _cpf = null;
+            }
+        }
+
         public string chNFe { get; set; }
 
         [XmlIgnore]
