@@ -10,7 +10,13 @@ namespace FiscalCore.Servicos.Utils
 {
     internal class Sefaz
     {
+        [Obsolete("Parametro Modelo Documento não é necessário")]
         public static string EnviarParaSefaz(ConfiguracaoServico cfgServico, eModeloDocumento modeloDocumento, SefazUrl sefazUrl, XmlDocument envelope)
+        {
+            return EnviarParaSefaz(cfgServico, sefazUrl, envelope);
+        }
+
+        public static string EnviarParaSefaz(ConfiguracaoServico cfgServico, SefazUrl sefazUrl, XmlDocument envelope)
         {
             HttpWebRequest webRequest = Soap.CreateWebRequest(sefazUrl.Url, sefazUrl.Action, "application/soap+xml;charset=utf-8");
 
