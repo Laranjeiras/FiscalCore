@@ -38,6 +38,11 @@ namespace FiscalCore.Servicos.Utils
             urls.Add(new SefazUrl(fcServico.ConsultaSituacaoNFe, eUF.RJ, eTipoAmbiente.Producao, eModeloDocumento.NFe, "https://nfe.svrs.rs.gov.br/ws/NfeConsulta/NfeConsulta4.asmx", "https://nfe.svrs.rs.gov.br/ws/NfeConsulta/NfeConsulta4.asmx?op=nfeConsultaNF"));
             urls.Add(new SefazUrl(fcServico.ConsultaSituacaoNFe, eUF.RJ, eTipoAmbiente.Producao, eModeloDocumento.NFCe, "https://nfce.svrs.rs.gov.br/ws/NfeConsulta/NfeConsulta4.asmx", "https://nfce.svrs.rs.gov.br/ws/NfeConsulta/NfeConsulta4.asmx?op=nfeConsultaNF"));
 
+            urls.Add(new SefazUrl(fcServico.CartaCorrecao, eUF.RJ, eTipoAmbiente.Producao, eModeloDocumento.NFe, "https://nfe.svrs.rs.gov.br/ws/recepcaoevento/recepcaoevento4.asmx", "https://nfe.svrs.rs.gov.br/ws/recepcaoevento/recepcaoevento4.asmx?op=nfeRecepcaoEvento"));
+            urls.Add(new SefazUrl(fcServico.CartaCorrecao, eUF.RJ, eTipoAmbiente.Homologacao, eModeloDocumento.NFe, "https://nfe-homologacao.svrs.rs.gov.br/ws/recepcaoevento/recepcaoevento4.asmx", "https://nfe-homologacao.svrs.rs.gov.br/ws/recepcaoevento/recepcaoevento4.asmx?op=nfeRecepcaoEvento"));
+            urls.Add(new SefazUrl(fcServico.CartaCorrecao, eUF.RJ, eTipoAmbiente.Producao, eModeloDocumento.NFCe, "https://nfce.svrs.rs.gov.br/ws/recepcaoevento/recepcaoevento4.asmx", "https://nfce.svrs.rs.gov.br/ws/recepcaoevento/recepcaoevento4.asmx?op=nfeRecepcaoEvento"));
+            urls.Add(new SefazUrl(fcServico.CartaCorrecao, eUF.RJ, eTipoAmbiente.Homologacao, eModeloDocumento.NFCe, "https://nfce-homologacao.svrs.rs.gov.br/ws/recepcaoevento/recepcaoevento4.asmx", "https://nfce-homologacao.svrs.rs.gov.br/ws/recepcaoevento/recepcaoevento4.asmx?op=nfeRecepcaoEvento"));
+
             return urls;
         }
     }

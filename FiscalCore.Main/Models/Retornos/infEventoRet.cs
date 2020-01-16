@@ -22,5 +22,7 @@ namespace FiscalCore.Main.Models.Retornos
         public int? nSeqEvento { get; set; }
 
         public DateTime dhRegEvento { get; set; }
+
+        public string nProt { get; set; }
     }
 }

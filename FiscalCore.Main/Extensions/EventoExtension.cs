@@ -19,6 +19,11 @@ namespace FiscalCore.Main.Extensions
             return FuncoesXml.ClasseParaXmlString(pedEvento);
         }
 
+        public static string ObterXmlString(this infEventoRet infEventoRet) 
+        {
+            return FuncoesXml.ClasseParaXmlString<infEventoRet>(infEventoRet);
+        }
+
         public static string ObterXmlString(this retEnvEvento retEnvEvento)
         {
             return FuncoesXml.ClasseParaXmlString<retEnvEvento>(retEnvEvento);
@@ -28,6 +33,7 @@ namespace FiscalCore.Main.Extensions
         {
             var tmp = FuncoesXml.XmlStringParaClasse<retEnvEvento>(xmlRecebido);
             tmp.XmlEnviado = xmlEnviado;
+            tmp.XmlRecebido = xmlRecebido;
             return tmp;
         }
 
@@ -39,6 +45,7 @@ namespace FiscalCore.Main.Extensions
         public static retConsSitNFe CarregarDeXmlString(this retConsSitNFe retConsSitNFe, string xmlRecebido, string xmlEnviado)
         {
             var tmp = FuncoesXml.XmlStringParaClasse<retConsSitNFe>(xmlRecebido);
+            tmp.XmlRecebido = xmlRecebido;
             tmp.XmlEnviado = xmlEnviado;
             return tmp;
         }

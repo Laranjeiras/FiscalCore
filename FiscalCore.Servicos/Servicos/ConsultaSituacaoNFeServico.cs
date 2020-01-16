@@ -9,12 +9,12 @@ using System;
 
 namespace FiscalCore.Servicos.Servicos
 {
-    public class ConsultaSituacaoNFe
+    public class ConsultaSituacaoNFeServico
     {
         private readonly ConfiguracaoServico _cfgServico;
         private readonly string _versao;
 
-        public ConsultaSituacaoNFe(ConfiguracaoServico cfgServico, string versao)
+        public ConsultaSituacaoNFeServico(ConfiguracaoServico cfgServico, string versao)
         {
             _cfgServico = cfgServico;
             _versao = versao;
@@ -37,7 +37,7 @@ namespace FiscalCore.Servicos.Servicos
             var sefazUrl = ObterSefazUrl.ObterUrl(fcServico.ConsultaSituacaoNFe, _cfgServico.TipoAmbiente, modeloDoc, _cfgServico.UF);
             var envelope = SoapEnvelopes.FabricarEnvelopeConsultarSituacaoNFe(xmlEvento);
 
-            var retornoXmlString = Sefaz.EnviarParaSefaz(_cfgServico, modeloDoc, sefazUrl, envelope);
+            var retornoXmlString = Sefaz.EnviarParaSefaz(_cfgServico, sefazUrl, envelope);
 
             var retornoXmlStringLimpa = Soap.ClearEnvelop(retornoXmlString, "retConsSitNFe").OuterXml;
 

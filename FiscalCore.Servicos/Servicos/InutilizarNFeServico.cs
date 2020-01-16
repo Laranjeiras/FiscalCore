@@ -10,11 +10,11 @@ using Zion.Common.Helpers;
 
 namespace FiscalCore.Servicos.Servicos
 {
-    public class InutilizacaoNFe
+    public class InutilizarNFeServico
     {
         ConfiguracaoServico _cfgServico;
 
-        public InutilizacaoNFe(ConfiguracaoServico cfgServico)
+        public InutilizarNFeServico(ConfiguracaoServico cfgServico)
         {
             _cfgServico = cfgServico;
         }
@@ -32,7 +32,7 @@ namespace FiscalCore.Servicos.Servicos
 
             var envelope = SoapEnvelopes.FabricarEnvelopeInutilizacaoNFe(xmlInutilizacao);
             var sefazUrl = ObterSefazUrl.ObterUrl(fcServico.InutilizacaoNFe, _cfgServico.TipoAmbiente, modeloDocumento, _cfgServico.UF);
-            var retornoXmlString = Sefaz.EnviarParaSefaz(_cfgServico, modeloDocumento, sefazUrl, envelope);
+            var retornoXmlString = Sefaz.EnviarParaSefaz(_cfgServico, sefazUrl, envelope);
             var retornoLimpo = Soap.ClearEnvelop(retornoXmlString, "retInutNFe").OuterXml;
 
             FuncoesXml.SalvarArquivoXml(_cfgServico.DiretorioSalvarXml, $"{DateTime.Now.Ticks} - {pedInutilizacao.infInut.Id} -inut.xml", retornoLimpo);

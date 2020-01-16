@@ -8,11 +8,11 @@ using Zion.Common.Helpers;
 
 namespace FiscalCore.Servicos.Servicos
 {
-    public class NFeAutorizacao4
+    public class AutorizarNFe4Servico
     {
         ConfiguracaoServico _cfgServico;
 
-        public NFeAutorizacao4(ConfiguracaoServico cfgServico)
+        public AutorizarNFe4Servico(ConfiguracaoServico cfgServico)
         {
             _cfgServico = cfgServico;
         }
@@ -27,7 +27,7 @@ namespace FiscalCore.Servicos.Servicos
 
             var envelope = SoapEnvelopes.FabricarEnvelopeAutorizacaoNFe4(xmlenviNFe4);
 
-            var retornoXmlString = Sefaz.EnviarParaSefaz(_cfgServico, modeloDocumento, urlSefaz, envelope);
+            var retornoXmlString = Sefaz.EnviarParaSefaz(_cfgServico, urlSefaz, envelope);
             var retornoLimpo = Soap.ClearEnvelop(retornoXmlString, "retEnviNFe").OuterXml;
 
             FuncoesXml.SalvarArquivoXml($"{_cfgServico.DiretorioSalvarXml}", $"{DateTime.Now.Ticks}-ret-env-nfe.xml", retornoLimpo);

@@ -12,7 +12,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" />
-    <PackageReference Include="MongoDB.Driver" Version="2.9.2" />
     <PackageReference Include="ZionDanfe" Version="0.92.0" />
   </ItemGroup>
 

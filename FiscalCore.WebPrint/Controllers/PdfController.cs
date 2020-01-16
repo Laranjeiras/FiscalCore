@@ -1,7 +1,6 @@
 ﻿using FiscalCore.WebPrint.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,8 +41,6 @@ namespace FiscalCore.WebPrint.Controllers
                                 var bytesPdf = danfe.ObterPdfBytes(pdfStream);
                                 return File(bytesPdf, "Application/pdf", $"{modelo.ChaveAcesso}.pdf");
                             }
-
-                            
                             //result.Add(new FileUploadResult() { Name = file.FileName, Length = file.Length, Success = true, Bytes = bytesPdf.ToArray() });
                         }
                     }
@@ -58,21 +55,6 @@ namespace FiscalCore.WebPrint.Controllers
             {
                 return BadRequest();
             }
-        }
-
-        [HttpGet]
-        [Route("Teste")]
-        public void Teste() {
-
-            var client = new MongoClient(
-                "mongodb+srv://zideunerp3:$Aa78222912@zideunerp-hviht.azure.mongodb.net/test?retryWrites=true&w=majority"
-            );
-            var database = client.GetDatabase("test");
-            IMongoCollection<dynamic> colNews = database.GetCollection<dynamic>("news");
-            colNews.InsertOne(new { nome = "Alex", sobrenome = "Laranjeiras" });
-
-
-
         }
 
         public byte[] FileToByte(string filename) 
