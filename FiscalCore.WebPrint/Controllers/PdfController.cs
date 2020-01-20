@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
 using ZionDanfe;
@@ -57,19 +58,34 @@ namespace FiscalCore.WebPrint.Controllers
             }
         }
 
-        public byte[] FileToByte(string filename) 
+        /// <summary>
+        /// Endpint/Método para receber Xmls zipada e ler o conteúdo
+        /// Ideia: receber xmls autorizadas e salvar em banco de dados.
+        /// </summary>
+        /// <param name="files"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("~/api/Pdf/Unzip")]
+        public async Task<IActionResult> UnzipFileFromApi(IList<IFormFile> files)
         {
-            FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
-            var ImageData = StreamToByte(fs);
-            fs.Close();
-            return ImageData; //return the byte data
-        }
+            var listaStringNFeProc = new List<string>();
+            foreach (var file in files)
+            {
+                var archive = new ZipArchive(file.OpenReadStream());
+                foreach (ZipArchiveEntry entry in archive.Entries)
+                {
+                    var stm = entry.Open();
+                    using (var outputStream = new MemoryStream())
+                    {
+                        await stm.CopyToAsync(outputStream);
+                        var bytes = outputStream.ToArray();
+                        var xmlText = Encoding.UTF8.GetString(bytes);
+                        listaStringNFeProc.Add(xmlText);
+                    }
+                }
+            }
 
-        public byte[] StreamToByte(Stream stream)
-        {
-            byte[] ImageData = new byte[stream.Length];
-            stream.Read(ImageData, 0, System.Convert.ToInt32(stream.Length));
-            return ImageData;
+            return Ok(listaStringNFeProc);
         }
     }
 }
