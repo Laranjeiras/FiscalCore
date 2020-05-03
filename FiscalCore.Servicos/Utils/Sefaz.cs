@@ -1,5 +1,4 @@
 ﻿using FiscalCore.Main.Configuracoes;
-using FiscalCore.Main.Enums;
 using FiscalCore.Main.Utils;
 using System;
 using System.IO;
@@ -10,7 +9,7 @@ namespace FiscalCore.Servicos.Utils
 {
     internal class Sefaz
     {
-        public static string EnviarParaSefaz(ConfiguracaoServico cfgServico, SefazUrl sefazUrl, XmlDocument envelope)
+        public static string EnviarParaSefaz(IConfiguracaoServico cfgServico, SefazUrl sefazUrl, XmlDocument envelope)
         {
             HttpWebRequest webRequest = Soap.CreateWebRequest(sefazUrl.Url, sefazUrl.Action, "application/soap+xml;charset=utf-8");
 

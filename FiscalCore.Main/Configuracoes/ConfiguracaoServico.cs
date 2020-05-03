@@ -3,9 +3,16 @@ using FiscalCore.Main.Models.Emitente;
 
 namespace FiscalCore.Main.Configuracoes
 {
-    public class ConfiguracaoServico
+    public class ConfiguracaoServico : IConfiguracaoServico
     {
-        public ConfiguracaoServico(eTipoAmbiente tipoAmbiente, eUF uf, ConfiguracaoCertificado certificado, emit emitente, ConfiguracaoCsc csc)
+        public ConfiguracaoServico(
+            eTipoAmbiente tipoAmbiente,
+            eUF uf,
+            ConfiguracaoCertificado certificado,
+            emit emitente,
+            ConfiguracaoCsc csc,
+            IConfiguracaoDanfe configDanfe
+        )
         {
             this.Certificado = certificado;
             this.TipoAmbiente = tipoAmbiente;
@@ -18,30 +25,33 @@ namespace FiscalCore.Main.Configuracoes
             VersaoCancelamentoNFe = eVersaoServico.Versao100;
             VersaoInutilizacaoNFe = eVersaoServico.Versao400;
             VersaoAutorizacaoNFe = eVersaoServico.Versao400;
+            ConfigDanfe = configDanfe;
         }
 
         public ConfiguracaoCertificado Certificado { get; set; }
        
-        public eTipoAmbiente TipoAmbiente { get; private set; }
+        public eTipoAmbiente TipoAmbiente { get; set; }
 
         public eTipoEmissao TipoEmissao { get; set; }
 
-        public eUF UF { get; private set; }
+        public eUF UF { get; set; }
 
         public string DiretorioSalvarXml { get; set; }
-
         public string DiretorioSchemas { get; set; }
+        public string DiretorioSalvarDanfe { get; set; }
 
-        public emit Emitente { get; private set; }
+        public emit Emitente { get; set; }
 
-        public ConfiguracaoCsc Csc { get; private set; }
-        public eTipoImpressao NFeTpImp { get; protected set; }
-        public eTipoImpressao NFCeTpImp { get; protected set; }
+        public IConfiguracaoDanfe ConfigDanfe { get; set; }
+        public ConfiguracaoCsc Csc { get; set; }
         public int TimeOut { get; set; } = 5000;
         public string VersaoProc { get; set; }
 
         public eVersaoServico VersaoInutilizacaoNFe { get; set; }
         public eVersaoServico VersaoCancelamentoNFe { get; set; }
         public eVersaoServico VersaoAutorizacaoNFe { get; set; }
+        public string ImpressoraCupom { get; set; }
+        public int NFeSerie { get; set; }
+        public int NFCeSerie { get; set; }
     }
 }

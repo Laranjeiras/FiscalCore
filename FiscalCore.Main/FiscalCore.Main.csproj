@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <Version>0.0.1</Version>
     <Authors>FiscalCore</Authors>
     <PackageProjectUrl></PackageProjectUrl>
@@ -10,16 +10,42 @@
     <PackageTags>NFe NFCe</PackageTags>
     <RepositoryUrl>https://github.com/Laranjeiras/FiscalCore</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="QRCoder" Version="1.3.9" />
+    <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="4.7.0" />
     <PackageReference Include="Zion.Common" Version="1.1.464" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\ZideunErp\Zideun.Enums\Zideun.Enums.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DFeBR.EmissorNFe">
+      <HintPath>..\..\DFebr-net\DFeBR.NFe\bin\Debug\netstandard2.0\DFeBR.EmissorNFe.dll</HintPath>
+    </Reference>
     <Reference Include="System.Security.Cryptography.Xml">
       <HintPath>..\..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\system.security.cryptography.xml\4.5.0\ref\netstandard2.0\System.Security.Cryptography.Xml.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

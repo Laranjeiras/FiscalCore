@@ -11,10 +11,10 @@ namespace FiscalCore.Servicos.Servicos
 {
     public class ConsultaSituacaoNFeServico
     {
-        private readonly ConfiguracaoServico _cfgServico;
+        private readonly IConfiguracaoServico _cfgServico;
         private readonly string _versao;
 
-        public ConsultaSituacaoNFeServico(ConfiguracaoServico cfgServico, string versao)
+        public ConsultaSituacaoNFeServico(IConfiguracaoServico cfgServico, string versao)
         {
             _cfgServico = cfgServico;
             _versao = versao;

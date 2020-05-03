@@ -12,10 +12,10 @@ namespace FiscalCore.Servicos.Servicos
 {
     public class CancelarNFeServico
     {
-        ConfiguracaoServico _cfgServico;
+        private readonly IConfiguracaoServico _cfgServico;
         string _versao;
 
-        public CancelarNFeServico(ConfiguracaoServico cfgServico)
+        public CancelarNFeServico(IConfiguracaoServico cfgServico)
         {
             _cfgServico = cfgServico;
             _versao = "1.00";

@@ -13,10 +13,10 @@ namespace FiscalCore.Servicos.Servicos
 {
     public class CartaCorrecaoServico
     {
-        ConfiguracaoServico _cfgServico;
-        string _versao;
+        private readonly IConfiguracaoServico _cfgServico;
+        private readonly string _versao;
 
-        public CartaCorrecaoServico(ConfiguracaoServico cfgServico)
+        public CartaCorrecaoServico(IConfiguracaoServico cfgServico)
         {
             _cfgServico = cfgServico;
             _versao = "1.00";
