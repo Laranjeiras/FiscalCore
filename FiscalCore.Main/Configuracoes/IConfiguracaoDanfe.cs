@@ -10,5 +10,6 @@ namespace FiscalCore.Main.Configuracoes
         public string NFCeUrlConsultaQrCodeSefaz { get; set; }
         public bool SegundaViaContingencia { get; set; }
         public FontFamily CarregarFontePadraoNfceNativa(string font = null);
+        public string DiretorioSalvarDanfe { get; set; }
     }
 }
