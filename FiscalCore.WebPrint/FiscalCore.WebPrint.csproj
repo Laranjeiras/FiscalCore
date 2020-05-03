@@ -15,4 +15,29 @@
     <PackageReference Include="ZionDanfe" Version="0.92.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FiscalCore.Servicos\FiscalCore.Servicos.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DFeBR.EmissorNFe">
+      <HintPath>..\..\DFebr-net\DFeBR.NFe\bin\Debug\netstandard2.0\DFeBR.EmissorNFe.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>
