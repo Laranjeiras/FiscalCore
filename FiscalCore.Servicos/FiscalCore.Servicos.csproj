@@ -2,13 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <Authors>FiscalCore</Authors>
-    <Company>FiscalCore</Company>
+    <Company>ZideunCo</Company>
     <Copyright>@fiscalcore</Copyright>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>NFe NFCe</PackageTags>
     <RepositoryUrl>https://github.com/Laranjeiras/FiscalCore</RepositoryUrl>
+    <Description>Desenvolvido por Alexandre Laranjeiras</Description>
   </PropertyGroup>
 
   <ItemGroup>
