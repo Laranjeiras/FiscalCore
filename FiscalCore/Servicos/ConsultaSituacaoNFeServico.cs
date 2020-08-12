@@ -1,13 +1,13 @@
-﻿using FiscalCore.Main.Configuracoes;
-using FiscalCore.Main.Enums;
-using FiscalCore.Main.Extensions;
-using FiscalCore.Main.Models.Consulta;
-using FiscalCore.Main.Models.Retornos;
-using FiscalCore.Main.Utils;
+﻿using FiscalCore.Configuracoes;
+using FiscalCore.Enums;
+using FiscalCore.Extensions;
+using FiscalCore.Modelos.Consulta;
+using FiscalCore.Modelos.Retornos;
+using FiscalCore.Utils;
 using FiscalCore.Servicos.Utils;
 using System;
 
-namespace FiscalCore.Servicos.Servicos
+namespace FiscalCore.Servicos
 {
     public class ConsultaSituacaoNFeServico
     {

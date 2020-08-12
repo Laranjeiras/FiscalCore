@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>0.0.2</Version>
+    <Version>0.0.3</Version>
     <Authors>FiscalCore</Authors>
     <Company>ZideunCo</Company>
     <Copyright>@fiscalcore</Copyright>
@@ -13,11 +13,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
+    <PackageReference Include="Zideun.DFeBR.EmissorNFe" Version="0.0.1" />
     <PackageReference Include="Zion.Common" Version="2.0.2.4" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FiscalCore.Main\FiscalCore.Main.csproj" />
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Validacoes\Sefaz\" />
   </ItemGroup>
 
 </Project>

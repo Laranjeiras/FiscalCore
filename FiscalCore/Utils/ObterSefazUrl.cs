@@ -1,4 +1,4 @@
-﻿using FiscalCore.Main.Enums;
+﻿using FiscalCore.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

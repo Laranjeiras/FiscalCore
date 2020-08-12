@@ -1,14 +1,14 @@
-﻿using FiscalCore.Main.Configuracoes;
-using FiscalCore.Main.Enums;
-using FiscalCore.Main.Extensions;
-using FiscalCore.Main.Models.Eventos;
-using FiscalCore.Main.Models.Retornos;
-using FiscalCore.Main.Utils;
+﻿using FiscalCore.Configuracoes;
+using FiscalCore.Enums;
+using FiscalCore.Extensions;
+using FiscalCore.Modelos.Eventos;
+using FiscalCore.Modelos.Retornos;
+using FiscalCore.Utils;
 using FiscalCore.Servicos.Utils;
 using System;
 using System.Collections.Generic;
 
-namespace FiscalCore.Servicos.Servicos
+namespace FiscalCore.Servicos
 {
     public class CancelarNFeServico
     {

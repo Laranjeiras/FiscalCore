@@ -1,4 +1,4 @@
-﻿using FiscalCore.Main.Enums;
+﻿using FiscalCore.Enums;
 
 namespace FiscalCore.Servicos.Utils
 {

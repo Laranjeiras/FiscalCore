@@ -16,10 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FiscalCore.Servicos\FiscalCore.Servicos.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="DFeBR.EmissorNFe">
       <HintPath>..\..\DFebr-net\DFeBR.NFe\bin\Debug\netstandard2.0\DFeBR.EmissorNFe.dll</HintPath>
     </Reference>

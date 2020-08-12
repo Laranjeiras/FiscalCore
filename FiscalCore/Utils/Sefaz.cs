@@ -1,5 +1,5 @@
-﻿using FiscalCore.Main.Configuracoes;
-using FiscalCore.Main.Utils;
+﻿using FiscalCore.Configuracoes;
+using FiscalCore.Utils;
 using System;
 using System.IO;
 using System.Net;

@@ -1,12 +1,12 @@
-﻿using FiscalCore.Main.Configuracoes;
-using FiscalCore.Main.Enums;
-using FiscalCore.Main.Models.Retornos;
-using FiscalCore.Main.Utils;
+﻿using FiscalCore.Configuracoes;
+using FiscalCore.Enums;
+using FiscalCore.Modelos.Retornos;
+using FiscalCore.Utils;
 using FiscalCore.Servicos.Utils;
 using System;
 using Zion.Common2.Helpers;
 
-namespace FiscalCore.Servicos.Servicos
+namespace FiscalCore.Servicos
 {
     public class AutorizarNFe4Servico
     {
