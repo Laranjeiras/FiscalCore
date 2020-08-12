@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Zion.Common" Version="1.1.464" />
+    <PackageReference Include="Zion.Common" Version="2.0.2.4" />
   </ItemGroup>
 
   <ItemGroup>
