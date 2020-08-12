@@ -16,4 +16,8 @@
     <PackageReference Include="Zion.Common" Version="2.0.2.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FiscalCore.Main\FiscalCore.Main.csproj" />
+  </ItemGroup>
+
 </Project>

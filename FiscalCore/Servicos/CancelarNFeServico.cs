@@ -39,10 +39,10 @@ namespace FiscalCore.Servicos.Servicos
                 var chave = item.ChaveAcesso;
                 var just = item.Justificativa;
 
-                Zion.Common.Assertions.ZionAssertion.StringIsNullOrEmptyOrWhiteSpace(protocolo, "Protocolo de autorização não informado");
-                Zion.Common.Assertions.ZionAssertion.StringHasLen(protocolo, 15, 15, "Protocolo de autorização inválido");
-                Zion.Common.Assertions.ZionAssertion.StringIsNullOrEmptyOrWhiteSpace(chave, "Chave da NFe não informada");
-                Zion.Common.Assertions.ZionAssertion.StringHasLen(just, 15, 255, "Justificativa de conter entre 15 e 255 caracteres");
+                Zion.Common2.Assertions.ZionAssertion.StringIsNullOrEmptyOrWhiteSpace(protocolo, "Protocolo de autorização não informado");
+                Zion.Common2.Assertions.ZionAssertion.StringHasLen(protocolo, 15, 15, "Protocolo de autorização inválido");
+                Zion.Common2.Assertions.ZionAssertion.StringIsNullOrEmptyOrWhiteSpace(chave, "Chave da NFe não informada");
+                Zion.Common2.Assertions.ZionAssertion.StringHasLen(just, 15, 255, "Justificativa de conter entre 15 e 255 caracteres");
 
                 var detEvento = new detEvento
                 {

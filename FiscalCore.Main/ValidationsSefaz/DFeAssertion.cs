@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Zion.Common.Assertions;
+using Zion.Common2.Assertions;
 
 namespace FiscalCore.Main.ValidationsSefaz
 {

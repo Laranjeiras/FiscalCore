@@ -1,9 +1,8 @@
 ﻿using FiscalCore.Main.Enums;
-using FiscalCore.Main.Extensions;
 using FiscalCore.Main.Models.Endereco;
 using System.Collections.Generic;
-using Zion.Common.Assertions;
-using Zion.Common.Flunt.Notifications;
+using Zion.Common2.Assertions;
+using Zion.Common2.NotificationPattern;
 
 namespace FiscalCore.Main.ValidationsSefaz
 {
@@ -111,7 +110,7 @@ namespace FiscalCore.Main.ValidationsSefaz
 
         public static bool cMun_IsValid(long value)
         {
-            if (!Zion.Common.Helpers.NumericHelper.IsBetweenOrEqual(value, 1000000, 9999999))
+            if(value < 1000000 || value > 9999999)
                 return false;
             return true;
         }

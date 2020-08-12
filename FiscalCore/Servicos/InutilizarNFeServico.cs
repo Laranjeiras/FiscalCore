@@ -6,7 +6,7 @@ using FiscalCore.Main.Models.Retornos;
 using FiscalCore.Main.Utils;
 using FiscalCore.Servicos.Utils;
 using System;
-using Zion.Common.Helpers;
+using Zion.Common2.Helpers;
 
 namespace FiscalCore.Servicos.Servicos
 {
@@ -42,8 +42,8 @@ namespace FiscalCore.Servicos.Servicos
 
         private inutNFe FabricarInutNFe(eTipoAmbiente tpAmb, eUF uf, int ano, string cnpj, eModeloDocumento modelo, int serie, int numeroInicial, int numeroFinal, string justificativa)
         {
-            Zion.Common.Assertions.ZionAssertion.StringHasMinLen(justificativa, 15, "Justificativa deve conter entre 15 e 255 caracteres");
-            Zion.Common.Assertions.ZionAssertion.StringHasMaxLen(justificativa, 255, "Justificativa deve conter entre 15 e 255 caracteres");
+            Zion.Common2.Assertions.ZionAssertion.StringHasMinLen(justificativa, 15, "Justificativa deve conter entre 15 e 255 caracteres");
+            Zion.Common2.Assertions.ZionAssertion.StringHasMaxLen(justificativa, 255, "Justificativa deve conter entre 15 e 255 caracteres");
 
             string versaoServico = EnumHelper.GetDescription(_cfgServico.VersaoInutilizacaoNFe);
 

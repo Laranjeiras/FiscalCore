@@ -13,7 +13,7 @@ using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Zion.Common.Extensions;
+using Zion.Common2.Extensions;
 
 namespace FiscalCore.Main.Danfe.NFCe
 {

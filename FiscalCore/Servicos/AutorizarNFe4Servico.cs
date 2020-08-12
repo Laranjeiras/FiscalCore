@@ -4,7 +4,7 @@ using FiscalCore.Main.Models.Retornos;
 using FiscalCore.Main.Utils;
 using FiscalCore.Servicos.Utils;
 using System;
-using Zion.Common.Helpers;
+using Zion.Common2.Helpers;
 
 namespace FiscalCore.Servicos.Servicos
 {
