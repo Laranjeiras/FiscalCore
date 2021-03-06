@@ -10,7 +10,7 @@ namespace FiscalCore.Configuracoes
 {
     public class ConfiguracaoDanfe : IConfiguracaoDanfe
     {
-        public eVersaoQrCode VersaoQrCode { get; set; } = eVersaoQrCode.QrCodeVersao2;
+        public VersaoQrCode VersaoQrCode { get; set; } = VersaoQrCode.QrCodeVersao2;
         public string FontPadraoNfceNativa { get; set; }
         public string NFCeUrlConsultaSefaz { get; set; }
         public bool SegundaViaContingencia { get; set; }

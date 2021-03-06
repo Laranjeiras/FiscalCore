@@ -6,6 +6,7 @@ namespace FiscalCore.Modelos.Emitente
     {
         public string CNPJ { get; set; }
         public string CPF { get; set; }
+        public string CpfCnpj => CNPJ ?? CPF;
         public string xNome { get; set; }
         public string xFant { get; set; }
         public enderEmit enderEmit { get; set; }

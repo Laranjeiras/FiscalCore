@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>0.0.3</Version>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Version>0.0.4</Version>
     <Authors>FiscalCore</Authors>
     <Company>ZideunCo</Company>
     <Copyright>@fiscalcore</Copyright>
@@ -14,8 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
-    <PackageReference Include="Zideun.DFeBR.EmissorNFe" Version="0.0.1" />
-    <PackageReference Include="Zion.Common" Version="2.0.2.4" />
+    <PackageReference Include="Zideun.DFeBR.EmissorNFe" Version="0.0.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +34,12 @@
 
   <ItemGroup>
     <Folder Include="Validacoes\Sefaz\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Zion.Common">
+      <HintPath>..\..\Zion.Common\Zion.Common\bin\Debug\netcoreapp3.1\Zion.Common.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

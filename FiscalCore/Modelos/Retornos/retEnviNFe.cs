@@ -19,7 +19,7 @@ namespace FiscalCore.Modelos.Retornos
 
         public string xMotivo { get; set; }
 
-        public eUF cUF { get; set; }
+        public eUF? cUF { get; set; }
 
         public DateTime dhRecbto { get; set; }
 

@@ -3,13 +3,7 @@ using System.Xml.Serialization;
 
 namespace FiscalCore.Tipos
 {
-    /// <summary>
-    ///     Indicador da IE do Destinatário
-    ///     <para>1 – Contribuinte ICMS;</para>
-    ///     <para>2 – Contribuinte isento de inscrição;</para>
-    ///     <para>9 – Não Contribuinte</para>
-    /// </summary>
-    public enum eIndIEDest
+    public enum IndIEDest
     {
         [Description("Contribuinte ICMS")]
         [XmlEnum("1")]

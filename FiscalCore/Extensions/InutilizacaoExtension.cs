@@ -19,7 +19,7 @@ namespace FiscalCore.Extensions
             if (inutNFeLocal.infInut.Id == null)
                 throw new Exception("Não é possível assinar um onjeto inutNFe sem sua respectiva Id!");
 
-            var assinatura = Assinador.ObterAssinatura(inutNFeLocal, inutNFeLocal.infInut.Id, certificadoDigital, false);
+            var assinatura = Assinador.ObterAssinatura(inutNFeLocal, inutNFeLocal.infInut.Id, certificadoDigital);
             inutNFeLocal.Signature = assinatura;
             return inutNFeLocal;
         }

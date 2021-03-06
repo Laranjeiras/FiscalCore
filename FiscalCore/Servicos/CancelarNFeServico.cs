@@ -39,10 +39,10 @@ namespace FiscalCore.Servicos
                 var chave = item.ChaveAcesso;
                 var just = item.Justificativa;
 
-                Zion.Common2.Assertions.ZionAssertion.StringIsNullOrEmptyOrWhiteSpace(protocolo, "Protocolo de autorização não informado");
-                Zion.Common2.Assertions.ZionAssertion.StringHasLen(protocolo, 15, 15, "Protocolo de autorização inválido");
-                Zion.Common2.Assertions.ZionAssertion.StringIsNullOrEmptyOrWhiteSpace(chave, "Chave da NFe não informada");
-                Zion.Common2.Assertions.ZionAssertion.StringHasLen(just, 15, 255, "Justificativa de conter entre 15 e 255 caracteres");
+                Zion.Common.Assertions.ZionAssertion.StringIsNullOrEmptyOrWhiteSpace(protocolo, "Protocolo de autorização não informado");
+                Zion.Common.Assertions.ZionAssertion.StringHasLen(protocolo, 15, 15, "Protocolo de autorização inválido");
+                Zion.Common.Assertions.ZionAssertion.StringIsNullOrEmptyOrWhiteSpace(chave, "Chave da NFe não informada");
+                Zion.Common.Assertions.ZionAssertion.StringHasLen(just, 15, 255, "Justificativa de conter entre 15 e 255 caracteres");
 
                 var detEvento = new detEvento
                 {
@@ -90,15 +90,15 @@ namespace FiscalCore.Servicos
                 eventoTmp.infEvento.Id = "ID" + ((int)eventoTmp.infEvento.tpEvento) + eventoTmp.infEvento.chNFe +
                                       eventoTmp.infEvento.nSeqEvento.ToString().PadLeft(2, '0');
 
-                var _certificado = Certificado.GetCertificado(_cfgServico.Certificado.Serial);
-                eventoTmp.Assina(_certificado, _cfgServico.Certificado.SignatureMethodSignedXml, _cfgServico.Certificado.DigestMethodReference);
+                var _certificado = ObterCertificado.ObterCertificado(_cfgServico.ConfigCertificado.Serial);
+                eventoTmp.Assina(_certificado, _cfgServico.ConfigCertificado.SignatureMethodSignedXml, _cfgServico.ConfigCertificado.DigestMethodReference);
             }
 
             var xmlEvento = pedEvento.ObterXmlString();
 
             FuncoesXml.SalvarArquivoXml(_cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ped-eve.xml", xmlEvento);
 
-            var sefazUrl = ObterSefazUrl.ObterUrl(fcServico.CancelarNFe, _cfgServico.TipoAmbiente, modeloDoc, _cfgServico.UF);
+            var sefazUrl = ObterSefazUrl.ObterUrl(TipoServico.CancelarNFe, _cfgServico.TipoAmbiente, modeloDoc, _cfgServico.UF);
             var envelope = SoapEnvelopes.FabricarEnvelopeEventoNFe(xmlEvento);
 
             var retornoXmlString = Sefaz.EnviarParaSefaz(_cfgServico, sefazUrl, envelope);

@@ -6,7 +6,7 @@ using FiscalCore.Modelos.Retornos;
 using FiscalCore.Utils;
 using FiscalCore.Servicos.Utils;
 using System;
-using Zion.Common2.Helpers;
+using Zion.Common.Extensions;
 
 namespace FiscalCore.Servicos
 {
@@ -31,7 +31,7 @@ namespace FiscalCore.Servicos
             FuncoesXml.SalvarArquivoXml(_cfgServico.DiretorioSalvarXml, $"{DateTime.Now.Ticks} - {pedInutilizacao.infInut.Id} -ped-inut.xml", xmlInutilizacao);
 
             var envelope = SoapEnvelopes.FabricarEnvelopeInutilizacaoNFe(xmlInutilizacao);
-            var sefazUrl = ObterSefazUrl.ObterUrl(fcServico.InutilizacaoNFe, _cfgServico.TipoAmbiente, modeloDocumento, _cfgServico.UF);
+            var sefazUrl = ObterSefazUrl.ObterUrl(TipoServico.InutilizacaoNFe, _cfgServico.TipoAmbiente, modeloDocumento, _cfgServico.UF);
             var retornoXmlString = Sefaz.EnviarParaSefaz(_cfgServico, sefazUrl, envelope);
             var retornoLimpo = Soap.ClearEnvelop(retornoXmlString, "retInutNFe").OuterXml;
 
@@ -42,10 +42,10 @@ namespace FiscalCore.Servicos
 
         private inutNFe FabricarInutNFe(eTipoAmbiente tpAmb, eUF uf, int ano, string cnpj, eModeloDocumento modelo, int serie, int numeroInicial, int numeroFinal, string justificativa)
         {
-            Zion.Common2.Assertions.ZionAssertion.StringHasMinLen(justificativa, 15, "Justificativa deve conter entre 15 e 255 caracteres");
-            Zion.Common2.Assertions.ZionAssertion.StringHasMaxLen(justificativa, 255, "Justificativa deve conter entre 15 e 255 caracteres");
+            Zion.Common.Assertions.ZionAssertion.StringHasMinLen(justificativa, 15, "Justificativa deve conter entre 15 e 255 caracteres");
+            Zion.Common.Assertions.ZionAssertion.StringHasMaxLen(justificativa, 255, "Justificativa deve conter entre 15 e 255 caracteres");
 
-            string versaoServico = EnumHelper.GetDescription(_cfgServico.VersaoInutilizacaoNFe);
+            string versaoServico = _cfgServico.VersaoInutilizacaoNFe.GetDescription();
 
             var pedInutilizacao = new inutNFe
             {
@@ -74,7 +74,7 @@ namespace FiscalCore.Servicos
             );
             pedInutilizacao.infInut.Id = "ID" + numId;
 
-            pedInutilizacao.Assina(Certificado.GetCertificado(_cfgServico.Certificado.Serial));
+            pedInutilizacao.Assina(ObterCertificado.ObterCertificado(_cfgServico.ConfigCertificado.Serial));
 
             return pedInutilizacao;
         }

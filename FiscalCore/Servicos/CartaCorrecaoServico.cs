@@ -71,8 +71,8 @@ namespace FiscalCore.Servicos
                 eventoTmp.infEvento.Id = "ID" + ((int)eventoTmp.infEvento.tpEvento) + eventoTmp.infEvento.chNFe +
                                       eventoTmp.infEvento.nSeqEvento.ToString().PadLeft(2, '0');
 
-                var _certificado = Certificado.GetCertificado(_cfgServico.Certificado.Serial);
-                eventoTmp.Assina(_certificado, _cfgServico.Certificado.SignatureMethodSignedXml, _cfgServico.Certificado.DigestMethodReference);
+                var _certificado = ObterCertificado.ObterCertificado(_cfgServico.ConfigCertificado.Serial);
+                eventoTmp.Assina(_certificado, _cfgServico.ConfigCertificado.SignatureMethodSignedXml, _cfgServico.ConfigCertificado.DigestMethodReference);
             }
 
             var pedEvento = new envEvento
@@ -86,7 +86,7 @@ namespace FiscalCore.Servicos
 
             FuncoesXml.SalvarArquivoXml(_cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ped-eve.xml", xmlEvento);
 
-            var sefazUrl = ObterSefazUrl.ObterUrl(fcServico.CartaCorrecao, _cfgServico.TipoAmbiente, eModeloDocumento.NFe, _cfgServico.UF);
+            var sefazUrl = ObterSefazUrl.ObterUrl(TipoServico.CartaCorrecao, _cfgServico.TipoAmbiente, eModeloDocumento.NFe, _cfgServico.UF);
             var envelope = SoapEnvelopes.FabricarEnvelopeEventoNFe(xmlEvento);
 
             var retornoXmlString = Sefaz.EnviarParaSefaz(_cfgServico, sefazUrl, envelope);

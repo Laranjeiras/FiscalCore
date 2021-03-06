@@ -2,7 +2,7 @@
 
 namespace FiscalCore.Enums
 {
-    public enum eVersaoQrCode
+    public enum VersaoQrCode
     {
         [Description("Versão 1.0 do QR-Code")]
         QrCodeVersao1 = 100,

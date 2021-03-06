@@ -56,7 +56,7 @@ namespace FiscalCore.Extensions
             if (eventoLocal.infEvento.Id == null)
                 throw new Exception("Não é possível assinar um objeto evento sem sua respectiva Id!");
 
-            var assinatura = Assinador.ObterAssinatura(eventoLocal, eventoLocal.infEvento.Id, certificadoDigital, false, signatureMethodSignedXml, digestMethodReference);
+            var assinatura = Assinador.ObterAssinatura(eventoLocal, eventoLocal.infEvento.Id, certificadoDigital, signatureMethodSignedXml, digestMethodReference);
             eventoLocal.Signature = assinatura;
             return eventoLocal;
         }

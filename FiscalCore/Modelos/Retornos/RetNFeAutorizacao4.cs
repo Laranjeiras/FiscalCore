@@ -2,7 +2,7 @@
 
 namespace FiscalCore.Modelos.Retornos
 {
-    public class RetNFeAutorizacao4 : BaseRetorno
+    public class RetNFeAutorizacao4 : BaseRetorno, IRetornoAutorizacao
     {
         public RetNFeAutorizacao4(string xmlRetorno) : base(xmlRetorno)
         {

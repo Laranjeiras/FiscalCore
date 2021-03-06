@@ -1,8 +1,8 @@
 ﻿using FiscalCore.Enums;
 using FiscalCore.Modelos.Endereco;
 using System.Collections.Generic;
-using Zion.Common2.Assertions;
-using Zion.Common2.NotificationPattern;
+using Zion.Common.Assertions;
+using Zion.Common.NotificationPattern;
 
 namespace FiscalCore.Validacoes.Sefaz
 {

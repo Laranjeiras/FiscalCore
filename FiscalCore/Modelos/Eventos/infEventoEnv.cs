@@ -2,7 +2,6 @@
 using FiscalCore.Extensions;
 using System;
 using System.Xml.Serialization;
-using Zion.Common2.Helpers;
 
 namespace FiscalCore.Modelos.Eventos
 {
@@ -20,8 +19,8 @@ namespace FiscalCore.Modelos.Eventos
         {
             get { return _cnpj; }
             set {
-                if (Zion.Common2.ValueObjects.CpfCnpj.IsValid(value))
-                    _cnpj = ZionHelper.OnlyNumbers(value);
+                if (Zion.Common.ValueObjects.CpfCnpj.IsValid(value))
+                    _cnpj = Zion.Common.Helpers.ZionHelper.OnlyNumbers(value);
                 else
                     _cnpj = null;
             }
@@ -33,8 +32,8 @@ namespace FiscalCore.Modelos.Eventos
             get { return _cpf; }
             set
             {
-                if (Zion.Common2.ValueObjects.CpfCnpj.IsValid(value))
-                    _cpf = ZionHelper.OnlyNumbers(value);
+                if (Zion.Common.ValueObjects.CpfCnpj.IsValid(value))
+                    _cpf = Zion.Common.Helpers.ZionHelper.OnlyNumbers(value);
                 else
                     _cpf = null;
             }

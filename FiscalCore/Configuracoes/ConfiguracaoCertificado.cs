@@ -4,25 +4,24 @@ namespace FiscalCore.Configuracoes
 {
     public class ConfiguracaoCertificado
     {
-        public ConfiguracaoCertificado()
-        {
-
-        }
-
-        public ConfiguracaoCertificado(eTipoCertificado tipoCertificado, string serial)
+        public ConfiguracaoCertificado(TipoCertificado tipoCertificado, string serial)
         {
             TipoCertificado = tipoCertificado;
-            Serial = serial; 
+            Serial = serial;
         }
 
-        public eTipoCertificado TipoCertificado { get; set; }
-        public string Serial { get; set; }
-        public byte[] ArrayBytesArquivo { get; set; }
-        public string Arquivo { get; set; }
-        public string Senha { get; set; }
-        public string CacheId { get; set; }
-        public bool ManterDadosEmCache { get; set; }
-        public string SignatureMethodSignedXml { get; set; } = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
-        public string DigestMethodReference { get; set; } = "http://www.w3.org/2000/09/xmldsig#sha1";
+        public ConfiguracaoCertificado(string arquivoCertificado, string senha = null)
+        {
+            TipoCertificado = TipoCertificado.A1Arquivo;
+            ArquivoCertificado = arquivoCertificado;
+            Senha = senha;
+        }
+
+        public TipoCertificado TipoCertificado { get; protected set; }
+        public string ArquivoCertificado { get; protected set; }
+        public string Serial { get; protected set; }
+        public string Senha { get; protected set; }
+        public string SignatureMethodSignedXml { get; protected set; } = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
+        public string DigestMethodReference { get; protected set; } = "http://www.w3.org/2000/09/xmldsig#sha1";
     }
 }

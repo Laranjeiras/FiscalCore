@@ -8,13 +8,13 @@ using Signature = FiscalCore.Modelos.Signatures.Signature;
 
 namespace FiscalCore.Utils
 {
-    public class Assinador
+    public static class Assinador
     {
         public static Signature ObterAssinatura<T>(T objeto, string id, X509Certificate2 certificadoDigital,
-            bool manterDadosEmCache = false, string signatureMethod = "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
-            string digestMethod = "http://www.w3.org/2000/09/xmldsig#sha1", bool cfgServicoRemoverAcentos = false) where T : class
+            string signatureMethod = "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
+            string digestMethod = "http://www.w3.org/2000/09/xmldsig#sha1") where T : class
         {
-            var objetoLocal = objeto;
+
             if (id == null)
                 throw new Exception("Não é possível assinar um objeto evento sem sua respectiva Id!");
 
@@ -22,7 +22,7 @@ namespace FiscalCore.Utils
             {
                 var documento = new XmlDocument { PreserveWhitespace = true };
 
-                documento.LoadXml(FuncoesXml.ClasseParaXmlString(objetoLocal));
+                documento.LoadXml(FuncoesXml.ClasseParaXmlString(objeto));
 
                 var docXml = new SignedXml(documento) { SigningKey = certificadoDigital.PrivateKey };
 

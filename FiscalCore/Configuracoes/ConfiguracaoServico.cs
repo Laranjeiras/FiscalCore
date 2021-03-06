@@ -1,5 +1,6 @@
 ﻿using FiscalCore.Enums;
 using FiscalCore.Modelos.Emitente;
+using System.IO;
 
 namespace FiscalCore.Configuracoes
 {
@@ -8,13 +9,13 @@ namespace FiscalCore.Configuracoes
         public ConfiguracaoServico(
             eTipoAmbiente tipoAmbiente,
             eUF uf,
-            ConfiguracaoCertificado certificado,
+            ConfiguracaoCertificado configCertificado,
             emit emitente,
             ConfiguracaoCsc csc,
             IConfiguracaoDanfe configDanfe
         )
         {
-            this.Certificado = certificado;
+            this.ConfigCertificado = configCertificado;
             this.TipoAmbiente = tipoAmbiente;
             this.UF = uf;
             this.Emitente = emitente;
@@ -28,17 +29,34 @@ namespace FiscalCore.Configuracoes
             ConfigDanfe = configDanfe;
         }
 
-        public ConfiguracaoCertificado Certificado { get; set; }
+        public ConfiguracaoCertificado ConfigCertificado { get; set; }
        
         public eTipoAmbiente TipoAmbiente { get; set; }
 
         public eTipoEmissao TipoEmissao { get; set; }
 
-        public eUF UF { get; set; }
+        public eUF UF { get; set; } = eUF.RJ;
 
-        public string DiretorioSalvarXml { get; set; }
-        public string DiretorioSchemas { get; set; }
-        public string DiretorioSalvarDanfe { get; set; }
+        private string _diretorioSalvarXml;
+        public string DiretorioSalvarXml
+        {
+            get { return _diretorioSalvarXml ?? Directory.GetCurrentDirectory(); }
+            set { _diretorioSalvarXml = value; }
+        }
+
+        private string _diretorioSchemas;
+        public string DiretorioSchemas
+        {
+            get { return _diretorioSchemas ?? Directory.GetCurrentDirectory(); }
+            set { _diretorioSchemas = value; }
+        }
+
+        public string _diretorioSalvarDanfe;
+        public string DiretorioSalvarDanfe
+        {
+            get { return _diretorioSalvarXml ?? Directory.GetCurrentDirectory(); }
+            set { _diretorioSalvarXml = value; }
+        }
 
         public emit Emitente { get; set; }
 

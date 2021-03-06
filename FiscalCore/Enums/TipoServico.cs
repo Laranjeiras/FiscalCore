@@ -1,6 +1,6 @@
 ﻿namespace FiscalCore.Enums
 {
-    public enum fcServico
+    public enum TipoServico
     {
         AutorizarNFe = 1,
         CancelarNFe = 2,

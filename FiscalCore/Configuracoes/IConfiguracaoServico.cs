@@ -9,7 +9,7 @@ namespace FiscalCore.Configuracoes
         public int NFCeSerie { get; set; }
         public eTipoAmbiente TipoAmbiente { get; set; }
         public emit Emitente { get; set; }
-        public ConfiguracaoCertificado Certificado { get; set; }
+        public ConfiguracaoCertificado ConfigCertificado { get; set; }
         public IConfiguracaoDanfe ConfigDanfe { get; set; }
         public string DiretorioSalvarXml { get; set; }
         public string DiretorioSalvarDanfe { get; set; }

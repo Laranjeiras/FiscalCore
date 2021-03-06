@@ -34,7 +34,7 @@ namespace FiscalCore.Servicos
 
             var modeloDoc = Conversor.ModeloDocumento(chaveAcesso.Substring(20, 2));
 
-            var sefazUrl = ObterSefazUrl.ObterUrl(fcServico.ConsultaSituacaoNFe, _cfgServico.TipoAmbiente, modeloDoc, _cfgServico.UF);
+            var sefazUrl = ObterSefazUrl.ObterUrl(TipoServico.ConsultaSituacaoNFe, _cfgServico.TipoAmbiente, modeloDoc, _cfgServico.UF);
             var envelope = SoapEnvelopes.FabricarEnvelopeConsultarSituacaoNFe(xmlEvento);
 
             var retornoXmlString = Sefaz.EnviarParaSefaz(_cfgServico, sefazUrl, envelope);
