@@ -6,10 +6,6 @@ namespace FiscalCore.Utils
 {
     public static class Fonte
     {
-        /// <summary>
-        /// Obtém um objeto <see cref="FontFamily"/> a partir de um array de bytes. Útil para carregar uma fonte a partir de um arquivo de recurso
-        /// </summary>
-        /// <returns></returns>
         public static FontFamily CarregarDeByteArray(byte[] fonte, out PrivateFontCollection colecaoDeFonte)
         {
             var handle = GCHandle.Alloc(fonte, GCHandleType.Pinned);

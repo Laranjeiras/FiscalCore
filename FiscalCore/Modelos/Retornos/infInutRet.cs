@@ -1,4 +1,4 @@
-﻿using FiscalCore.Enums;
+﻿using FiscalCore.Tipos;
 using System;
 using System.Xml.Serialization;
 

@@ -2,11 +2,11 @@
 using System.Net;
 using System.Xml;
 
-namespace FiscalCore.Servicos.Utils
+namespace FiscalCore.Utils
 {
     public class Soap
     {
-        public static void InsertSoapEnvelopeIntoWebRequest(XmlDocument soapEnvelopeXml, HttpWebRequest webRequest)
+        public static void InserirSoapEnvelopeWebRequest(XmlDocument soapEnvelopeXml, HttpWebRequest webRequest)
         {
             using (Stream stream = webRequest.GetRequestStream())
             {
@@ -15,23 +15,7 @@ namespace FiscalCore.Servicos.Utils
             }
         }
 
-        public static XmlDocument CreateSoapEnvelope(string request)
-        {
-            XmlDocument soapEnvelopeDocument = new XmlDocument();
-            soapEnvelopeDocument.LoadXml(request);
-            return soapEnvelopeDocument;
-        }
-
-        public static HttpWebRequest CreateWebRequest(string url, string action, string contentType)
-        {
-            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(url);
-            webRequest.Headers.Add(@"SOAP:Action");
-            webRequest.ContentType = contentType;
-            webRequest.Method = "POST";
-            return webRequest;
-        }
-
-        private static string GetTagConverter(string ret, string tag)
+        private static string ObterTag(string ret, string tag)
         {
             XmlDocument doc = new XmlDocument();
             doc.Load(new StringReader(ret));
@@ -40,9 +24,9 @@ namespace FiscalCore.Servicos.Utils
             return xmlConverter;
         }
 
-        public static XmlElement ClearEnvelop(string soapResult, string tag)
+        public static XmlElement LimparEnvelope(string soapResult, string tag)
         {
-            var xmlTag = Soap.GetTagConverter(soapResult, tag);
+            var xmlTag = Soap.ObterTag(soapResult, tag);
 
             var documento = new XmlDocument();
             documento.LoadXml(xmlTag);

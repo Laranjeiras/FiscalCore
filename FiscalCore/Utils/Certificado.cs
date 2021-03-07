@@ -1,5 +1,5 @@
 ﻿using FiscalCore.Configuracoes;
-using FiscalCore.Enums;
+using FiscalCore.Tipos;
 using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
@@ -14,16 +14,13 @@ namespace FiscalCore.Utils
 
         public static X509Certificate2 Obter(ConfiguracaoCertificado configCertificado)
         {
-            if (string.IsNullOrEmpty(configCertificado.Serial))
-                throw new Exception("Serial do certificado não informado");
-
             switch (configCertificado.TipoCertificado)
             {
-                case TipoCertificado.A1Repositorio:
+                case eTipoCertificado.A1Repositorio:
                     return ObterDoRepositorio(configCertificado.Serial);
-                case TipoCertificado.A1Arquivo:
+                case eTipoCertificado.A1Arquivo:
                     return ObterDeArquivo(configCertificado.ArquivoCertificado, configCertificado.Senha);
-                case TipoCertificado.A3:
+                case eTipoCertificado.A3:
                     return ObterDoRepositorio(configCertificado.Serial);
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -32,6 +29,9 @@ namespace FiscalCore.Utils
 
         private static X509Certificate2 ObterDoRepositorio(string serial)
         {
+            if (string.IsNullOrEmpty(serial))
+                throw new Exception("Serial do certificado não informado");
+
             X509Store store = new X509Store(StoreLocation.CurrentUser);
             try
             {

@@ -1,14 +1,13 @@
-﻿using FiscalCore.Enums;
-using FiscalCore.Modelos.Endereco;
+﻿using FiscalCore.Modelos.NotaFiscal.Endereco;
+using FiscalCore.Tipos;
+using FiscalCore.Utils;
 using System.Collections.Generic;
-using Zion.Common.Assertions;
-using Zion.Common.NotificationPattern;
 
 namespace FiscalCore.Validacoes.Sefaz
 {
     public class DFeAddressValidation
     {
-        public IList<Notification> Notifications = new List<Notification>();
+        public Contrato Contrato { get; private set; } = new Contrato();
 
         BaseEndereco _address;
 
@@ -25,23 +24,21 @@ namespace FiscalCore.Validacoes.Sefaz
         public bool IsValid()
         {
             if (!AddressValidation.xLgr_IsValid(_address.xLgr))
-                Notifications.Add(new Notification("xLgr", "Logradouro inválido"));
+                Contrato.Add(new Notificacao("xLgr", "Logradouro inválido"));
             if (!AddressValidation.nro_IsValid(_address.nro))
-                Notifications.Add(new Notification("nro", "Número do endereço inválido"));
+                Contrato.Add(new Notificacao("nro", "Número do endereço inválido"));
             if (!AddressValidation.xBairro_IsValid(_address.xBairro))
-                Notifications.Add(new Notification("xBairro", "Bairro inválido"));
+                Contrato.Add(new Notificacao("xBairro", "Bairro inválido"));
             if (!AddressValidation.cMun_IsValid(_address.cMun))
-                Notifications.Add(new Notification("cMun", "Município inválido"));
+                Contrato.Add(new Notificacao("cMun", "Município inválido"));
             if (!AddressValidation.xMun_IsValid(_address.xMun))
-                Notifications.Add(new Notification("xMun", "Município inválido"));
+                Contrato.Add(new Notificacao("xMun", "Município inválido"));
             if (!AddressValidation.UF_IsValid(_address.UF.ToString()))
-                Notifications.Add(new Notification("UF", "UF inválido"));
+                Contrato.Add(new Notificacao("UF", "UF inválido"));
 
-            return Notifications.Count == 0;
+            return Contrato.Valido;
         }
     }
-
-
 
     /// <summary>
     /// Alterar a Exception pra validação com boolean
@@ -52,9 +49,9 @@ namespace FiscalCore.Validacoes.Sefaz
         {
             try
             {
-                ZionAssertion.StringIsNullOrEmptyOrWhiteSpace(value);
-                ZionAssertion.StringHasMinLen(value, 2);
-                ZionAssertion.StringHasMaxLen(value, 60);
+                //ZionAssertion.StringIsNullOrEmptyOrWhiteSpace(value);
+                //ZionAssertion.StringHasMinLen(value, 2);
+                //ZionAssertion.StringHasMaxLen(value, 60);
                 return true;
             }
             catch
@@ -67,9 +64,9 @@ namespace FiscalCore.Validacoes.Sefaz
         {
             try
             {
-                ZionAssertion.StringIsNullOrEmptyOrWhiteSpace(value);
-                ZionAssertion.StringHasMinLen(value, 1);
-                ZionAssertion.StringHasMaxLen(value, 60);
+                //ZionAssertion.StringIsNullOrEmptyOrWhiteSpace(value);
+                //ZionAssertion.StringHasMinLen(value, 1);
+                //ZionAssertion.StringHasMaxLen(value, 60);
                 return true;
             }
             catch
@@ -83,7 +80,7 @@ namespace FiscalCore.Validacoes.Sefaz
             try
             {
                 if (value == null) return true;
-                ZionAssertion.StringHasMaxLen(value, 60);
+                //ZionAssertion.StringHasMaxLen(value, 60);
                 return true;
             }
             catch
@@ -96,9 +93,9 @@ namespace FiscalCore.Validacoes.Sefaz
         {
             try
             {
-                ZionAssertion.StringIsNullOrEmptyOrWhiteSpace(value);
-                ZionAssertion.StringHasMinLen(value, 2);
-                ZionAssertion.StringHasMaxLen(value, 60);
+                //ZionAssertion.StringIsNullOrEmptyOrWhiteSpace(value);
+                //ZionAssertion.StringHasMinLen(value, 2);
+                //ZionAssertion.StringHasMaxLen(value, 60);
                 return true;
             }
             catch
@@ -119,9 +116,9 @@ namespace FiscalCore.Validacoes.Sefaz
         {
             try
             {
-                ZionAssertion.StringIsNullOrEmptyOrWhiteSpace(value);
-                ZionAssertion.StringHasMinLen(value, 2);
-                ZionAssertion.StringHasMaxLen(value, 60);
+                //ZionAssertion.StringIsNullOrEmptyOrWhiteSpace(value);
+                //ZionAssertion.StringHasMinLen(value, 2);
+                //ZionAssertion.StringHasMaxLen(value, 60);
                 return true;
             }
             catch
@@ -134,8 +131,8 @@ namespace FiscalCore.Validacoes.Sefaz
         {
             try
             {
-                ZionAssertion.StringHasMinLen(value, 2);
-                ZionAssertion.StringHasMaxLen(value, 2);
+                //ZionAssertion.StringHasMinLen(value, 2);
+                //ZionAssertion.StringHasMaxLen(value, 2);
                 return true;
             }
             catch

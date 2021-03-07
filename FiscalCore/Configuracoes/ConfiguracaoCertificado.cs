@@ -1,10 +1,10 @@
-﻿using FiscalCore.Enums;
+﻿using FiscalCore.Tipos;
 
 namespace FiscalCore.Configuracoes
 {
     public class ConfiguracaoCertificado
     {
-        public ConfiguracaoCertificado(TipoCertificado tipoCertificado, string serial)
+        public ConfiguracaoCertificado(eTipoCertificado tipoCertificado, string serial)
         {
             TipoCertificado = tipoCertificado;
             Serial = serial;
@@ -12,12 +12,12 @@ namespace FiscalCore.Configuracoes
 
         public ConfiguracaoCertificado(string arquivoCertificado, string senha = null)
         {
-            TipoCertificado = TipoCertificado.A1Arquivo;
+            TipoCertificado = eTipoCertificado.A1Arquivo;
             ArquivoCertificado = arquivoCertificado;
             Senha = senha;
         }
 
-        public TipoCertificado TipoCertificado { get; protected set; }
+        public eTipoCertificado TipoCertificado { get; protected set; }
         public string ArquivoCertificado { get; protected set; }
         public string Serial { get; protected set; }
         public string Senha { get; protected set; }

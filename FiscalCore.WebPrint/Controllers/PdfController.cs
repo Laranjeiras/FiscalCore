@@ -34,7 +34,7 @@ namespace FiscalCore.WebPrint.Controllers
                         var modelo = ZionDanfe.Modelo.DanfeViewModelCreator.CriarDeStringXml(xmlText);
                         var pdfStream = new MemoryStream();
 
-                        using (var danfe = new Danfe(modelo))
+                        using (var danfe = new ZionDanfe.Danfe(modelo))
                         {
                             danfe.ViewModel.DefinirTextoCreditos("Desenvolvido por www.laranjeiras.dev / (21)97161-4935 / (zideun@outlook.com)");
                             danfe.Gerar();

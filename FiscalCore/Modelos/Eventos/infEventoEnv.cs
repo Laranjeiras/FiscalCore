@@ -1,4 +1,4 @@
-﻿using FiscalCore.Enums;
+﻿using FiscalCore.Tipos;
 using FiscalCore.Extensions;
 using System;
 using System.Xml.Serialization;
@@ -19,10 +19,11 @@ namespace FiscalCore.Modelos.Eventos
         {
             get { return _cnpj; }
             set {
-                if (Zion.Common.ValueObjects.CpfCnpj.IsValid(value))
-                    _cnpj = Zion.Common.Helpers.ZionHelper.OnlyNumbers(value);
-                else
-                    _cnpj = null;
+                _cnpj = value;
+                //if (Zion.Common.ValueObjects.CpfCnpj.IsValid(value))
+                //    _cnpj = Zion.Common.Helpers.ZionHelper.OnlyNumbers(value);
+                //else
+                //    _cnpj = null;
             }
         }
 
@@ -32,10 +33,11 @@ namespace FiscalCore.Modelos.Eventos
             get { return _cpf; }
             set
             {
-                if (Zion.Common.ValueObjects.CpfCnpj.IsValid(value))
-                    _cpf = Zion.Common.Helpers.ZionHelper.OnlyNumbers(value);
-                else
-                    _cpf = null;
+                _cpf = value;
+                //if (Zion.Common.ValueObjects.CpfCnpj.IsValid(value))
+                //    _cpf = Zion.Common.Helpers.ZionHelper.OnlyNumbers(value);
+                //else
+                //    _cpf = null;
             }
         }
 
@@ -51,7 +53,7 @@ namespace FiscalCore.Modelos.Eventos
             set { dhEvento = DateTime.Parse(value); }
         }
 
-        public eNFeTipoEvento tpEvento { get; set; }
+        public eTipoEventoNFe tpEvento { get; set; }
 
         public int nSeqEvento { get; set; }
 

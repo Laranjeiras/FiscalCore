@@ -3,7 +3,7 @@ using DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica.Informacoes.Destinatario;
 using DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica.Informacoes.Pagamento;
 using FiscalCore.Configuracoes;
 using FiscalCore.Danfe.NFCe.Nativo;
-using FiscalCore.Modelos.Emitente;
+using FiscalCore.Extensions;
 using FiscalCore.Utils;
 using QRCoder;
 using System;
@@ -13,7 +13,6 @@ using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Zion.Common.Extensions;
 
 namespace FiscalCore.Danfe.NFCe
 {
@@ -42,14 +41,14 @@ namespace FiscalCore.Danfe.NFCe
         {
             try
             {
-                _proc = FuncoesXml.XmlStringParaClasse<nfeProc>(xml);
+                _proc = Xml.XmlStringParaClasse<nfeProc>(xml);
                 _nfe = _proc.NFe;
             }
             catch (Exception)
             {
                 try
                 {
-                    _nfe = FuncoesXml.XmlStringParaClasse<NFe>(xml);
+                    _nfe = Xml.XmlStringParaClasse<NFe>(xml);
                 }
                 catch (Exception)
                 {
@@ -530,7 +529,7 @@ namespace FiscalCore.Danfe.NFCe
 
         private void DesenharFormaPagamento(int x, int larguraLinhaMargemDireita, Graphics g, FormaPagamento? formaPagamento, decimal? vPag)
         {
-            var _formaPagamento = formaPagamento.GetDescription();
+            var _formaPagamento = formaPagamento.Descricao();
             AdicionarTexto textoFormaPagamento = new AdicionarTexto(g, _formaPagamento, 7);
             textoFormaPagamento.Desenhar(x, y);
 

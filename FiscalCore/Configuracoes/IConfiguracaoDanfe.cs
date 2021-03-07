@@ -1,11 +1,11 @@
-﻿using FiscalCore.Enums;
+﻿using FiscalCore.Tipos;
 using System.Drawing;
 
 namespace FiscalCore.Configuracoes
 {
     public interface IConfiguracaoDanfe
     {
-        public VersaoQrCode VersaoQrCode { get; set; }
+        public eVersaoQrCode VersaoQrCode { get; set; }
         public string NFCeUrlConsultaSefaz { get; set; }
         public string NFCeUrlConsultaQrCodeSefaz { get; set; }
         public bool SegundaViaContingencia { get; set; }

@@ -1,5 +1,5 @@
-﻿using FiscalCore.Enums;
-using FiscalCore.Modelos.Emitente;
+﻿using FiscalCore.Modelos.NotaFiscal.Emitente;
+using FiscalCore.Tipos;
 
 namespace FiscalCore.Configuracoes
 {
@@ -17,6 +17,7 @@ namespace FiscalCore.Configuracoes
         public eUF UF { get; set; }
         public ConfiguracaoCsc Csc { get; set; }
         public eVersaoServico VersaoAutorizacaoNFe { get; set; }
+        public eVersaoServico VersaoInutilizacaoNFe { get; set; }
         public string ImpressoraCupom { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using FiscalCore.Enums;
+﻿using FiscalCore.Tipos;
 using System.Xml.Serialization;
 
 namespace FiscalCore.Modelos.Inutilizacao

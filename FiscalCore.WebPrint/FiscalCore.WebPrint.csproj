@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
+    <Authors>Alexandre Laranjeiras</Authors>
+    <RepositoryUrl>github.com/Laranjeiras/FiscalCore</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,6 +20,9 @@
   <ItemGroup>
     <Reference Include="DFeBR.EmissorNFe">
       <HintPath>..\..\DFebr-net\DFeBR.NFe\bin\Debug\netstandard2.0\DFeBR.EmissorNFe.dll</HintPath>
+    </Reference>
+    <Reference Include="FiscalCore">
+      <HintPath>..\FiscalCore\bin\Debug\net5.0\FiscalCore.dll</HintPath>
     </Reference>
   </ItemGroup>
 

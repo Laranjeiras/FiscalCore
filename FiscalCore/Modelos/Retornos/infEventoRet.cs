@@ -1,4 +1,4 @@
-﻿using FiscalCore.Enums;
+﻿using FiscalCore.Tipos;
 using System;
 using System.Xml.Serialization;
 
@@ -18,7 +18,7 @@ namespace FiscalCore.Modelos.Retornos
         public string xMotivo { get; set; }
 
         public string chNFe { get; set; }
-        public eNFeTipoEvento? tpEvento { get; set; }
+        public eTipoEventoNFe? tpEvento { get; set; }
         public int? nSeqEvento { get; set; }
 
         public DateTime dhRegEvento { get; set; }

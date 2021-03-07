@@ -1,6 +1,7 @@
 ﻿using FiscalCore.Configuracoes;
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 
 namespace FiscalCore.Utils
@@ -13,10 +14,10 @@ namespace FiscalCore.Utils
             var ambiente = nfe.infNFe.ide.tpAmb.ToString();
             var dataFiscal = nfe.infNFe.ide.dhEmi;
 
-            SalvarArquivoXml(_configServico.DiretorioSalvarXml, ambiente, "Autorizacao", dataFiscal, nomeArquivo ,conteudo);
+            SalvarArquivoString(_configServico.DiretorioSalvarXml, ambiente, "Autorizacao", dataFiscal, nomeArquivo ,conteudo);
         }
 
-        public static void SalvarArquivoXml(string diretorioBase, string ambiente, string subDiretorio, DateTimeOffset dataFiscal, string nomeArquivo, string conteudo)
+        public static void SalvarArquivoString(string diretorioBase, string ambiente, string subDiretorio, DateTimeOffset dataFiscal, string nomeArquivo, string conteudo)
         {
             if (diretorioBase == null)
                 throw new ArgumentNullException(nameof(diretorioBase), "O caminho do arquivo deve ser informado");
@@ -42,16 +43,12 @@ namespace FiscalCore.Utils
             }
         }
 
-        /// <summary>
-        ///     Verificar se o diretorio existe
-        /// </summary>
-        /// <param name="caminho">caminho do arquivo</param>
-        /// <returns></returns>
-        public static bool ExisteDiretorio(string caminho)
+        public static string LerArquivo(string arquivo)
         {
-            if (Directory.Exists(caminho))
-                return true;
-            return false;
+            TextReader tr = new StreamReader(arquivo);
+            var texto = tr.ReadToEnd();
+            tr.Close();
+            return texto;
         }
 
         public static string CriarDiretorioNaRaizDoApp(string nomeDiretorio)
@@ -67,14 +64,34 @@ namespace FiscalCore.Utils
         /// <returns></returns>
         public static string CriarDiretorioSeNaoExistir(string diretorio)
         {
-            //var separador = Path.DirectorySeparatorChar;
             if (diretorio == null)
-                throw new ArgumentNullException("diretorio");
+                throw new ArgumentNullException(nameof(diretorio));
 
             if (!Directory.Exists(diretorio))
                 Directory.CreateDirectory(diretorio);
 
             return diretorio;
+        }
+
+        public static string Unzip(byte[] bytes)
+        {
+            using (var msi = new MemoryStream(bytes))
+            using (var mso = new MemoryStream())
+            {
+                using (var gs = new GZipStream(msi, CompressionMode.Decompress))
+                {
+                    var bytes_0 = new byte[4096];
+
+                    int cnt;
+
+                    while ((cnt = gs.Read(bytes_0, 0, bytes_0.Length)) != 0)
+                    {
+                        mso.Write(bytes_0, 0, cnt);
+                    }
+                }
+
+                return Encoding.UTF8.GetString(mso.ToArray());
+            }
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using FiscalCore.Enums;
-using FiscalCore.Modelos.Signatures;
+﻿using FiscalCore.Modelos.Signatures;
+using FiscalCore.Tipos;
 using System;
 
 namespace FiscalCore.Modelos.Protocolos

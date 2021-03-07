@@ -1,11 +1,16 @@
-﻿using FiscalCore.Enums;
-using FiscalCore.Modelos.Emitente;
+﻿using FiscalCore.Modelos.NotaFiscal.Emitente;
+using FiscalCore.Tipos;
 using System.IO;
 
 namespace FiscalCore.Configuracoes
 {
     public class ConfiguracaoServico : IConfiguracaoServico
     {
+        public ConfiguracaoServico()
+        {
+
+        }
+
         public ConfiguracaoServico(
             eTipoAmbiente tipoAmbiente,
             eUF uf,

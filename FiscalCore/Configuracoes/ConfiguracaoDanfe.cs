@@ -1,7 +1,6 @@
-﻿using FiscalCore.Enums;
-using FiscalCore.Properties;
+﻿using FiscalCore.Properties;
 using FiscalCore.Utils;
-using System;
+using FiscalCore.Tipos;
 using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
@@ -10,7 +9,7 @@ namespace FiscalCore.Configuracoes
 {
     public class ConfiguracaoDanfe : IConfiguracaoDanfe
     {
-        public VersaoQrCode VersaoQrCode { get; set; } = VersaoQrCode.QrCodeVersao2;
+        public eVersaoQrCode VersaoQrCode { get; set; } = eVersaoQrCode.QrCodeVersao2;
         public string FontPadraoNfceNativa { get; set; }
         public string NFCeUrlConsultaSefaz { get; set; }
         public bool SegundaViaContingencia { get; set; }

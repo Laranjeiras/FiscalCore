@@ -1,6 +1,6 @@
-﻿using FiscalCore.Enums;
-using FiscalCore.Modelos.Consulta;
+﻿using FiscalCore.Modelos.Consulta;
 using FiscalCore.Modelos.Protocolos;
+using FiscalCore.Tipos;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
