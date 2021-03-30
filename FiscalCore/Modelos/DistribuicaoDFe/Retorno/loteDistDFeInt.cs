@@ -1,7 +1,7 @@
 ﻿using DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica.RetornoServicos.DistribuicaoDFe.Schemas;
 using System.Xml.Serialization;
 
-namespace FiscalCore.DistribuicaoDFe.Modelos.Retorno
+namespace FiscalCore.Modelos.DistribuicaoDFe
 {
     [XmlType(AnonymousType = true, Namespace = "http://www.portalfiscal.inf.br/nfe")]    
     public class loteDistDFeInt

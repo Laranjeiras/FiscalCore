@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace FiscalCore.DistribuicaoDFe.Modelos.Retorno
+namespace FiscalCore.Modelos.DistribuicaoDFe
 {
     public class retEvento
     {

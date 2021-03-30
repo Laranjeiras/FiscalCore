@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FiscalCore.DistribuicaoDFe.Modelos
+namespace FiscalCore.Modelos.DistribuicaoDFe
 {
     public class resNFe
     {

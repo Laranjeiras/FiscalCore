@@ -1,7 +1,7 @@
 ﻿using FiscalCore.Tipos;
 using System.Xml.Serialization;
 
-namespace FiscalCore.DistribuicaoDFe.Modelos
+namespace FiscalCore.Modelos.DistribuicaoDFe
 {
     public class consNFeDest
     {

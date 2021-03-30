@@ -1,8 +1,7 @@
 ﻿using DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica.RetornoServicos.DistribuicaoDFe.Schemas;
 using FiscalCore.Configuracoes;
-using FiscalCore.DistribuicaoDFe.Modelos;
-using FiscalCore.DistribuicaoDFe.Modelos.Retorno;
 using FiscalCore.Fabrica;
+using FiscalCore.Modelos.DistribuicaoDFe;
 using FiscalCore.Servicos;
 using FiscalCore.Tipos;
 using FiscalCore.Utils;

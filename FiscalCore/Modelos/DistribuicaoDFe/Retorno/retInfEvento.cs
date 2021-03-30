@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FiscalCore.DistribuicaoDFe.Modelos.Retorno
+namespace FiscalCore.Modelos.DistribuicaoDFe
 {
     public class retInfEvento
     {

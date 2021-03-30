@@ -2,7 +2,7 @@
 using System;
 using System.Xml.Serialization;
 
-namespace FiscalCore.DistribuicaoDFe.Modelos
+namespace FiscalCore.Modelos.DistribuicaoDFe
 {
     [XmlRoot("distDFeInt", Namespace = "http://www.portalfiscal.inf.br/nfe", IsNullable = false)]
     public class distDFeInt

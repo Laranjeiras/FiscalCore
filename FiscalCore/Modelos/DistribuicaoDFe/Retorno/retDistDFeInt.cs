@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace FiscalCore.DistribuicaoDFe.Modelos.Retorno
+namespace FiscalCore.Modelos.DistribuicaoDFe
 {
     [XmlRoot("retDistDFeInt", Namespace = "http://www.portalfiscal.inf.br/nfe", IsNullable = false)]
     public class retDistDFeInt

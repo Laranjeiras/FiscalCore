@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Xml.Serialization;
 
-namespace FiscalCore.DistribuicaoDFe.Modelos
+namespace FiscalCore.Modelos.DistribuicaoDFe
 {
     [Serializable()]
     [DesignerCategory("code")]
