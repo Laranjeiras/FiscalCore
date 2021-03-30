@@ -2,6 +2,8 @@
 
 Dotnet Standard 2.1
 
+[![Pack DistribuicaoDFe + Push no NuGet](https://github.com/Laranjeiras/FiscalCore/actions/workflows/publish.yml/badge.svg)](https://github.com/Laranjeiras/FiscalCore/actions/workflows/publish.yml)
+
 #Exemplo NFe Autorização
 
 var cert = new ConfiguracaoCertificado(eTipoCertificado.A3, "3b6cc164ef2d4cf7ac1488ac895cbedf");
