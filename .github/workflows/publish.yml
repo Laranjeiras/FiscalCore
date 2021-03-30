@@ -1,0 +1,30 @@
+
+name: Pack DistribuicaoDFe + Push no NuGet
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  pack-push:
+    env:
+      PROJECT_PATH: ./FiscalCore.DistribuicaoDFe/FiscalCore.DistribuicaoDFe.csproj
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup FiscalCore.DistribuicaoDFe
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.1.607
+
+    - name: Packet generator
+      run: dotnet pack ${{ env.PROJECT_PATH }} -c Release -o out
+
+    - name: Push to NuGet
+      run: |
+        cd out
+        dotnet nuget push *.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source ${{ secrets.NUGET_SERVER }} --skip-duplicate
