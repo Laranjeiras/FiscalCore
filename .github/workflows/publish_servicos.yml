@@ -16,10 +16,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup FiscalCore.DistribuicaoDFe
+    - name: Setup FiscalCore.Servicos
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0
+        dotnet-version: 3.1.x
 
     - name: Packet generator
       run: dotnet pack ${{ env.PROJECT_PATH }} -c Release -o out
