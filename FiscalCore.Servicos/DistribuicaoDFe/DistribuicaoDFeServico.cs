@@ -9,6 +9,7 @@ using FiscalCore.Validacoes;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using resNFe = FiscalCore.Modelos.DistribuicaoDFe.resNFe;
 
 namespace FiscalCore.DistribuicaoDFe.Servicos
 {
@@ -21,7 +22,7 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
             this.cfgServico = cfgServico;
         }
 
-        public async Task<string> ConsultarEmissaoContraCNPJ(string nsu, bool validarXmlConsulta = true)
+        public async Task<string> ConsultarDistribuicao(string nsu, bool validarXmlConsulta = true)
         {
             if (string.IsNullOrEmpty(nsu))
                 throw new ArgumentNullException(nameof(nsu));
@@ -61,11 +62,35 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
             return retornoLimpo;
         }
 
-        public async Task<retDistDFeInt> MontarRetorno(string retorno)
+        public async Task<string> ConsultarDFe(string chaveNFe, bool validarXmlConsulta = true)
+        {
+            if (string.IsNullOrEmpty(chaveNFe))
+                throw new ArgumentNullException(nameof(chaveNFe));
+            if (!(chaveNFe.Length == 43))
+                throw new ArgumentOutOfRangeException(nameof(chaveNFe));
+
+            var distDFeInt = new distDFeInt
+            {
+                Versao = "1.01",
+                Cnpj = cfgServico.Emitente.CNPJ,
+                consChNFe = new consChNFe
+                {
+                    ChNFe = chaveNFe
+                },
+                cUFAutor = ((int)cfgServico.UF).ToString(),
+                TpAmb = cfgServico.TipoAmbiente
+            };
+
+            return null;
+        }
+
+        public async Task<RetornoDistNFeViewModel> MontarRetorno(string retorno)
         {
             var retDistDFeInt = Xml.XmlStringParaClasse<retDistDFeInt>(retorno);
 
-            var conteudos = new List<RetornoT>();
+            var retornoViewModel = new RetornoDistNFeViewModel();
+            retornoViewModel.CStat = retDistDFeInt.cStat;
+            retornoViewModel.XMotivo = retDistDFeInt.xMotivo;
 
             if (retDistDFeInt.loteDistDFeInt != null)
             {
@@ -77,33 +102,36 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
                     var conteudoZip = Arquivo.Unzip(dfeInt.XmlNfe);
                     await Xml.SalvarArquivoXmlAsync(cfgServico.DiretorioSalvarXml, $"{cfgServico.Emitente.CNPJ ?? cfgServico.Emitente.CPF}-{DateTime.Now.Ticks}-{dfeInt.NSU}-{tipoRet}.xml", conteudoZip);
 
-                    var conteudo = new RetornoT();
-
                     if (conteudoZip.StartsWith("<resNFe"))
                     {
-                        var retConteudo = Xml.XmlStringParaClasse<DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica.RetornoServicos.DistribuicaoDFe.Schemas.resNFe>(conteudoZip);
-
-                        conteudo.Chave = retConteudo.chNFe;
-                        conteudo.Mensagem = $"Conteúdo da NFE: {retConteudo.CNPJ ?? retConteudo.CPF} {retConteudo.xNome}";
+                        var retConteudo = Xml.XmlStringParaClasse<resNFe>(conteudoZip);
+                        retornoViewModel.ResNFes.Add(retConteudo);
+                        
                     }
                     else if (conteudoZip.StartsWith("<procEventoNFe"))
                     {
                         var xml = Xml.ObterTagXml(conteudoZip, "procEventoNFe");
                         var retEvento = Xml.XmlStringParaClasse<procEventoNFe>(xml);
-                        conteudo.Chave = retEvento.retEvento.infEvento.chNFe;
-                        conteudo.Mensagem = retEvento.retEvento.infEvento.xMotivo;
+                        retornoViewModel.ProcEventos.Add(retEvento);
                     }
-                    conteudos.Add(conteudo);
                 }
             }
-            return retDistDFeInt;
+            return retornoViewModel;
         }
     }
 
-    public class RetornoT
+    public class RetornoDistNFeViewModel
     {
-        public string Chave { get; set; }
-        public string Mensagem { get; set; }
-        public string Cliente { get; set; }
+        public RetornoDistNFeViewModel()
+        {
+            ResNFes = new List<resNFe>();
+            ProcEventos = new List<procEventoNFe>();
+        }
+
+        public IList<resNFe> ResNFes { get; private set; }
+        public IList<procEventoNFe> ProcEventos { get; private set; }
+
+        public int CStat { get; set; }
+        public string XMotivo { get; set; }
     }
 }
