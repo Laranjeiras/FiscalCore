@@ -4,6 +4,11 @@ Dotnet Standard 2.1
 
 [![Pack Servicos + Push no NuGet](https://github.com/Laranjeiras/FiscalCore/actions/workflows/publish_servicos.yml/badge.svg)](https://github.com/Laranjeiras/FiscalCore/actions/workflows/publish_servicos.yml)
 
+[![Pack Dominio + Push no NuGet](https://github.com/Laranjeiras/FiscalCore/actions/workflows/publish_dominio.yml/badge.svg)](https://github.com/Laranjeiras/FiscalCore/actions/workflows/publish_dominio.yml)
+
+https://api.nuget.org/v3/index.json
+
+
 #Exemplo NFe Autorização
 
 var cert = new ConfiguracaoCertificado(eTipoCertificado.A3, "3b6cc164ef2d4cf7ac1488ac895cbedf");
