@@ -1,5 +1,5 @@
 
-name: Pack Servico + Push no NuGet
+name: Pack Dominio + Push no NuGet
 
 on:
   push:
@@ -27,4 +27,4 @@ jobs:
     - name: Push to NuGet
       run: |
         cd out
-        dotnet nuget push *.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source ${{ secrets.NUGET_SERVER }} --skip-duplicate
+        dotnet nuget push *.nupkg --api-key ${{ secrets.NUGET_DOMINIO_API_KEY }} --source ${{ secrets.NUGET_SERVER }} --skip-duplicate
