@@ -1,5 +1,5 @@
 
-name: Pack DistribuicaoDFe + Push no NuGet
+name: Pack Servico + Push no NuGet
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 jobs:
   pack-push:
     env:
-      PROJECT_PATH: ./FiscalCore.DistribuicaoDFe/FiscalCore.DistribuicaoDFe.csproj
+      PROJECT_PATH: ./FiscalCore.Servicos/FiscalCore.Servicos.csproj
 
     runs-on: ubuntu-latest
 
@@ -19,7 +19,7 @@ jobs:
     - name: Setup FiscalCore.DistribuicaoDFe
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 2.1.607
+        dotnet-version: 5.0
 
     - name: Packet generator
       run: dotnet pack ${{ env.PROJECT_PATH }} -c Release -o out
