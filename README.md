@@ -2,7 +2,7 @@
 
 Dotnet Standard 2.1
 
-[![Pack DistribuicaoDFe + Push no NuGet](https://github.com/Laranjeiras/FiscalCore/actions/workflows/publish.yml/badge.svg)](https://github.com/Laranjeiras/FiscalCore/actions/workflows/publish_servicos.yml)
+[![Pack Servicos + Push no NuGet](https://github.com/Laranjeiras/FiscalCore/actions/workflows/publish_servicos.yml/badge.svg)](https://github.com/Laranjeiras/FiscalCore/actions/workflows/publish_servicos.yml)
 
 #Exemplo NFe Autorização
 
