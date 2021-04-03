@@ -10,13 +10,13 @@ on:
 jobs:
   pack-push:
     env:
-      PROJECT_PATH: ./FiscalCore.Servicos/FiscalCore.Servicos.csproj
+      PROJECT_PATH: ./FiscalCore/FiscalCore.csproj
 
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup FiscalCore.Servicos
+    - name: Setup FiscalCore
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.x
