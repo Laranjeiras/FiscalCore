@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Xml.Serialization;
 
 namespace FiscalCore.Modelos.DistribuicaoDFe
 {
+    [XmlRoot(Namespace = "http://www.portalfiscal.inf.br/nfe", IsNullable = false)]
     public class resNFe
     {
         public string chNFe { get; set; }
