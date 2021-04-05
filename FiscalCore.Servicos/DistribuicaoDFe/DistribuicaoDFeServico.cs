@@ -8,6 +8,7 @@ using FiscalCore.Utils;
 using FiscalCore.Validacoes;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using resNFe = FiscalCore.Modelos.DistribuicaoDFe.resNFe;
 
@@ -16,10 +17,12 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
     public class DistribuicaoDFeServico
     {
         private readonly IConfiguracaoServico cfgServico;
+        private readonly string dirBase;
 
         public DistribuicaoDFeServico(IConfiguracaoServico cfgServico)
         {
             this.cfgServico = cfgServico;
+            this.dirBase = Path.Combine(cfgServico.DiretorioSalvarXml, "DistribuicaoDFe");
         }
 
         public async Task<string> ConsultarDistribuicao(string nsu, bool validarXmlConsulta = true)
@@ -35,7 +38,7 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
             {
                 Versao = "1.01",
                 Cnpj = cfgServico.Emitente.CNPJ,
-                DistNSU = new DistNSU
+                DistNSU = new distNSU
                 {
                     UltNSU = nsu
                 },
@@ -48,7 +51,7 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
             if (validarXmlConsulta)
                 Schemas.ValidarSchema(eTipoServico.NFeDistribuicaoDFe, xml, cfgServico);
 
-            Xml.SalvarArquivoXml(cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ped-DistDFeInt.xml", xml);
+            Xml.SalvarArquivoXml(dirBase, $"{cfgServico.Emitente.CNPJ ?? cfgServico.Emitente.CPF}-{DateTime.Now.Ticks}-ped-DistDFeInt.xml", xml);
 
             var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.NFeDistribuicaoDFe, xml);
 
@@ -57,7 +60,7 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
 
             var retornoLimpo = Soap.LimparEnvelope(retorno, "retDistDFeInt").OuterXml;
 
-            Xml.SalvarArquivoXml(cfgServico.DiretorioSalvarXml, $"{cfgServico.Emitente.CNPJ ?? cfgServico.Emitente.CPF}-{DateTime.Now.Ticks}-retDistDFeInt.xml", retornoLimpo);
+            Xml.SalvarArquivoXml(dirBase, $"{cfgServico.Emitente.CNPJ ?? cfgServico.Emitente.CPF}-{DateTime.Now.Ticks}-retDistDFeInt.xml", retornoLimpo);
 
             return retornoLimpo;
         }
@@ -84,13 +87,13 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
             return null;
         }
 
-        public async Task<RetornoDistNFeViewModel> MontarRetorno(string retorno)
+        public async Task<RetornoDistNFeDTO> MontarRetorno(string retorno)
         {
             var retDistDFeInt = Xml.XmlStringParaClasse<retDistDFeInt>(retorno);
 
-            var retornoViewModel = new RetornoDistNFeViewModel();
-            retornoViewModel.CStat = retDistDFeInt.cStat;
-            retornoViewModel.XMotivo = retDistDFeInt.xMotivo;
+            var retornoDto = new RetornoDistNFeDTO();
+            retornoDto.CStat = retDistDFeInt.cStat;
+            retornoDto.XMotivo = retDistDFeInt.xMotivo;
 
             if (retDistDFeInt.loteDistDFeInt != null)
             {
@@ -100,29 +103,30 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
                     var tipoRet = tmpSchema[0] ?? dfeInt.schema;
 
                     var conteudoZip = Arquivo.Unzip(dfeInt.XmlNfe);
-                    await Xml.SalvarArquivoXmlAsync(cfgServico.DiretorioSalvarXml, $"{cfgServico.Emitente.CNPJ ?? cfgServico.Emitente.CPF}-{DateTime.Now.Ticks}-{dfeInt.NSU}-{tipoRet}.xml", conteudoZip);
+
+                    await Xml.SalvarArquivoXmlAsync(dirBase, $"{cfgServico.Emitente.CNPJ ?? cfgServico.Emitente.CPF}-{DateTime.Now.Ticks}-{dfeInt.NSU}-{tipoRet}.xml", conteudoZip);
 
                     if (conteudoZip.StartsWith("<resNFe"))
                     {
                         var retConteudo = Xml.XmlStringParaClasse<resNFe>(conteudoZip);
-                        retornoViewModel.ResNFes.Add(retConteudo);
+                        retornoDto.ResNFes.Add(retConteudo);
                         
                     }
                     else if (conteudoZip.StartsWith("<procEventoNFe"))
                     {
                         var xml = Xml.ObterTagXml(conteudoZip, "procEventoNFe");
                         var retEvento = Xml.XmlStringParaClasse<procEventoNFe>(xml);
-                        retornoViewModel.ProcEventos.Add(retEvento);
+                        retornoDto.ProcEventos.Add(retEvento);
                     }
                 }
             }
-            return retornoViewModel;
+            return retornoDto;
         }
     }
 
-    public class RetornoDistNFeViewModel
+    public class RetornoDistNFeDTO
     {
-        public RetornoDistNFeViewModel()
+        public RetornoDistNFeDTO()
         {
             ResNFes = new List<resNFe>();
             ProcEventos = new List<procEventoNFe>();

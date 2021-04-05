@@ -50,8 +50,15 @@ namespace FiscalCore.Utils
 
         public static string SalvarArquivoXml(string dir, string nomeArquivo, string xmlString)
         {
-            if (!Directory.Exists(dir))
+            try
+            {
+                if (!Directory.Exists(dir))
+                    Arquivo.CriarDiretorioSeNaoExistir(dir);
+            }
+            catch
+            {
                 throw new Exception("Diretorio não existe");
+            }
             var filename = Path.Combine(dir, nomeArquivo);
             var stw = new StreamWriter(filename);
             stw.WriteLine(xmlString);
@@ -61,8 +68,15 @@ namespace FiscalCore.Utils
 
         public static async Task<string> SalvarArquivoXmlAsync(string dir, string nomeArquivo, string xmlString)
         {
-            if (!Directory.Exists(dir))
+            try
+            {
+                if (!Directory.Exists(dir))
+                    Arquivo.CriarDiretorioSeNaoExistir(dir);
+            }
+            catch {
                 throw new Exception("Diretorio não existe");
+            }
+
             var filename = Path.Combine(dir, nomeArquivo);
             var stw = new StreamWriter(filename);
             await stw.WriteLineAsync(xmlString);

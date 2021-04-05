@@ -6,6 +6,9 @@ namespace FiscalCore.Modelos.DistribuicaoDFe
     [XmlRoot(Namespace = "http://www.portalfiscal.inf.br/nfe", IsNullable = false)]
     public class resNFe
     {
+        /// <summary>
+        /// C03 - Chave de acesso da NF-e
+        /// </summary>
         public string chNFe { get; set; }
 
         /// <summary>
@@ -30,6 +33,16 @@ namespace FiscalCore.Modelos.DistribuicaoDFe
         /// IE (Contribuinte do ICMS)
         /// </summary>
         public string IE { get; set; }
+
+        /// <summary>
+        /// C08 - Data de Emissão da NF-e
+        /// </summary>
+        public DateTime dhEmi { get; set; }
+
+        /// <summary>
+        /// C09 - Tipo de Operação da NF-e: 0=Entrada; 1=Saída
+        /// </summary>
+        public int tpNF { get; set; }
 
         /// <summary>
         /// C10 - Valor Total da NF-e

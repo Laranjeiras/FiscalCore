@@ -22,7 +22,7 @@ namespace FiscalCore.Modelos.DistribuicaoDFe
         public string CPF { get; set; }
 
         [XmlElement("distNSU")]
-        public DistNSU DistNSU { get; set; }
+        public distNSU DistNSU { get; set; }
 
         public consNSU consNSU { get; set; }
 
