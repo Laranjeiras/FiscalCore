@@ -2,9 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-      <RepositoryUrl>github.com/Laranjeiras/FiscalCore</RepositoryUrl>
-      <Authors>Alexandre Laranjeiras</Authors>
-      <PackageTags>NuGet;Classlib;GitHub;Actions</PackageTags>      
+    <RepositoryUrl>github.com/Laranjeiras/FiscalCore</RepositoryUrl>
+    <Authors>Alexandre Laranjeiras</Authors>
+    <PackageTags>NuGet;Classlib;GitHub;Actions</PackageTags>
+    <Version>1.0.2</Version>      
   </PropertyGroup>
 
   <ItemGroup>
