@@ -23,7 +23,7 @@ namespace FiscalCore.Utils
             {
                 var documento = new XmlDocument { PreserveWhitespace = true };
 
-                documento.LoadXml(Xml.ClasseParaXmlString(objeto));
+                documento.LoadXml(XmlUtils.ClasseParaXmlString(objeto));
 
                 var docXml = new SignedXml(documento) { SigningKey = certificadoDigital.PrivateKey };
 
@@ -46,7 +46,7 @@ namespace FiscalCore.Utils
                 docXml.ComputeSignature();
 
                 var xmlDigitalSignature = docXml.GetXml();
-                var assinatura = Xml.XmlStringParaClasse<Signature>(xmlDigitalSignature.OuterXml);
+                var assinatura = XmlUtils.XmlStringParaClasse<Signature>(xmlDigitalSignature.OuterXml);
                 return assinatura;
             }
             finally

@@ -17,6 +17,6 @@ namespace FiscalCore.Tipos
         [Description("Manifestação do Destinatário")]
         ManifestacaoDestinatario = 6,
         [Description("Distribuição DFe")]
-        NFeDistribuicaoDFe = 7
+        NFeDistribuicaoDFe = 7,
     }
 }

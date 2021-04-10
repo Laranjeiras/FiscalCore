@@ -22,7 +22,7 @@ namespace FiscalCore.Fabrica
                 case eTipoServico.CartaCorrecao:
                     return FabricarEnvelopeEventoNFe(xml);
                 case eTipoServico.ManifestacaoDestinatario:
-                    throw new NotImplementedException();
+                    return FabricarEnvelopeEventoNFe(xml);
                 case eTipoServico.NFeDistribuicaoDFe:
                     return FabricarEnvelopeNFeDistribuicaoDFe(xml);
                 default:
@@ -62,6 +62,18 @@ namespace FiscalCore.Fabrica
         {
             var envelope = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><soap12:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap12=\"http://www.w3.org/2003/05/soap-envelope\">" +
             $"<soap12:Body><nfeDistDFeInteresse xmlns=\"http://www.portalfiscal.inf.br/nfe/wsdl/NFeDistribuicaoDFe\"><nfeDadosMsg>{xml}</nfeDadosMsg></nfeDistDFeInteresse></soap12:Body></soap12:Envelope>";
+            return CriarEnvelopeSoap(envelope);
+        }
+
+        private static XmlDocument FabricarEnvelopeManifestacaoNacional(string xml)
+        {
+            var envelope = "<?xml version=\"1.0\" encoding=\"utf-8\"?><soap12:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns: xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap12=\"http://www.w3.org/2003/05/soap-envelope\">" +
+                "<soap12:Body>" +
+                    "<nfeDadosMsg xmlns=\"http://www.portalfiscal.inf.br/nfe/wsdl/NFeRecepcaoEvento4\">" +
+                        $"{xml}" +
+                    "</nfeDadosMsg>" +
+                "</soap12:Body>" +
+                "</soap12:Envelope>";
             return CriarEnvelopeSoap(envelope);
         }
 

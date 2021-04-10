@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -73,8 +72,14 @@ namespace FiscalCore.Servicos
             urls.Add(new UrlSefaz(eTipoServico.CartaCorrecao, eUF.RJ, eTipoAmbiente.Producao, eModeloDocumento.NFCe, "https://nfce.svrs.rs.gov.br/ws/recepcaoevento/recepcaoevento4.asmx", "https://nfce.svrs.rs.gov.br/ws/recepcaoevento/recepcaoevento4.asmx?op=nfeRecepcaoEvento"));
             urls.Add(new UrlSefaz(eTipoServico.CartaCorrecao, eUF.RJ, eTipoAmbiente.Homologacao, eModeloDocumento.NFCe, "https://nfce-homologacao.svrs.rs.gov.br/ws/recepcaoevento/recepcaoevento4.asmx", "https://nfce-homologacao.svrs.rs.gov.br/ws/recepcaoevento/recepcaoevento4.asmx?op=nfeRecepcaoEvento"));
 
-            urls.Add(new UrlSefaz(eTipoServico.ManifestacaoDestinatario, eUF.RJ, eTipoAmbiente.Producao, eModeloDocumento.NFe, "https://www1.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx", "https://www1.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx?op=nfeDistDFeInteresse"));
 
+            #region Ambiente Nacional
+            // Distribuicao DFe - Consultar Documentos Destinados
+            urls.Add(new UrlSefaz(eTipoServico.NFeDistribuicaoDFe, eUF.RJ, eTipoAmbiente.Producao, eModeloDocumento.NFe, "https://www1.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx", "https://www1.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx?op=nfeDistDFeInteresse"));
+
+            urls.Add(new UrlSefaz(eTipoServico.ManifestacaoDestinatario, eUF.RJ, eTipoAmbiente.Producao, eModeloDocumento.NFe, "https://www.nfe.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx", "https://www.nfe.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx?op=nfeRecepcaoEventoNF"));
+            //
+            #endregion
             return urls;
         }
     }

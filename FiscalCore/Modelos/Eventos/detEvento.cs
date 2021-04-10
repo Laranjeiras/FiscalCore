@@ -8,7 +8,7 @@ namespace FiscalCore.Modelos.Eventos
         public string versao { get; set; }
 
         /// <summary>
-        ///     HP19 - "Cancelamento", "Carta de Correção", "Carta de Correcao" ou "EPEC"
+        ///     HP19 - Informar a descrição do evento
         /// </summary>
         public string descEvento { get; set; }
 

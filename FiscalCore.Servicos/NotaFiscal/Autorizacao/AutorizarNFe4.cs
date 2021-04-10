@@ -42,7 +42,7 @@ namespace FiscalCore.Servicos
             foreach (var nfe in nfes)
             {
                 var nfeAssinada = nfe.Assinar(ObterCertificado.Obter(cfgServico.ConfigCertificado));
-                var xml = Xml.ClasseParaXmlString<NFe>(nfeAssinada);
+                var xml = XmlUtils.ClasseParaXmlString<NFe>(nfeAssinada);
                 Schemas.ValidarSchema(eTipoServico.AutorizarNFe, xml, cfgServico);
                 nfesAssinadas.Add(nfeAssinada);
             }
@@ -54,13 +54,13 @@ namespace FiscalCore.Servicos
 
             var versaoServico = cfgServico.VersaoAutorizacaoNFe.Descricao();
             var enviNFe = new enviNFe(versaoServico, idLote, IndicadorSincronizacao.Sincrono, nfesAssinadas);
-            var xmlEnviNFe = Xml.ClasseParaXmlString<enviNFe>(enviNFe);
+            var xmlEnviNFe = XmlUtils.ClasseParaXmlString<enviNFe>(enviNFe);
             return await Autorizar(xmlEnviNFe, mod);
         }
 
         private async Task<IRetornoAutorizacao> Autorizar(string xmlenviNFe4, eModeloDocumento modeloDocumento)
         {
-            Xml.SalvarArquivoXml($"{cfgServico.DiretorioSalvarXml}", $"{DateTime.Now.Ticks}-env-nfe.xml", xmlenviNFe4);
+            XmlUtils.SalvarArquivoXml($"{cfgServico.DiretorioSalvarXml}", $"{DateTime.Now.Ticks}-env-nfe.xml", xmlenviNFe4);
 
             var urlSefaz = SefazServico.ObterUrl(eTipoServico.AutorizarNFe, cfgServico.TipoAmbiente, modeloDocumento, cfgServico.UF);
 
@@ -69,7 +69,7 @@ namespace FiscalCore.Servicos
             var retornoXmlString = await SefazServico.EnviarParaSefazAsync(cfgServico, urlSefaz, envelope);
             var retornoLimpo = Soap.LimparEnvelope(retornoXmlString, "retEnviNFe").OuterXml;
 
-            Xml.SalvarArquivoXml($"{cfgServico.DiretorioSalvarXml}", $"{DateTime.Now.Ticks}-ret-env-nfe.xml", retornoLimpo);
+            XmlUtils.SalvarArquivoXml($"{cfgServico.DiretorioSalvarXml}", $"{DateTime.Now.Ticks}-ret-env-nfe.xml", retornoLimpo);
 
             var retEnviNFe = new RetNFeAutorizacao4(retornoLimpo);
             retEnviNFe.XmlEnviado = xmlenviNFe4;

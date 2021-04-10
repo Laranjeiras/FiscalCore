@@ -3,44 +3,53 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace FiscalCore.Utils
 {
     public static class Arquivo
     {
-        public static void SalvarArquivoAutorizado(DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica.NFe nfe, IConfiguracaoServico _configServico, string conteudo)
-        {
-            var nomeArquivo = $"{nfe.infNFe.Id}.xml";
-            var ambiente = nfe.infNFe.ide.tpAmb.ToString();
-            var dataFiscal = nfe.infNFe.ide.dhEmi;
+        //public static void SalvarArquivoAutorizado(DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica.NFe nfe, IConfiguracaoServico _configServico, string conteudo)
+        //{
+        //    var nomeArquivo = $"{nfe.infNFe.Id}.xml";
+        //    var ambiente = nfe.infNFe.ide.tpAmb.ToString();
+        //    var dataFiscal = nfe.infNFe.ide.dhEmi;
 
-            SalvarArquivoString(_configServico.DiretorioSalvarXml, ambiente, "Autorizacao", dataFiscal, nomeArquivo ,conteudo);
-        }
+        //    SalvarArquivoString(_configServico.DiretorioSalvarXml, ambiente, "Autorizacao", dataFiscal, nomeArquivo ,conteudo);
+        //}
 
-        public static void SalvarArquivoString(string diretorioBase, string ambiente, string subDiretorio, DateTimeOffset dataFiscal, string nomeArquivo, string conteudo)
+        public static async Task<string> SalvarArquivoAsync(IConfiguracaoServico configuracao, string subDiretorio, string nomeArquivo, string conteudo, DateTime? dataFiscal = null)
         {
-            if (diretorioBase == null)
-                throw new ArgumentNullException(nameof(diretorioBase), "O caminho do arquivo deve ser informado");
-            if (ambiente == null)
-                throw new ArgumentNullException(nameof(ambiente), "O ambiente do arquivo deve ser informado");
-            if (subDiretorio == null)
-                throw new ArgumentNullException(nameof(ambiente), "O subdiretorio do arquivo deve ser informado");
+            var dir = Path.Combine(configuracao.DiretorioSalvarXml, configuracao.TipoAmbiente.ToString(), subDiretorio);
+            if (dataFiscal != null)
+                dir = Path.Combine(dir, dataFiscal?.ToString("MM_yyyy"));
+
+            CriarDiretorioSeNaoExistir(dir);
+
+            if (dir == null)
+                throw new ArgumentNullException(nameof(dir), "O caminho do arquivo deve ser informado");
             if (nomeArquivo == null)
                 throw new ArgumentNullException(nameof(nomeArquivo), "O nome do arquivo deve ser informado");
             if (conteudo == null)
                 throw new ArgumentNullException(nameof(conteudo), "O conteúdo do arquivo deve ser informado");
 
-            var diretorio = Path.Combine(diretorioBase, ambiente, dataFiscal.ToString("MM_yyyy"), subDiretorio);
+            var arquivo = Path.Combine(dir, nomeArquivo);
+            var stw = new StreamWriter(arquivo);
+            await stw.WriteLineAsync(conteudo);
+            stw.Close();
+            return arquivo;
+        }
 
-            CriarDiretorioSeNaoExistir(diretorio);
+        [Obsolete("Substituido por SalvarArquivoAsync(IConfiguracaoServico configuracao...")]
+        public static async Task<string> SalvarArquivoAsync(string dir, string nomeArquivo, string xmlString)
+        {
+            CriarDiretorioSeNaoExistir(dir);
 
-            var encodedText = Encoding.UTF8.GetBytes(conteudo);
-            var c1 = Path.Combine(diretorio, nomeArquivo);
-            using (var sourceStream = new FileStream(c1, FileMode.Append, FileAccess.Write, FileShare.None, 4096, true))
-            {
-                sourceStream.Write(encodedText, 0, encodedText.Length);
-                sourceStream.Close();
-            }
+            var filename = Path.Combine(dir, nomeArquivo);
+            var stw = new StreamWriter(filename);
+            await stw.WriteLineAsync(xmlString);
+            stw.Close();
+            return filename;
         }
 
         public static string LerArquivo(string arquivo)
@@ -57,11 +66,6 @@ namespace FiscalCore.Utils
             return CriarDiretorioSeNaoExistir(caminho);
         }
 
-        /// <summary>
-        /// Criar diretório se não existir
-        /// </summary>
-        /// <param name="diretorio">Diretório a ser criado</param>
-        /// <returns></returns>
         public static string CriarDiretorioSeNaoExistir(string diretorio)
         {
             if (diretorio == null)

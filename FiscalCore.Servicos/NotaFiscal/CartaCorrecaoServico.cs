@@ -81,9 +81,9 @@ namespace FiscalCore.Servicos
                 evento = eventos
             };
 
-            var xmlEvento = Xml.ClasseParaXmlString<envEvento>(pedEvento);
+            var xmlEvento = XmlUtils.ClasseParaXmlString<envEvento>(pedEvento);
 
-            Xml.SalvarArquivoXml(_cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ped-eve.xml", xmlEvento);
+            XmlUtils.SalvarArquivoXml(_cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ped-eve.xml", xmlEvento);
 
             var sefazUrl = SefazServico.ObterUrl(eTipoServico.CartaCorrecao, _cfgServico.TipoAmbiente, eModeloDocumento.NFe, _cfgServico.UF);
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.CartaCorrecao, xmlEvento);
@@ -92,7 +92,7 @@ namespace FiscalCore.Servicos
 
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retEnvEvento").OuterXml;
 
-            Xml.SalvarArquivoXml(_cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ret-eve.xml", retornoXmlStringLimpa);
+            XmlUtils.SalvarArquivoXml(_cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ret-eve.xml", retornoXmlStringLimpa);
 
             var retorno = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 

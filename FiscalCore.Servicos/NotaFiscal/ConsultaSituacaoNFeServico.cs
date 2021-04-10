@@ -30,7 +30,7 @@ namespace FiscalCore.Servicos
                 versao = _versao
             };
 
-            var xmlEvento = Xml.ClasseParaXmlString<consSitNFe>(consSit);
+            var xmlEvento = XmlUtils.ClasseParaXmlString<consSitNFe>(consSit);
 
             var modeloDoc = chaveAcesso.Substring(20, 2).ModeloDocumento();
 
@@ -41,7 +41,7 @@ namespace FiscalCore.Servicos
 
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retConsSitNFe").OuterXml;
 
-            Xml.SalvarArquivoXml(_cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-retConsSitNFe.xml", retornoXmlStringLimpa);
+            XmlUtils.SalvarArquivoXml(_cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-retConsSitNFe.xml", retornoXmlStringLimpa);
 
             var retEnvEvento = new retConsSitNFe().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 

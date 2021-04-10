@@ -1,28 +1,25 @@
-﻿using DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica.RetornoServicos.DistribuicaoDFe.Schemas;
-using FiscalCore.Configuracoes;
+﻿using FiscalCore.Configuracoes;
+using FiscalCore.DTOs.DistribuicaoDFe;
 using FiscalCore.Fabrica;
+using FiscalCore.Modelos.Consulta;
 using FiscalCore.Modelos.DistribuicaoDFe;
 using FiscalCore.Servicos;
 using FiscalCore.Tipos;
 using FiscalCore.Utils;
 using FiscalCore.Validacoes;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using resNFe = FiscalCore.Modelos.DistribuicaoDFe.resNFe;
 
 namespace FiscalCore.DistribuicaoDFe.Servicos
 {
     public class DistribuicaoDFeServico
     {
-        private readonly IConfiguracaoServico cfgServico;
-        private readonly string dirBase;
+        private readonly IConfiguracaoServico configuracao;
 
-        public DistribuicaoDFeServico(IConfiguracaoServico cfgServico)
+        public DistribuicaoDFeServico(IConfiguracaoServico configuracao)
         {
-            this.cfgServico = cfgServico;
-            this.dirBase = Path.Combine(cfgServico.DiretorioSalvarXml, "DistribuicaoDFe");
+            this.configuracao = configuracao;
         }
 
         public async Task<string> ConsultarDistribuicao(string nsu, bool validarXmlConsulta = true)
@@ -37,30 +34,30 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
             var distDFeInt = new distDFeInt
             {
                 Versao = "1.01",
-                Cnpj = cfgServico.Emitente.CNPJ,
+                Cnpj = configuracao.Emitente.CNPJ,
                 DistNSU = new distNSU
                 {
                     UltNSU = nsu
                 },
-                cUFAutor = ((int)cfgServico.UF).ToString(),
-                TpAmb = cfgServico.TipoAmbiente
+                cUFAutor = ((int)configuracao.UF).ToString(),
+                TpAmb = configuracao.TipoAmbiente
             };
 
-            var xml = Xml.ClasseParaXmlString<distDFeInt>(distDFeInt);
+            var xml = XmlUtils.ClasseParaXmlString<distDFeInt>(distDFeInt);
 
             if (validarXmlConsulta)
-                Schemas.ValidarSchema(eTipoServico.NFeDistribuicaoDFe, xml, cfgServico);
+                Schemas.ValidarSchema(eTipoServico.NFeDistribuicaoDFe, xml, configuracao);
 
-            Xml.SalvarArquivoXml(dirBase, $"{cfgServico.Emitente.CNPJ ?? cfgServico.Emitente.CPF}-{DateTime.Now.Ticks}-ped-DistDFeInt.xml", xml);
+            await Arquivo.SalvarArquivoAsync(configuracao, "DistribuicaoDFe", $"{configuracao.Emitente.CNPJ ?? configuracao.Emitente.CPF}-{DateTime.Now.Ticks}-ped-DistDFeInt.xml", xml);
 
             var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.NFeDistribuicaoDFe, xml);
 
-            var sefazUrl = SefazServico.ObterUrl(eTipoServico.ManifestacaoDestinatario, eTipoAmbiente.Producao, eModeloDocumento.NFe, eUF.RJ);
-            var retorno = await SefazServico.EnviarParaSefazAsync(cfgServico, sefazUrl, envelope);
+            var sefazUrl = SefazServico.ObterUrl(eTipoServico.NFeDistribuicaoDFe, configuracao.TipoAmbiente, eModeloDocumento.NFe, eUF.RJ);
+            var retorno = await SefazServico.EnviarParaSefazAsync(configuracao, sefazUrl, envelope);
 
             var retornoLimpo = Soap.LimparEnvelope(retorno, "retDistDFeInt").OuterXml;
 
-            Xml.SalvarArquivoXml(dirBase, $"{cfgServico.Emitente.CNPJ ?? cfgServico.Emitente.CPF}-{DateTime.Now.Ticks}-retDistDFeInt.xml", retornoLimpo);
+            await Arquivo.SalvarArquivoAsync(configuracao, "DistribuicaoDFe", $"{configuracao.Emitente.CNPJ ?? configuracao.Emitente.CPF}-{DateTime.Now.Ticks}-retDistDFeInt.xml", xml);
 
             return retornoLimpo;
         }
@@ -75,25 +72,27 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
             var distDFeInt = new distDFeInt
             {
                 Versao = "1.01",
-                Cnpj = cfgServico.Emitente.CNPJ,
+                Cnpj = configuracao.Emitente.CNPJ,
                 consChNFe = new consChNFe
                 {
                     ChNFe = chaveNFe
                 },
-                cUFAutor = ((int)cfgServico.UF).ToString(),
-                TpAmb = cfgServico.TipoAmbiente
+                cUFAutor = ((int)configuracao.UF).ToString(),
+                TpAmb = configuracao.TipoAmbiente
             };
 
             return null;
         }
 
-        public async Task<RetornoDistNFeDTO> MontarRetorno(string retorno)
+        public async Task<RetDistNFeDTO> MontarRetorno(string retorno)
         {
-            var retDistDFeInt = Xml.XmlStringParaClasse<retDistDFeInt>(retorno);
+            var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retorno);
 
-            var retornoDto = new RetornoDistNFeDTO();
-            retornoDto.CStat = retDistDFeInt.cStat;
-            retornoDto.XMotivo = retDistDFeInt.xMotivo;
+            var retornoDto = new RetDistNFeDTO
+            {
+                CStat = retDistDFeInt.cStat,
+                Motivo = retDistDFeInt.xMotivo
+            };
 
             if (retDistDFeInt.loteDistDFeInt != null)
             {
@@ -104,38 +103,23 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
 
                     var conteudoZip = Arquivo.Unzip(dfeInt.XmlNfe);
 
-                    await Xml.SalvarArquivoXmlAsync(dirBase, $"{cfgServico.Emitente.CNPJ ?? cfgServico.Emitente.CPF}-{DateTime.Now.Ticks}-{dfeInt.NSU}-{tipoRet}.xml", conteudoZip);
+                    await Arquivo.SalvarArquivoAsync(configuracao, "DistribuicaoDFe", $"{configuracao.Emitente.CNPJ ?? configuracao.Emitente.CPF}-{DateTime.Now.Ticks}-{dfeInt.NSU}-{tipoRet}.xml", conteudoZip);
 
                     if (conteudoZip.StartsWith("<resNFe"))
                     {
-                        var retConteudo = Xml.XmlStringParaClasse<resNFe>(conteudoZip);
+                        var retConteudo = XmlUtils.XmlStringParaClasse<resNFe>(conteudoZip);
                         retornoDto.ResNFes.Add(retConteudo);
                         
                     }
                     else if (conteudoZip.StartsWith("<procEventoNFe"))
                     {
-                        var xml = Xml.ObterTagXml(conteudoZip, "procEventoNFe");
-                        var retEvento = Xml.XmlStringParaClasse<procEventoNFe>(xml);
+                        var xml = XmlUtils.ObterTagXml(conteudoZip, "procEventoNFe");
+                        var retEvento = XmlUtils.XmlStringParaClasse<procEventoNFe>(xml);
                         retornoDto.ProcEventos.Add(retEvento);
                     }
                 }
             }
             return retornoDto;
         }
-    }
-
-    public class RetornoDistNFeDTO
-    {
-        public RetornoDistNFeDTO()
-        {
-            ResNFes = new List<resNFe>();
-            ProcEventos = new List<procEventoNFe>();
-        }
-
-        public IList<resNFe> ResNFes { get; private set; }
-        public IList<procEventoNFe> ProcEventos { get; private set; }
-
-        public int CStat { get; set; }
-        public string XMotivo { get; set; }
     }
 }

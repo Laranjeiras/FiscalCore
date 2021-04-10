@@ -8,7 +8,7 @@ namespace FiscalCore.Extensions
 
         public static retEnvEvento CarregarDeXmlString(this retEnvEvento retEnvEvento, string xmlRecebido, string xmlEnviado)
         {
-            var tmp = Xml.XmlStringParaClasse<retEnvEvento>(xmlRecebido);
+            var tmp = XmlUtils.XmlStringParaClasse<retEnvEvento>(xmlRecebido);
             tmp.XmlEnviado = xmlEnviado;
             tmp.XmlRecebido = xmlRecebido;
             return tmp;
@@ -16,7 +16,7 @@ namespace FiscalCore.Extensions
 
         public static retConsSitNFe CarregarDeXmlString(this retConsSitNFe retConsSitNFe, string xmlRecebido, string xmlEnviado)
         {
-            var tmp = Xml.XmlStringParaClasse<retConsSitNFe>(xmlRecebido);
+            var tmp = XmlUtils.XmlStringParaClasse<retConsSitNFe>(xmlRecebido);
             tmp.XmlRecebido = xmlRecebido;
             tmp.XmlEnviado = xmlEnviado;
             return tmp;

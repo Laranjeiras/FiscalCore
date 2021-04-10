@@ -9,10 +9,6 @@ namespace FiscalCore.Tipos
         [XmlEnum("110110")]
         NFeCartaCorrecao = 110110,
 
-        [Description("EPEC")]
-        [XmlEnum("110140")]
-        NFceEpec = 110140,
-
         [Description("Cancelamento")]
         [XmlEnum("110111")]
         NFeCancelamento = 110111,
@@ -20,5 +16,26 @@ namespace FiscalCore.Tipos
         [Description("Cancelamento por substituicao")]
         [XmlEnum("110112")]
         NFeCancelamentoSubstituicao = 110112,
+
+        [Description("EPEC")]
+        [XmlEnum("110140")]
+        NFceEpec = 110140,
+
+        [Description("Confirmação da Operação")]
+        [XmlEnum("210200")]
+        ConfirmacaoOperacao = 210200,
+
+        [Description("Ciência da Operação")]
+        //[Description("Ciencia da Operacao")]
+        [XmlEnum("210210")]
+        CienciaOperacao = 210210,
+
+        [Description("Desconhecimento da Operação")]
+        [XmlEnum("210220")]
+        DesconhecimentoOperacao = 210220,
+
+        [Description("Operação não Realizada")]
+        [XmlEnum("210240")]
+        OperacaoNaoRealizada = 210240
     }
 }

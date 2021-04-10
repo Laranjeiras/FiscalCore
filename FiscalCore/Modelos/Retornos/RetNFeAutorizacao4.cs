@@ -6,7 +6,7 @@ namespace FiscalCore.Modelos.Retornos
     {
         public RetNFeAutorizacao4(string xmlRetorno) : base(xmlRetorno)
         {
-            Retorno = Xml.XmlStringParaClasse<retEnviNFe>(XmlRecebido);
+            Retorno = XmlUtils.XmlStringParaClasse<retEnviNFe>(XmlRecebido);
         }
 
         public retEnviNFe Retorno { get; set; }

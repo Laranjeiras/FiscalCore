@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,9 +9,8 @@ using System.Xml.Serialization;
 
 namespace FiscalCore.Utils
 {
-    public class Xml
-    {
-        private static readonly Hashtable CacheSerializers = new Hashtable();
+    public static class XmlUtils
+    { 
 
         public static string ClasseParaXmlString<T>(T objeto)
         {
@@ -48,40 +46,16 @@ namespace FiscalCore.Utils
             return xmlConverter;
         }
 
+        [Obsolete("Substituido por Arquivo.SalvarArquivo")]
         public static string SalvarArquivoXml(string dir, string nomeArquivo, string xmlString)
         {
-            try
-            {
-                if (!Directory.Exists(dir))
-                    Arquivo.CriarDiretorioSeNaoExistir(dir);
-            }
-            catch
-            {
-                throw new Exception("Diretorio não existe");
-            }
-            var filename = Path.Combine(dir, nomeArquivo);
-            var stw = new StreamWriter(filename);
-            stw.WriteLine(xmlString);
-            stw.Close();
-            return filename;
+            return Arquivo.SalvarArquivoAsync(dir, nomeArquivo, xmlString).Result;
         }
 
+        [Obsolete("Substituido por Arquivo.SalvarArquivo")]
         public static async Task<string> SalvarArquivoXmlAsync(string dir, string nomeArquivo, string xmlString)
         {
-            try
-            {
-                if (!Directory.Exists(dir))
-                    Arquivo.CriarDiretorioSeNaoExistir(dir);
-            }
-            catch {
-                throw new Exception("Diretorio não existe");
-            }
-
-            var filename = Path.Combine(dir, nomeArquivo);
-            var stw = new StreamWriter(filename);
-            await stw.WriteLineAsync(xmlString);
-            stw.Close();
-            return filename;
+            return await Arquivo.SalvarArquivoAsync(dir, nomeArquivo, xmlString);
         }
     }
 }

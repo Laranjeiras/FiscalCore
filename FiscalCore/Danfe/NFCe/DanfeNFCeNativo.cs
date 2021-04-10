@@ -41,14 +41,14 @@ namespace FiscalCore.Danfe.NFCe
         {
             try
             {
-                _proc = Xml.XmlStringParaClasse<nfeProc>(xml);
+                _proc = XmlUtils.XmlStringParaClasse<nfeProc>(xml);
                 _nfe = _proc.NFe;
             }
             catch (Exception)
             {
                 try
                 {
-                    _nfe = Xml.XmlStringParaClasse<NFe>(xml);
+                    _nfe = XmlUtils.XmlStringParaClasse<NFe>(xml);
                 }
                 catch (Exception)
                 {

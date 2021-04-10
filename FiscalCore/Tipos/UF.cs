@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.ComponentModel;
+using System.Xml.Serialization;
 
 namespace FiscalCore.Tipos
 {
@@ -59,6 +60,7 @@ namespace FiscalCore.Tipos
         [XmlEnum("17")]
         TO = 17,
         [XmlEnum("91")]
+        [Description("AMBIENTE NACIONAL")]
         AN = 91,
         [XmlEnum("99")]
         EX = 99
