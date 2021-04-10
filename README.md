@@ -4,7 +4,7 @@ Dotnet Standard 2.1
 
 [![Pack Servicos + Push no NuGet](https://github.com/Laranjeiras/FiscalCore/actions/workflows/publish_servicos.yml/badge.svg)](https://github.com/Laranjeiras/FiscalCore/actions/workflows/publish_servicos.yml)
 
-[![Pack Dominio + Push no NuGet](https://github.com/Laranjeiras/FiscalCore/actions/workflows/publish_dominio.yml/badge.svg)](https://github.com/Laranjeiras/FiscalCore/actions/workflows/publish_domain.yml)
+[![Pack Dominio + Push no NuGet](https://github.com/Laranjeiras/FiscalCore/actions/workflows/publish_domain.yml/badge.svg)](https://github.com/Laranjeiras/FiscalCore/actions/workflows/publish_domain.yml)
 
 https://api.nuget.org/v3/index.json
 
