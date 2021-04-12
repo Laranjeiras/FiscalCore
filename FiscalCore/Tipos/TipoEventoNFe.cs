@@ -26,7 +26,6 @@ namespace FiscalCore.Tipos
         ConfirmacaoOperacao = 210200,
 
         [Description("Ciência da Operação")]
-        //[Description("Ciencia da Operacao")]
         [XmlEnum("210210")]
         CienciaOperacao = 210210,
 

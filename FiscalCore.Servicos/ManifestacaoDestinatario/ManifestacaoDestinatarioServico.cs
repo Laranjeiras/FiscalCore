@@ -29,14 +29,14 @@ namespace FiscalCore.Servicos.ManifestacaoDestinatario
             this.certificado = ObterCertificado.Obter(configuracao.ConfigCertificado);
         }
 
-        public async Task<string> TransmitirAsync(string chaveAcesso, eTipoEventoNFe tipoEvento, string justificativa = null)
+        public async Task<string> ManifestarAsync(string chaveAcesso, eTipoEventoNFe tipoEvento, string justificativa = null)
         {
             var xmlEvento = GerarXmlEvento(chaveAcesso, tipoEvento, justificativa);
 
             await Arquivo.SalvarArquivoAsync(configuracao, "Eventos", $"{DateTime.Now.Ticks}-ped-eve.xml", xmlEvento);
 
             var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.ManifestacaoDestinatario, xmlEvento);
-            var sefazUrl = SefazServico.ObterUrl(eTipoServico.ManifestacaoDestinatario, configuracao.TipoAmbiente, eModeloDocumento.NFe, configuracao.UF);
+            var sefazUrl = SefazServico.ObterUrl(eTipoServico.ManifestacaoDestinatario, configuracao.TipoAmbiente, eModeloDocumento.NFe, eUF.AN);
             var xmlRetorno = await SefazServico.EnviarParaSefazAsync(configuracao, sefazUrl, envelope);
             var xmlRetLimpo = Soap.LimparEnvelope(xmlRetorno, "retEnvEvento").OuterXml;
             await Arquivo.SalvarArquivoAsync(configuracao, "Eventos", $"{DateTime.Now.Ticks}-ret-eve.xml", xmlRetLimpo);

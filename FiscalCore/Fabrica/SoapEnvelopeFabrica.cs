@@ -5,7 +5,7 @@ using System.Xml;
 
 namespace FiscalCore.Fabrica
 {
-    public class SoapEnvelopeFabrica
+    public static class SoapEnvelopeFabrica
     {
         public static XmlDocument FabricarEnvelope(eTipoServico tipoServico, string xml)
         {
@@ -22,7 +22,7 @@ namespace FiscalCore.Fabrica
                 case eTipoServico.CartaCorrecao:
                     return FabricarEnvelopeEventoNFe(xml);
                 case eTipoServico.ManifestacaoDestinatario:
-                    return FabricarEnvelopeEventoNFe(xml);
+                    return FabricarEnvelopeManifestacaoNacional(xml);
                 case eTipoServico.NFeDistribuicaoDFe:
                     return FabricarEnvelopeNFeDistribuicaoDFe(xml);
                 default:

@@ -75,10 +75,9 @@ namespace FiscalCore.Servicos
 
             #region Ambiente Nacional
             // Distribuicao DFe - Consultar Documentos Destinados
-            urls.Add(new UrlSefaz(eTipoServico.NFeDistribuicaoDFe, eUF.RJ, eTipoAmbiente.Producao, eModeloDocumento.NFe, "https://www1.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx", "https://www1.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx?op=nfeDistDFeInteresse"));
-
-            urls.Add(new UrlSefaz(eTipoServico.ManifestacaoDestinatario, eUF.RJ, eTipoAmbiente.Producao, eModeloDocumento.NFe, "https://www.nfe.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx", "https://www.nfe.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx?op=nfeRecepcaoEventoNF"));
-            //
+            urls.Add(new UrlSefaz(eTipoServico.NFeDistribuicaoDFe, eUF.AN, eTipoAmbiente.Producao, eModeloDocumento.NFe, "https://www1.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx", "https://www1.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx?op=nfeDistDFeInteresse"));
+            // Manifestação Destinatário
+            urls.Add(new UrlSefaz(eTipoServico.ManifestacaoDestinatario, eUF.AN, eTipoAmbiente.Producao, eModeloDocumento.NFe, "https://www.nfe.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx", "https://www.nfe.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx?op=nfeRecepcaoEventoNF"));
             #endregion
             return urls;
         }
