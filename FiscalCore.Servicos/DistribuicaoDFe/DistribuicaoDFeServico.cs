@@ -106,11 +106,11 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
             return retornoLimpo;
         }
 
-        public async Task<RetDistNFeDTO> MontarRetorno(string retorno)
+        public async Task<RetDistDFeDTO> MontarRetorno(string retorno)
         {
             var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retorno);
 
-            var retornoDto = new RetDistNFeDTO
+            var retornoDto = new RetDistDFeDTO
             {
                 CStat = retDistDFeInt.cStat,
                 Motivo = retDistDFeInt.xMotivo
@@ -125,26 +125,36 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
 
                     var conteudoZip = Arquivo.Unzip(dfeInt.XmlNfe);
 
+                    string chaveNFe = null;
+                    string tipoRetorno = null;
+
                     await Arquivo.SalvarArquivoAsync(configuracao, "DistribuicaoDFe", $"{configuracao.Emitente.CNPJ ?? configuracao.Emitente.CPF}-{DateTime.Now.Ticks}-{dfeInt.NSU}-{tipoRet}.xml", conteudoZip);
 
                     if (conteudoZip.StartsWith("<resNFe"))
                     {
                         var retConteudo = XmlUtils.XmlStringParaClasse<resNFe>(conteudoZip);
                         retornoDto.ResNFes.Add(retConteudo);
-                        
+                        chaveNFe = retConteudo.chNFe;
+                        tipoRetorno = "resNFe";
                     }
                     else if (conteudoZip.StartsWith("<procEventoNFe"))
                     {
                         var xml = XmlUtils.ObterTagXml(conteudoZip, "procEventoNFe");
-                        var retEvento = XmlUtils.XmlStringParaClasse<procEventoNFe>(xml);
-                        retornoDto.ProcEventos.Add(retEvento);
+                        var procEvento = XmlUtils.XmlStringParaClasse<procEventoNFe>(xml);
+                        retornoDto.ProcEventos.Add(procEvento);
+                        chaveNFe = procEvento?.retEvento?.infEvento?.chNFe;
+                        tipoRetorno = "procEventoNFe";
                     }
                     else if (conteudoZip.StartsWith("<nfeProc"))
                     {
                         var xml = XmlUtils.ObterTagXml(conteudoZip, "nfeProc");
-                        var retEvento = XmlUtils.XmlStringParaClasse<nfeProc>(xml);
-                        retornoDto.NFeProcs.Add(retEvento);
+                        var nfeProc = XmlUtils.XmlStringParaClasse<nfeProc>(xml);
+                        retornoDto.NFeProcs.Add(nfeProc);
+                        chaveNFe = nfeProc.NFe.infNFe.Id;
+                        tipoRetorno = "nfeProc";
                     }
+
+                    retornoDto.DistDfeIntDTOs.Add(new RetDistDFeIntDTO(chaveNFe, dfeInt.NSU, conteudoZip, tipoRetorno));
                 }
             }
             return retornoDto;

@@ -1,4 +1,7 @@
-﻿namespace FiscalCore.Extensions
+﻿using System;
+using System.Linq;
+
+namespace FiscalCore.Extensions
 {
     public static class StringExtension
     {
@@ -11,6 +14,11 @@
                 texto = texto.Replace(comAcentos[i].ToString(), semAcentos[i].ToString());
 
             return texto;
+        }
+
+        public static string SomenteNumeros(this string value)
+        {
+            return string.IsNullOrEmpty(value) ? null : new string(value.Where(Char.IsDigit).ToArray());
         }
     }
 }
