@@ -51,6 +51,8 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
             if (string.IsNullOrEmpty(nsu))
                 throw new ArgumentNullException(nameof(nsu));
 
+            nsu = nsu.PadLeft(15, '0');
+
             var distDFeInt = new distDFeInt
             {
                 Versao = "1.01",
