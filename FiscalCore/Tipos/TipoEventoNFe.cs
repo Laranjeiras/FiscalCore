@@ -1,10 +1,16 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Xml.Serialization;
 
 namespace FiscalCore.Tipos
 {
     public enum eTipoEventoNFe
     {
+        [Obsolete("Colocado apenas para ser usado em um ERP (banco de dados) legado (DFeEventos/TpEvento = 0)")]
+        [Description("Nenhum evento informado")]
+        [XmlEnum("0")]
+        NenhumEventoInformado = 0,
+
         [Description("Carta de Correção")]
         [XmlEnum("110110")]
         NFeCartaCorrecao = 110110,
