@@ -49,6 +49,22 @@ namespace FiscalCore.Tipos
         [XmlEnum("15")]
         BoletoBancario = 15, // VERSÃO 4.00
 
+        [Description("Depósito Bancário")]
+        [XmlEnum("16")]
+        DepositoBancario = 16, // VERSÃO 4.00 NT2020.006
+
+        [Description("Pix - Pagamento Instantâneo")]
+        [XmlEnum("17")]
+        PixPagamentoInstantaneo = 17, // VERSÃO 4.00 NT2020.006
+
+        [Description("Transferência Bancária, Carteira Digital")]
+        [XmlEnum("18")]
+        TransferenciaBancariaCarteiraDigital = 18, // VERSÃO 4.00 NT2020.006
+
+        [Description("Programa de Fidelidade, Cashback, Crédito Virtual")]
+        [XmlEnum("19")]
+        ProgramadeFidelidadeCashbackCreditoVirtual = 19, // VERSÃO 4.00 NT2020.006
+
         [Description("Sem pagamento")]
         [XmlEnum("90")]
         SemPagamento = 90, // VERSÃO 4.00
