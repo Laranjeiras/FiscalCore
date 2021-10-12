@@ -1,17 +1,18 @@
 ﻿using FiscalCore.Configuracoes;
 using FiscalCore.Tipos;
+using FiscalCore.ValueObjects;
 using System;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace FiscalCore.Utils
 {
     public static class ObterCertificado
     {
-        //public DateTime Validade => Convert.ToDateTime(ObterCertificado().GetExpirationDateString());
-        //public string IssuedTo => ObterCertificado().Issuer;
-        //public string FriendlyName => ObterCertificado().FriendlyName;
-
         public static X509Certificate2 Obter(ConfiguracaoCertificado configCertificado)
         {
             switch (configCertificado.TipoCertificado)
@@ -58,6 +59,24 @@ namespace FiscalCore.Utils
                 throw new FileNotFoundException(string.Format("Certificado digital {0} não encontrado!", arquivo));
             var certificado = new X509Certificate2(arquivo, senha, X509KeyStorageFlags.MachineKeySet);
             return certificado;
+        }
+
+        public static string ExtrairCNPJArquivo(X509Certificate2 certificado)
+        {
+            const string oIdSubjectAlternativeName = "2.5.29.17";
+
+            var extensao = certificado.Extensions[oIdSubjectAlternativeName];
+            var texto = Encoding.UTF8.GetString(extensao.RawData);
+
+            var matches = Regex.Matches(texto, @"(?<!\d)\d{14}(?!\d)");
+
+            var cnpjValido = matches.FirstOrDefault(p => new Cnpj(p.Value).EhValido);
+            return cnpjValido?.Value;
+        }
+
+        public static DateTime Validade(this X509Certificate2 certificado)
+        {
+            return certificado.NotAfter;
         }
     }
 }
