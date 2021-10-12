@@ -9,7 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FiscalCore", "FiscalCore\Fi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FiscalCore.WebPrint", "FiscalCore.WebPrint\FiscalCore.WebPrint.csproj", "{DDE2A254-BC13-499D-BB0A-DFE1CCFAFF2A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiscalCore.Servicos", "FiscalCore.Servicos\FiscalCore.Servicos.csproj", "{52D7ED58-4329-477C-8E21-E2035D036666}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FiscalCore.Servicos", "FiscalCore.Servicos\FiscalCore.Servicos.csproj", "{52D7ED58-4329-477C-8E21-E2035D036666}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testes", "Testes", "{FCBF3709-48DF-4090-869B-15973C92F2F5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F910B40D-3FF5-460E-846E-022E42602242}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiscalCore.Testes", "FiscalCore.Testes\FiscalCore.Testes.csproj", "{1C87443E-776E-461C-A91B-D6ED044C183D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,9 +39,20 @@ Global
 		{52D7ED58-4329-477C-8E21-E2035D036666}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{52D7ED58-4329-477C-8E21-E2035D036666}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{52D7ED58-4329-477C-8E21-E2035D036666}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C87443E-776E-461C-A91B-D6ED044C183D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C87443E-776E-461C-A91B-D6ED044C183D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C87443E-776E-461C-A91B-D6ED044C183D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C87443E-776E-461C-A91B-D6ED044C183D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D37B8CEA-3215-462F-A652-C90A6F52A687} = {FCBF3709-48DF-4090-869B-15973C92F2F5}
+		{4F86A89E-5FD4-474B-AD86-0B876A71E25A} = {F910B40D-3FF5-460E-846E-022E42602242}
+		{DDE2A254-BC13-499D-BB0A-DFE1CCFAFF2A} = {F910B40D-3FF5-460E-846E-022E42602242}
+		{52D7ED58-4329-477C-8E21-E2035D036666} = {F910B40D-3FF5-460E-846E-022E42602242}
+		{1C87443E-776E-461C-A91B-D6ED044C183D} = {FCBF3709-48DF-4090-869B-15973C92F2F5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9CBF5611-49FE-47DA-83C2-F026B4A583AA}
