@@ -1,10 +1,12 @@
-﻿using FiscalCore.Modelos.NotaFiscal.Emitente;
+﻿using FiscalCore.Exceptions;
+using FiscalCore.Modelos.NotaFiscal.Emitente;
 using FiscalCore.Tipos;
+using FiscalCore.Utils;
 using System.IO;
 
 namespace FiscalCore.Configuracoes
 {
-    public class ConfiguracaoServico : IConfiguracaoServico
+    public class ConfiguracaoServico
     {
         public ConfiguracaoServico()
         {
@@ -59,8 +61,8 @@ namespace FiscalCore.Configuracoes
         public string _diretorioSalvarDanfe;
         public string DiretorioSalvarDanfe
         {
-            get { return _diretorioSalvarXml ?? Directory.GetCurrentDirectory(); }
-            set { _diretorioSalvarXml = value; }
+            get { return _diretorioSalvarDanfe ?? Directory.GetCurrentDirectory(); }
+            set { _diretorioSalvarDanfe = value; }
         }
 
         public emit Emitente { get; set; }
@@ -68,6 +70,11 @@ namespace FiscalCore.Configuracoes
         public IConfiguracaoDanfe ConfigDanfe { get; set; }
         public ConfiguracaoCsc Csc { get; set; }
         public int TimeOut { get; set; } = 5000;
+
+
+        /// <summary>
+        /// Versão do Processo de emissão da NF-e.
+        /// </summary>
         public string VersaoProc { get; set; }
 
         public eVersaoServico VersaoInutilizacaoNFe { get; set; }
@@ -76,5 +83,36 @@ namespace FiscalCore.Configuracoes
         public string ImpressoraCupom { get; set; }
         public int NFeSerie { get; set; }
         public int NFCeSerie { get; set; }
+
+        public bool Valido => valido();
+
+        private bool valido()
+        {
+            try
+            {
+                Validar();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public void Validar()
+        {
+            if (Emitente == null)
+                throw new FalhaValidacaoException("Emitente não informado");
+            if (Emitente.enderEmit == null)
+                throw new FalhaValidacaoException("Endereço do emitente não informado");
+            if (Emitente.enderEmit.cMun <= 0)
+                throw new FalhaValidacaoException("Municipio do emitente inválido");
+            if ((int)VersaoAutorizacaoNFe == 0)
+                throw new FalhaValidacaoException("Versão autorização NFe não informado");
+            if ((int)VersaoCancelamentoNFe == 0)
+                throw new FalhaValidacaoException("Versão cancelamento NFe não informado");
+            if ((int)VersaoInutilizacaoNFe == 0)
+                throw new FalhaValidacaoException("Versão inutilização NFe não informado");
+        }
     }
 }

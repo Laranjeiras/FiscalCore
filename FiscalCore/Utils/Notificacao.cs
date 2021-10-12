@@ -10,10 +10,11 @@ namespace FiscalCore.Utils
         public string Mensagem { get; protected set; }
         public bool EhErro { get; protected set; }
 
-        public Notificacao(string campo, string mensagem, bool EhErro = true)
+        public Notificacao(string campo, string mensagem, bool ehErro = true)
         {
             Campo = campo;
             Mensagem = mensagem;
+            EhErro = ehErro;
         }
     }
 

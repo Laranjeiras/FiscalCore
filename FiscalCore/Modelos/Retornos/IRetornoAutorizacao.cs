@@ -3,5 +3,6 @@
     public interface IRetornoAutorizacao
     {
         retEnviNFe Retorno { get; set; }
+        bool Autorizado { get; }
     }
 }

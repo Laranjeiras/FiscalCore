@@ -10,5 +10,7 @@ namespace FiscalCore.Modelos.Retornos
         }
 
         public retEnviNFe Retorno { get; set; }
+
+        public bool Autorizado => Retorno?.cStat == 100 ? true : false;
     }
 }

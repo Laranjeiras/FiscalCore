@@ -24,13 +24,20 @@ namespace FiscalCore.Servicos
                 throw new FalhaValidacaoException("CNPJ/CPF do Emitente da NFe difere do CNPJ/CPF do Emissor Cadastrado");
 
             if (!ValidarModeloUnico(nfes))
-                throw new Exception("Apenas um modelo de NFe pode ser enviado por lote");
+                throw new FalhaValidacaoException("Apenas um modelo de NFe pode ser enviado por lote");
         }
 
         private bool ValidarEmitenteEmissor(IList<NFe> nfes)
         {
-            var cpfCnpjEmitente = nfes.Select(x => new { CpfCnpj = x.infNFe.emit.CNPJ ?? x.infNFe.emit.CPF }).Distinct().SingleOrDefault();
-            return !(cpfCnpjEmitente.CpfCnpj != cfgServico.Emitente.CpfCnpj);
+            try
+            {
+                var cpfCnpjEmitente = nfes.Select(x => new { CpfCnpj = x.infNFe.emit.CNPJ ?? x.infNFe.emit.CPF }).Distinct().SingleOrDefault();
+                return !(cpfCnpjEmitente.CpfCnpj != cfgServico.Emitente.CpfCnpj);
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private bool ValidarModeloUnico(IList<NFe> nfes)

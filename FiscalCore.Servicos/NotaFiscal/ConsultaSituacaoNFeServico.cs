@@ -11,10 +11,10 @@ namespace FiscalCore.Servicos
 {
     public class ConsultaSituacaoNFeServico
     {
-        private readonly IConfiguracaoServico _cfgServico;
+        private readonly ConfiguracaoServico _cfgServico;
         private readonly string _versao;
 
-        public ConsultaSituacaoNFeServico(IConfiguracaoServico cfgServico, string versao)
+        public ConsultaSituacaoNFeServico(ConfiguracaoServico cfgServico, string versao)
         {
             _cfgServico = cfgServico;
             _versao = versao;
@@ -41,7 +41,7 @@ namespace FiscalCore.Servicos
 
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retConsSitNFe").OuterXml;
 
-            XmlUtils.SalvarArquivoXml(_cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-retConsSitNFe.xml", retornoXmlStringLimpa);
+            await Arquivo.SalvarArquivoAsync(_cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-retConsSitNFe.xml", retornoXmlStringLimpa);
 
             var retEnvEvento = new retConsSitNFe().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 

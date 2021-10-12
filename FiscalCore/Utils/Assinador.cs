@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
@@ -19,45 +20,34 @@ namespace FiscalCore.Utils
             if (id == null)
                 throw new Exception("Não é possível assinar um objeto evento sem sua respectiva Id!");
 
-            try
-            {
-                var documento = new XmlDocument { PreserveWhitespace = true };
+            var documento = new XmlDocument { PreserveWhitespace = true };
 
-                documento.LoadXml(XmlUtils.ClasseParaXmlString(objeto));
+            var xml = XmlUtils.ClasseParaXmlString(objeto);
+            documento.LoadXml(xml);
 
-                var docXml = new SignedXml(documento) { SigningKey = certificadoDigital.PrivateKey };
+            var docXml = new SignedXml(documento) { SigningKey = certificadoDigital.PrivateKey };
 
-                docXml.SignedInfo.SignatureMethod = signatureMethod;
+            docXml.SignedInfo.SignatureMethod = signatureMethod;
 
-                var reference = new Reference { Uri = "#" + id, DigestMethod = digestMethod };
+            var reference = new Reference { Uri = "#" + id, DigestMethod = digestMethod };
 
-                var envelopedSigntature = new XmlDsigEnvelopedSignatureTransform();
-                reference.AddTransform(envelopedSigntature);
+            var envelopedSigntature = new XmlDsigEnvelopedSignatureTransform();
+            reference.AddTransform(envelopedSigntature);
 
-                var c14Transform = new XmlDsigC14NTransform();
-                reference.AddTransform(c14Transform);
+            var c14Transform = new XmlDsigC14NTransform();
+            reference.AddTransform(c14Transform);
 
-                docXml.AddReference(reference);
+            docXml.AddReference(reference);
 
-                var keyInfo = new KeyInfo();
-                keyInfo.AddClause(new KeyInfoX509Data(certificadoDigital));
+            var keyInfo = new KeyInfo();
+            keyInfo.AddClause(new KeyInfoX509Data(certificadoDigital));
 
-                docXml.KeyInfo = keyInfo;
-                docXml.ComputeSignature();
+            docXml.KeyInfo = keyInfo;
+            docXml.ComputeSignature();
 
-                var xmlDigitalSignature = docXml.GetXml();
-                var assinatura = XmlUtils.XmlStringParaClasse<Signature>(xmlDigitalSignature.OuterXml);
-                return assinatura;
-            }
-            finally
-            {
-                //Marcos Gerene 04/08/2018 - o objeto certificadoDigital nunca será nulo, porque se ele for nulo nem as configs para criar ele teria.
-
-                //Se não mantém os dados do certificado em cache libera o certificado, chamando o método reset.
-                //if (!manterDadosEmCache & certificadoDigital == null)
-                //     certificadoDigital.Reset();
-            }
-
+            var xmlDigitalSignature = docXml.GetXml();
+            var assinatura = XmlUtils.XmlStringParaClasse<Signature>(xmlDigitalSignature.OuterXml);
+            return assinatura;
         }
 
         public static DFeBR.EmissorNFe.Dominio.Assinatura.Signature Parse(this Modelos.Signatures.Signature origem)

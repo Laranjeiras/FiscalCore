@@ -1,8 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
@@ -11,7 +9,6 @@ namespace FiscalCore.Utils
 {
     public static class XmlUtils
     { 
-
         public static string ClasseParaXmlString<T>(T objeto)
         {
             XElement xml;
@@ -44,18 +41,6 @@ namespace FiscalCore.Utils
             XmlNodeList xmlList = doc.GetElementsByTagName(tag);
             var xmlConverter = xmlList[0].OuterXml;
             return xmlConverter;
-        }
-
-        [Obsolete("Substituido por Arquivo.SalvarArquivo")]
-        public static string SalvarArquivoXml(string dir, string nomeArquivo, string xmlString)
-        {
-            return Arquivo.SalvarArquivoAsync(dir, nomeArquivo, xmlString).Result;
-        }
-
-        [Obsolete("Substituido por Arquivo.SalvarArquivo")]
-        public static async Task<string> SalvarArquivoXmlAsync(string dir, string nomeArquivo, string xmlString)
-        {
-            return await Arquivo.SalvarArquivoAsync(dir, nomeArquivo, xmlString);
         }
     }
 }

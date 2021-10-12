@@ -12,10 +12,10 @@ namespace FiscalCore.Servicos
 {
     public class CancelarNFeServico
     {
-        private readonly IConfiguracaoServico _cfgServico;
+        private readonly ConfiguracaoServico _cfgServico;
         string _versao;
 
-        public CancelarNFeServico(IConfiguracaoServico cfgServico)
+        public CancelarNFeServico(ConfiguracaoServico cfgServico)
         {
             _cfgServico = cfgServico;
             _versao = "1.00";
@@ -100,7 +100,7 @@ namespace FiscalCore.Servicos
 
             var xmlEvento = XmlUtils.ClasseParaXmlString<envEvento>(pedEvento);
 
-            XmlUtils.SalvarArquivoXml(_cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ped-eve.xml", xmlEvento);
+            await Arquivo.SalvarArquivoAsync(_cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ped-eve.xml", xmlEvento);
 
             var sefazUrl = SefazServico.ObterUrl(eTipoServico.CancelarNFe, _cfgServico.TipoAmbiente, modeloDoc, _cfgServico.UF);
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.CancelarNFe, xmlEvento);
@@ -109,7 +109,7 @@ namespace FiscalCore.Servicos
 
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retEnvEvento").OuterXml;
 
-            XmlUtils.SalvarArquivoXml(_cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ret-eve.xml", retornoXmlStringLimpa);
+            await Arquivo.SalvarArquivoAsync(_cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ret-eve.xml", retornoXmlStringLimpa);
 
             var retEnvEvento = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 

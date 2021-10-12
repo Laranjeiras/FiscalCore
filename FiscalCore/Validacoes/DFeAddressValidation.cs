@@ -1,7 +1,6 @@
 ﻿using FiscalCore.Modelos.NotaFiscal.Endereco;
 using FiscalCore.Tipos;
 using FiscalCore.Utils;
-using System.Collections.Generic;
 
 namespace FiscalCore.Validacoes.Sefaz
 {

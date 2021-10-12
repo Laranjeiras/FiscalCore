@@ -12,9 +12,9 @@ namespace FiscalCore.Servicos
 {
     public class InutilizarNFeServico
     {
-        IConfiguracaoServico cfgServico;
+        private ConfiguracaoServico cfgServico;
 
-        public InutilizarNFeServico(IConfiguracaoServico cfgServico)
+        public InutilizarNFeServico(ConfiguracaoServico cfgServico)
         {
             this.cfgServico = cfgServico;
         }
@@ -28,14 +28,14 @@ namespace FiscalCore.Servicos
                         
             var xmlInutilizacao = XmlUtils.ClasseParaXmlString<inutNFe>(pedInutilizacao);
 
-            XmlUtils.SalvarArquivoXml(cfgServico.DiretorioSalvarXml, $"{DateTime.Now.Ticks} - {pedInutilizacao.infInut.Id} -ped-inut.xml", xmlInutilizacao);
+            await Arquivo.SalvarArquivoAsync(cfgServico.DiretorioSalvarXml, $"{DateTime.Now.Ticks} - {pedInutilizacao.infInut.Id} -ped-inut.xml", xmlInutilizacao);
 
             var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.InutilizacaoNFe, xmlInutilizacao);
             var sefazUrl = SefazServico.ObterUrl(eTipoServico.InutilizacaoNFe, cfgServico.TipoAmbiente, modeloDocumento, cfgServico.UF);
             var retornoXmlString = await SefazServico.EnviarParaSefazAsync(cfgServico, sefazUrl, envelope);
             var retornoLimpo = Soap.LimparEnvelope(retornoXmlString, "retInutNFe").OuterXml;
 
-            XmlUtils.SalvarArquivoXml(cfgServico.DiretorioSalvarXml, $"{DateTime.Now.Ticks} - {pedInutilizacao.infInut.Id} -inut.xml", retornoLimpo);
+            await Arquivo.SalvarArquivoAsync(cfgServico.DiretorioSalvarXml, $"{DateTime.Now.Ticks} - {pedInutilizacao.infInut.Id} -inut.xml", retornoLimpo);
 
             return XmlUtils.XmlStringParaClasse<retInutNFe>(retornoLimpo);
         }

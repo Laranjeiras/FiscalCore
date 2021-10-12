@@ -16,12 +16,12 @@ namespace FiscalCore.Servicos.ManifestacaoDestinatario
 {
     public class ManifestacaoDestinatarioServico
     {
-        private readonly IConfiguracaoServico configuracao;
+        private readonly ConfiguracaoServico configuracao;
         private readonly string versao;
         private readonly int nSeqEvento;
         private readonly X509Certificate2 certificado;
 
-        public ManifestacaoDestinatarioServico(IConfiguracaoServico configuracao)
+        public ManifestacaoDestinatarioServico(ConfiguracaoServico configuracao)
         {
             this.configuracao = configuracao;
             this.versao = "1.00";

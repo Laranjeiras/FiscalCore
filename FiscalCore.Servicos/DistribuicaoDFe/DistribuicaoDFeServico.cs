@@ -15,9 +15,9 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
 {
     public class DistribuicaoDFeServico
     {
-        private readonly IConfiguracaoServico configuracao;
+        private readonly ConfiguracaoServico configuracao;
 
-        public DistribuicaoDFeServico(IConfiguracaoServico configuracao)
+        public DistribuicaoDFeServico(ConfiguracaoServico configuracao)
         {
             this.configuracao = configuracao;
         }

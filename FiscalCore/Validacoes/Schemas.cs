@@ -15,7 +15,7 @@ namespace FiscalCore.Validacoes
 {
     public static class Schemas
     {
-        public static void ValidarSchema(eTipoServico tipoServico, string xml, IConfiguracaoServico cfgServico)
+        public static void ValidarSchema(eTipoServico tipoServico, string xml, ConfiguracaoServico cfgServico)
         {
             var caminhoSchema = cfgServico.DiretorioSchemas;
 

@@ -4,21 +4,13 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace FiscalCore.Utils
 {
     public static class Arquivo
     {
-        //public static void SalvarArquivoAutorizado(DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica.NFe nfe, IConfiguracaoServico _configServico, string conteudo)
-        //{
-        //    var nomeArquivo = $"{nfe.infNFe.Id}.xml";
-        //    var ambiente = nfe.infNFe.ide.tpAmb.ToString();
-        //    var dataFiscal = nfe.infNFe.ide.dhEmi;
-
-        //    SalvarArquivoString(_configServico.DiretorioSalvarXml, ambiente, "Autorizacao", dataFiscal, nomeArquivo ,conteudo);
-        //}
-
-        public static async Task<string> SalvarArquivoAsync(IConfiguracaoServico configuracao, string subDiretorio, string nomeArquivo, string conteudo, DateTime? dataFiscal = null)
+        public static async Task<string> SalvarArquivoAsync(ConfiguracaoServico configuracao, string subDiretorio, string nomeArquivo, string conteudo, DateTime? dataFiscal = null)
         {
             var dir = Path.Combine(configuracao.DiretorioSalvarXml, configuracao.TipoAmbiente.ToString(), subDiretorio);
             if (dataFiscal != null)
@@ -40,7 +32,28 @@ namespace FiscalCore.Utils
             return arquivo;
         }
 
-        [Obsolete("Substituido por SalvarArquivoAsync(IConfiguracaoServico configuracao...")]
+        public static async Task<string> SalvarArquivoAsync(ConfiguracaoServico configuracao, string nomeArquivo, string conteudo, DateTime? dataFiscal = null)
+        {
+            var dir = Path.Combine(configuracao.DiretorioSalvarXml, configuracao.TipoAmbiente.ToString());
+            if (dataFiscal != null)
+                dir = Path.Combine(dir, dataFiscal?.ToString("MM_yyyy"));
+
+            CriarDiretorioSeNaoExistir(dir);
+
+            if (dir == null)
+                throw new ArgumentNullException(nameof(dir), "O caminho do arquivo deve ser informado");
+            if (nomeArquivo == null)
+                throw new ArgumentNullException(nameof(nomeArquivo), "O nome do arquivo deve ser informado");
+            if (conteudo == null)
+                throw new ArgumentNullException(nameof(conteudo), "O conteúdo do arquivo deve ser informado");
+
+            var arquivo = Path.Combine(dir, nomeArquivo);
+            var stw = new StreamWriter(arquivo);
+            await stw.WriteLineAsync(conteudo);
+            stw.Close();
+            return arquivo;
+        }
+
         public static async Task<string> SalvarArquivoAsync(string dir, string nomeArquivo, string xmlString)
         {
             CriarDiretorioSeNaoExistir(dir);
@@ -52,12 +65,33 @@ namespace FiscalCore.Utils
             return filename;
         }
 
-        public static string LerArquivo(string arquivo)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="texto"></param>
+        /// <param name="nomeArquivo">Nome do arquivo</param>
+        /// <param name="diretorio">Diretorio para salvar o arquivo, diretório temp caso não informe</param>
+        /// <returns></returns>
+        public static async Task<string> SalvarEmArquivo(this string texto, string nomeArquivo, string diretorio = null)
         {
-            TextReader tr = new StreamReader(arquivo);
-            var texto = tr.ReadToEnd();
-            tr.Close();
-            return texto;
+            if (nomeArquivo is null)
+                nomeArquivo = Guid.NewGuid().ToString();
+            if (diretorio is null)
+                diretorio = Path.GetTempPath();
+
+            var salvo = await SalvarArquivoAsync(diretorio, nomeArquivo, texto);
+            return salvo;
+        }
+
+        public static T ArquivoXmlParaClasse<T>(string arquivo) where T : class
+        {
+            if (!File.Exists(arquivo))
+                throw new FileNotFoundException(arquivo);
+
+            var xml = File.ReadAllText(arquivo);
+            var ser = XmlSerializer.FromTypes(new[] { typeof(T) })[0];
+            using var sr = new StringReader(xml);
+            return (T)ser.Deserialize(sr);
         }
 
         public static string CriarDiretorioNaRaizDoApp(string nomeDiretorio)

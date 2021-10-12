@@ -12,12 +12,12 @@ namespace FiscalCore.Servicos
 {
     public class CartaCorrecaoServico
     {
-        private readonly IConfiguracaoServico _cfgServico;
+        private readonly ConfiguracaoServico cfgServico;
         private readonly string _versao;
 
-        public CartaCorrecaoServico(IConfiguracaoServico cfgServico)
+        public CartaCorrecaoServico(ConfiguracaoServico cfgServico)
         {
-            _cfgServico = cfgServico;
+            this.cfgServico = cfgServico;
             _versao = "1.00";
         }
 
@@ -46,12 +46,12 @@ namespace FiscalCore.Servicos
                 var infEvento = new infEventoEnv
                 {
                     chNFe = chave,
-                    CNPJ = _cfgServico.Emitente.CNPJ,
-                    CPF = _cfgServico.Emitente.CPF,
-                    cOrgao = _cfgServico.UF,
+                    CNPJ = cfgServico.Emitente.CNPJ,
+                    CPF = cfgServico.Emitente.CPF,
+                    cOrgao = cfgServico.UF,
                     dhEvento = DateTime.Now,
                     nSeqEvento = nSeqEvento,
-                    tpAmb = _cfgServico.TipoAmbiente,
+                    tpAmb = cfgServico.TipoAmbiente,
                     tpEvento = eTipoEventoNFe.NFeCartaCorrecao,
                     verEvento = _versao,
                     detEvento = new detEvento()
@@ -70,8 +70,8 @@ namespace FiscalCore.Servicos
                 eventoTmp.infEvento.Id = "ID" + ((int)eventoTmp.infEvento.tpEvento) + eventoTmp.infEvento.chNFe +
                                       eventoTmp.infEvento.nSeqEvento.ToString().PadLeft(2, '0');
 
-                var _certificado = ObterCertificado.Obter(_cfgServico.ConfigCertificado);
-                eventoTmp.Assinar(_certificado, _cfgServico.ConfigCertificado.SignatureMethodSignedXml, _cfgServico.ConfigCertificado.DigestMethodReference);
+                var _certificado = ObterCertificado.Obter(cfgServico.ConfigCertificado);
+                eventoTmp.Assinar(_certificado, cfgServico.ConfigCertificado.SignatureMethodSignedXml, cfgServico.ConfigCertificado.DigestMethodReference);
             }
 
             var pedEvento = new envEvento
@@ -83,21 +83,20 @@ namespace FiscalCore.Servicos
 
             var xmlEvento = XmlUtils.ClasseParaXmlString<envEvento>(pedEvento);
 
-            XmlUtils.SalvarArquivoXml(_cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ped-eve.xml", xmlEvento);
+            await Arquivo.SalvarArquivoAsync(cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ped-eve.xml", xmlEvento);
 
-            var sefazUrl = SefazServico.ObterUrl(eTipoServico.CartaCorrecao, _cfgServico.TipoAmbiente, eModeloDocumento.NFe, _cfgServico.UF);
+            var sefazUrl = SefazServico.ObterUrl(eTipoServico.CartaCorrecao, cfgServico.TipoAmbiente, eModeloDocumento.NFe, cfgServico.UF);
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.CartaCorrecao, xmlEvento);
 
-            var retornoXmlString = await SefazServico.EnviarParaSefazAsync(_cfgServico, sefazUrl, envelope);
+            var retornoXmlString = await SefazServico.EnviarParaSefazAsync(cfgServico, sefazUrl, envelope);
 
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retEnvEvento").OuterXml;
 
-            XmlUtils.SalvarArquivoXml(_cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ret-eve.xml", retornoXmlStringLimpa);
+            await Arquivo.SalvarArquivoAsync(cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ret-eve.xml", retornoXmlStringLimpa);
 
             var retorno = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 
             return retorno;
-
         }
     }
 

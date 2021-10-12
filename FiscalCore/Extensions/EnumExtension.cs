@@ -8,16 +8,30 @@ namespace FiscalCore.Extensions
     {
         public static T ObterAtributo<T>(this Enum value) where T : Attribute
         {
-            var type = value.GetType();
-            var memberInfo = type.GetMember(value.ToString());
-            var attributes = memberInfo[0].GetCustomAttributes(typeof(T), false);
-            return (T)attributes[0];
+            try
+            {
+                var type = value.GetType();
+                var memberInfo = type.GetMember(value.ToString());
+                var attributes = memberInfo[0].GetCustomAttributes(typeof(T), false);
+                return (T)attributes[0];
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         public static string Descricao(this Enum value)
         {
-            var attribute = value.ObterAtributo<DescriptionAttribute>();
-            return attribute == null ? value.ToString() : attribute.Description;
+            try
+            {
+                var attribute = value.ObterAtributo<DescriptionAttribute>();
+                return attribute == null ? value.ToString() : attribute.Description;
+            } 
+            catch
+            {
+                throw;
+            }
         }
 
         public static string XmlDescricao(this Enum value)

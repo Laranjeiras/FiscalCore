@@ -15,7 +15,7 @@ namespace FiscalCore.Configuracoes
         public bool SegundaViaContingencia { get; set; }
         public string NFCeUrlConsultaQrCodeSefaz { get; set; }
 
-        private string _diretorioSalvarDanfe { get; set; }
+        private string diretorioSalvarDanfe { get; set; }
         public string DiretorioSalvarDanfe
         {
             get => ObterDiretorioSalvarDanfe();
@@ -38,17 +38,18 @@ namespace FiscalCore.Configuracoes
 
         private string ObterDiretorioSalvarDanfe()
         {
-            if (_diretorioSalvarDanfe == null || !Directory.Exists(_diretorioSalvarDanfe))
-                return Arquivo.CriarDiretorioNaRaizDoApp("Danfes");
-            return _diretorioSalvarDanfe;
+            if (diretorioSalvarDanfe == null || !Directory.Exists(diretorioSalvarDanfe))
+                DefinirDiretorioSalvarDanfe(null);
+            return diretorioSalvarDanfe;
         }
 
         private void DefinirDiretorioSalvarDanfe(string diretorioSalvarDanfe)
         {
             if (diretorioSalvarDanfe == null)
-                diretorioSalvarDanfe = Arquivo.CriarDiretorioNaRaizDoApp("Danfes");
+                diretorioSalvarDanfe = Path.Combine(Directory.GetCurrentDirectory(), "Danfes");
+
             Arquivo.CriarDiretorioSeNaoExistir(diretorioSalvarDanfe);
-            _diretorioSalvarDanfe = diretorioSalvarDanfe;
+            this.diretorioSalvarDanfe = diretorioSalvarDanfe;
         }
     }
 }

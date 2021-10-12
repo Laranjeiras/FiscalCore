@@ -14,7 +14,7 @@ namespace FiscalCore.Servicos
 {
     public class SefazServico
     {
-        public async static Task<string> EnviarParaSefazAsync(IConfiguracaoServico cfgServico, UrlSefaz sefazUrl, XmlDocument envelope)
+        public async static Task<string> EnviarParaSefazAsync(ConfiguracaoServico cfgServico, UrlSefaz sefazUrl, XmlDocument envelope)
         {
             HttpWebRequest webRequest = SoapEnvelopeFabrica.CriarWebRequest(sefazUrl.Url, "application/soap+xml;charset=utf-8");
 

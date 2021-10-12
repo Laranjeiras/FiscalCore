@@ -14,7 +14,7 @@ using FiscalCore.Tipos;
 
 namespace FiscalCore.Servicos
 {
-    public class AutorizarNFe4 : IAutorizarNFe
+    public class AutorizarNFe4 : IAutorizarNFeServico
     {
         private readonly ConfiguracaoServico cfgServico;
 
@@ -60,7 +60,7 @@ namespace FiscalCore.Servicos
 
         private async Task<IRetornoAutorizacao> Autorizar(string xmlenviNFe4, eModeloDocumento modeloDocumento)
         {
-            XmlUtils.SalvarArquivoXml($"{cfgServico.DiretorioSalvarXml}", $"{DateTime.Now.Ticks}-env-nfe.xml", xmlenviNFe4);
+            await Arquivo.SalvarArquivoAsync(cfgServico, $"{DateTime.Now.Ticks}-env-nfe.xml", xmlenviNFe4);
 
             var urlSefaz = SefazServico.ObterUrl(eTipoServico.AutorizarNFe, cfgServico.TipoAmbiente, modeloDocumento, cfgServico.UF);
 
@@ -69,7 +69,7 @@ namespace FiscalCore.Servicos
             var retornoXmlString = await SefazServico.EnviarParaSefazAsync(cfgServico, urlSefaz, envelope);
             var retornoLimpo = Soap.LimparEnvelope(retornoXmlString, "retEnviNFe").OuterXml;
 
-            XmlUtils.SalvarArquivoXml($"{cfgServico.DiretorioSalvarXml}", $"{DateTime.Now.Ticks}-ret-env-nfe.xml", retornoLimpo);
+            await Arquivo.SalvarArquivoAsync(cfgServico, $"{DateTime.Now.Ticks}-ret-env-nfe.xml", retornoLimpo);
 
             var retEnviNFe = new RetNFeAutorizacao4(retornoLimpo);
             retEnviNFe.XmlEnviado = xmlenviNFe4;
