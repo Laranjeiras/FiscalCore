@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using FiscalCore.Tipos;
 using FiscalCore.Fabrica;
 
-namespace FiscalCore.Servicos
+namespace FiscalCore.Servicos.NotaFiscal.Eventos
 {
-    public class InutilizarNFeServico
+    public class InutilizarNFeServico : IEventoServico
     {
         private ConfiguracaoServico cfgServico;
 

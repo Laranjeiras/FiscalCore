@@ -8,9 +8,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FiscalCore.Tipos;
 
-namespace FiscalCore.Servicos
+namespace FiscalCore.Servicos.NotaFiscal.Eventos
 {
-    public class CartaCorrecaoServico
+    public class CartaCorrecaoServico : IEventoServico
     {
         private readonly ConfiguracaoServico cfgServico;
         private readonly string _versao;

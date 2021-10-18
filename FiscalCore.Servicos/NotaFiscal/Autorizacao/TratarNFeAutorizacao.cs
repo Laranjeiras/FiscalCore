@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace FiscalCore.Servicos
 {
-    public class TratarNFeAutorizacao
+    internal class TratarNFeAutorizacao
     {
         private IList<NFe> nfes;
         private ConfiguracaoServico cfgServico;

@@ -7,18 +7,26 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FiscalCore.Tipos;
+using FiscalCore.ValueObjects;
+using System.Linq;
+using DFeBR.EmissorNFe.Utilidade.Exceptions;
 
-namespace FiscalCore.Servicos
+namespace FiscalCore.Servicos.NotaFiscal.Eventos
 {
-    public class CancelarNFeServico
+    public class CancelarNFeServico : IEventoServico
     {
-        private readonly ConfiguracaoServico _cfgServico;
-        string _versao;
+        private readonly ConfiguracaoServico cfgServico;
+        string versao;
 
         public CancelarNFeServico(ConfiguracaoServico cfgServico)
         {
-            _cfgServico = cfgServico;
-            _versao = "1.00";
+            this.cfgServico = cfgServico;
+            versao = "1.00";
+        }
+
+        public async Task<retEnvEvento> Cancelar(InfoNFeCancelar infoNFe)
+        {
+            return await Cancelar(new List<InfoNFeCancelar> { infoNFe });
         }
 
         public async Task<retEnvEvento> Cancelar(IList<InfoNFeCancelar> infos) 
@@ -29,9 +37,13 @@ namespace FiscalCore.Servicos
             if (infos.Count > 20)
                 throw new Exception("No máximo 20 NFes podem ser canceladas");
 
-            List<evento> eventos = new List<evento>();
+            var modelos = infos.Select(x => x.ChaveAcesso.Modelo).Distinct().ToList();
+            if (modelos.Count != 1)
+                throw new FalhaValidacaoException("Lista de cancelamento deve conter somente 1 modelo");
 
-            eModeloDocumento _modeloDocumento = infos[0].ChaveAcesso.Substring(20, 2).ModeloDocumento();
+            eModeloDocumento modeloDocumento = modelos.FirstOrDefault();
+
+            List<evento> eventos = new List<evento>();
 
             foreach (var item in infos)
             {
@@ -39,52 +51,45 @@ namespace FiscalCore.Servicos
                 var chave = item.ChaveAcesso;
                 var just = item.Justificativa;
 
-                if (string.IsNullOrEmpty(protocolo))
-                    throw new Exception("Protocolo de autorização não informado");
-                if(!(protocolo.Length == 15))
-                    throw new Exception("Protocolo de autorização inválido");
-                if (string.IsNullOrEmpty(chave))
-                    throw new Exception("Chave da NFe não informada");
                 if(string.IsNullOrEmpty(just) || just.Length < 15 || just.Length > 255)
                     throw new Exception("Justificativa de conter entre 15 e 255 caracteres");
 
                 var detEvento = new detEvento
                 {
-                    nProt = protocolo,
-                    versao = _versao,
+                    nProt = protocolo.Protocolo,
+                    versao = versao,
                     xJust = just,
                     descEvento = "Cancelamento",
                 };
 
                 var infEvento = new infEventoEnv
                 {
-                    cOrgao = _cfgServico.UF,
-                    tpAmb = _cfgServico.TipoAmbiente,
-                    chNFe = chave,
+                    cOrgao = cfgServico.UF,
+                    tpAmb = cfgServico.TipoAmbiente,
+                    chNFe = chave.Chave,
                     dhEvento = DateTime.Now,
                     tpEvento = eTipoEventoNFe.NFeCancelamento,
                     nSeqEvento = 1,
-                    verEvento = _versao,
+                    verEvento = versao,
                     detEvento = detEvento
                 };
 
-                if (!string.IsNullOrEmpty(_cfgServico.Emitente.CNPJ))
-                    infEvento.CNPJ = _cfgServico.Emitente.CNPJ;
+                if (!string.IsNullOrEmpty(cfgServico.Emitente.CNPJ))
+                    infEvento.CNPJ = cfgServico.Emitente.CNPJ;
                 else
-                    infEvento.CPF = _cfgServico.Emitente.CPF;
+                    infEvento.CPF = cfgServico.Emitente.CPF;
 
-                var evento = new evento { versao = _versao, infEvento = infEvento };
+                var evento = new evento { versao = versao, infEvento = infEvento };
                 eventos.Add(evento);
-
             }            
-            return await Cancelar(eventos, _modeloDocumento);
+            return await Cancelar(eventos, modeloDocumento);
         }
 
         private async Task<retEnvEvento> Cancelar(List<evento> eventos, eModeloDocumento modeloDoc) 
         {
             var pedEvento = new envEvento
             {
-                versao = _versao,
+                versao = versao,
                 idLote = 1,
                 evento = eventos
             };
@@ -94,42 +99,40 @@ namespace FiscalCore.Servicos
                 eventoTmp.infEvento.Id = "ID" + ((int)eventoTmp.infEvento.tpEvento) + eventoTmp.infEvento.chNFe +
                                       eventoTmp.infEvento.nSeqEvento.ToString().PadLeft(2, '0');
 
-                var _certificado = ObterCertificado.Obter(_cfgServico.ConfigCertificado);
-                eventoTmp.Assinar(_certificado, _cfgServico.ConfigCertificado.SignatureMethodSignedXml, _cfgServico.ConfigCertificado.DigestMethodReference);
+                var _certificado = ObterCertificado.Obter(cfgServico.ConfigCertificado);
+                eventoTmp.Assinar(_certificado, cfgServico.ConfigCertificado.SignatureMethodSignedXml, cfgServico.ConfigCertificado.DigestMethodReference);
             }
 
             var xmlEvento = XmlUtils.ClasseParaXmlString<envEvento>(pedEvento);
 
-            await Arquivo.SalvarArquivoAsync(_cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ped-eve.xml", xmlEvento);
+            await Arquivo.SalvarArquivoAsync(cfgServico, DateTime.Now.Ticks + "-ped-eve.xml", xmlEvento);
 
-            var sefazUrl = SefazServico.ObterUrl(eTipoServico.CancelarNFe, _cfgServico.TipoAmbiente, modeloDoc, _cfgServico.UF);
+            var sefazUrl = SefazServico.ObterUrl(eTipoServico.CancelarNFe, cfgServico.TipoAmbiente, modeloDoc, cfgServico.UF);
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.CancelarNFe, xmlEvento);
 
-            var retornoXmlString = await SefazServico.EnviarParaSefazAsync(_cfgServico, sefazUrl, envelope);
+            var retornoXmlString = await SefazServico.EnviarParaSefazAsync(cfgServico, sefazUrl, envelope);
 
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retEnvEvento").OuterXml;
 
-            await Arquivo.SalvarArquivoAsync(_cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ret-eve.xml", retornoXmlStringLimpa);
+            await Arquivo.SalvarArquivoAsync(cfgServico, DateTime.Now.Ticks + "-ret-eve.xml", retornoXmlStringLimpa);
 
             var retEnvEvento = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 
             return retEnvEvento;
-
         }
     }
 
     public class InfoNFeCancelar
     {
-        public string ChaveAcesso { get; private set; }
-        public string ProtocoloAutorizacao { get; private set; }
+        public ChaveFiscal ChaveAcesso { get; private set; }
+        public ProtocoloAutorizacao ProtocoloAutorizacao { get; private set; }
         public string Justificativa { get; private set; }
 
-        public InfoNFeCancelar(string chaveAcesso, string protocoloAutorizacao, string justificativa = "Nota Fiscal Emitida Indevidamente")
+        public InfoNFeCancelar(ChaveFiscal chaveAcesso, ProtocoloAutorizacao protocoloAutorizacao, string justificativa = "Nota Fiscal Emitida Indevidamente")
         {
-            ChaveAcesso = chaveAcesso.Replace("NFe", "");
-            ProtocoloAutorizacao = protocoloAutorizacao;
+            ChaveAcesso = chaveAcesso ?? throw new ArgumentNullException(nameof(chaveAcesso));
+            ProtocoloAutorizacao = protocoloAutorizacao ?? throw new ArgumentNullException(nameof(protocoloAutorizacao));
             Justificativa = justificativa;
         }
     }
-
 }
