@@ -1,29 +1,27 @@
-﻿using DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica;
-using FiscalCore.Configuracoes;
-using FiscalCore.DTOs.DistribuicaoDFe;
-using FiscalCore.Fabrica;
-using FiscalCore.Modelos.Consulta;
+﻿using FiscalCore.Configuracoes;
 using FiscalCore.Modelos.DistribuicaoDFe;
 using FiscalCore.Servicos;
-using FiscalCore.Tipos;
 using FiscalCore.Utils;
-using FiscalCore.Validacoes;
+using FiscalCore.ValueObjects;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
 namespace FiscalCore.DistribuicaoDFe.Servicos
 {
-    public class DistribuicaoDFeServico
+    public class DistribuicaoDFeServico : BaseSefazServico
     {
-        private readonly ConfiguracaoServico configuracao;
+        private readonly ILogger logger;
 
-        public DistribuicaoDFeServico(ConfiguracaoServico configuracao)
+        public DistribuicaoDFeServico(ConfiguracaoServico configuracao, ITransmitirSefazCommand transmitir, ILogger<DistribuicaoDFeServico> logger)
+            : base(configuracao, transmitir)
         {
-            this.configuracao = configuracao;
+            this.logger = logger;
         }
 
-        public async Task<string> ConsultarDocumentosDestinadosAsync(string ultimoNsu, bool validarXmlConsulta = true)
+        public async Task<retDistDFeInt> ConsultarDocumentosDestinadosAsync(string ultimoNsu, bool validarXmlConsulta = true)
         {
+            logger.LogInformation($"Consultar documentos destinados, ultimo NSU {ultimoNsu}");
             if (string.IsNullOrEmpty(ultimoNsu))
                 throw new ArgumentNullException(nameof(ultimoNsu));
             if (ultimoNsu.Length > 15)
@@ -34,132 +32,131 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
             var distDFeInt = new distDFeInt
             {
                 Versao = "1.01",
-                Cnpj = configuracao.Emitente.CNPJ,
+                Cnpj = Configuracao.Emitente.CNPJ,
                 DistNSU = new distNSU
                 {
                     UltNSU = ultimoNsu
                 },
-                cUFAutor = ((int)configuracao.UF).ToString(),
-                TpAmb = configuracao.TipoAmbiente
+                cUFAutor = ((int)Configuracao.UF).ToString(),
+                TpAmb = Configuracao.TipoAmbiente
             };
 
-            return await TransmitirSefaz(distDFeInt, validarXmlConsulta);
+            var retorno = await Transmitir.TransmitirAsync(distDFeInt, validarXmlConsulta);
+            var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retorno);
+            return retDistDFeInt;
         }
 
-        public async Task<string> ConsultarDFePorNSU(string nsu)
+        public async Task<retDistDFeInt> ConsultarPorNSUAsync(string nsu)
         {
+            logger.LogInformation($"Consultar documentos destinados por NSU {nsu}");
             if (string.IsNullOrEmpty(nsu))
                 throw new ArgumentNullException(nameof(nsu));
+            if (nsu.Length > 15)
+                throw new ArgumentOutOfRangeException(nameof(nsu));
 
             nsu = nsu.PadLeft(15, '0');
 
             var distDFeInt = new distDFeInt
             {
                 Versao = "1.01",
-                Cnpj = configuracao.Emitente.CNPJ,
+                Cnpj = Configuracao.Emitente.CNPJ,
                 consNSU = new consNSU { NSU = nsu },
-                cUFAutor = ((int)configuracao.UF).ToString(),
-                TpAmb = configuracao.TipoAmbiente
+                cUFAutor = ((int)Configuracao.UF).ToString(),
+                TpAmb = Configuracao.TipoAmbiente
             };
 
-            return await TransmitirSefaz(distDFeInt);
+            var retorno = await Transmitir.TransmitirAsync(distDFeInt);
+            var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retorno);
+            return retDistDFeInt;
         }
 
-        public async Task<string> ConsultarDFePorChaveAsync(string chaveNFe, bool validarXmlConsulta = true)
+        public async Task<retDistDFeInt> ConsultarDFePorChaveAsync(ChaveFiscal chaveNFe, bool validarXmlConsulta = true)
         {
-            if (string.IsNullOrEmpty(chaveNFe))
-                throw new ArgumentNullException(nameof(chaveNFe));
-            if (!(chaveNFe.Length == 44))
-                throw new ArgumentOutOfRangeException(nameof(chaveNFe));
-
             var distDFeInt = new distDFeInt
             {
                 Versao = "1.01",
-                Cnpj = configuracao.Emitente.CNPJ,
+                Cnpj = Configuracao.Emitente.CNPJ,
                 consChNFe = new consChNFe
                 {
-                    ChNFe = chaveNFe
+                    ChNFe = chaveNFe.Chave
                 },
-                cUFAutor = ((int)configuracao.UF).ToString(),
-                TpAmb = configuracao.TipoAmbiente
+                cUFAutor = ((int)Configuracao.UF).ToString(),
+                TpAmb = Configuracao.TipoAmbiente
             };
 
-            return await TransmitirSefaz(distDFeInt, validarXmlConsulta);
-        }
-
-        private async Task<string> TransmitirSefaz(distDFeInt distDFeInt, bool validarXmlConsulta = true)
-        {
-            var xml = XmlUtils.ClasseParaXmlString<distDFeInt>(distDFeInt);
-
-            if (validarXmlConsulta)
-                Schemas.ValidarSchema(eTipoServico.NFeDistribuicaoDFe, xml, configuracao);
-
-            await Arquivo.SalvarArquivoAsync(configuracao, "DistribuicaoDFe", $"{configuracao.Emitente.CNPJ ?? configuracao.Emitente.CPF}-{DateTime.Now.Ticks}-ped-DistDFeInt.xml", xml);
-
-            var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.NFeDistribuicaoDFe, xml);
-
-            var sefazUrl = SefazServico.ObterUrl(eTipoServico.NFeDistribuicaoDFe, configuracao.TipoAmbiente, eModeloDocumento.NFe, eUF.AN);
-            var retorno = await SefazServico.EnviarParaSefazAsync(configuracao, sefazUrl, envelope);
-
-            var retornoLimpo = Soap.LimparEnvelope(retorno, "retDistDFeInt").OuterXml;
-
-            await Arquivo.SalvarArquivoAsync(configuracao, "DistribuicaoDFe", $"{configuracao.Emitente.CNPJ ?? configuracao.Emitente.CPF}-{DateTime.Now.Ticks}-retDistDFeInt.xml", retornoLimpo);
-
-            return retornoLimpo;
-        }
-
-        public async Task<RetDistDFeDTO> MontarRetorno(string retorno)
-        {
+            var retorno = await Transmitir.TransmitirAsync(distDFeInt, validarXmlConsulta);
             var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retorno);
 
-            var retornoDto = new RetDistDFeDTO
-            {
-                CStat = retDistDFeInt.cStat,
-                Motivo = retDistDFeInt.xMotivo
-            };
-
-            if (retDistDFeInt.loteDistDFeInt != null)
-            {
-                foreach (var dfeInt in retDistDFeInt.loteDistDFeInt)
-                {
-                    var tmpSchema = dfeInt.schema.Split("_");
-                    var tipoRet = tmpSchema[0] ?? dfeInt.schema;
-
-                    var conteudoZip = Arquivo.Unzip(dfeInt.XmlNfe);
-
-                    string chaveNFe = null;
-                    string tipoRetorno = null;
-
-                    await Arquivo.SalvarArquivoAsync(configuracao, "DistribuicaoDFe", $"{configuracao.Emitente.CNPJ ?? configuracao.Emitente.CPF}-{DateTime.Now.Ticks}-{dfeInt.NSU}-{tipoRet}.xml", conteudoZip);
-
-                    if (conteudoZip.StartsWith("<resNFe"))
-                    {
-                        var retConteudo = XmlUtils.XmlStringParaClasse<resNFe>(conteudoZip);
-                        retornoDto.ResNFes.Add(retConteudo);
-                        chaveNFe = retConteudo.chNFe;
-                        tipoRetorno = "resNFe";
-                    }
-                    else if (conteudoZip.StartsWith("<procEventoNFe"))
-                    {
-                        var xml = XmlUtils.ObterTagXml(conteudoZip, "procEventoNFe");
-                        var procEvento = XmlUtils.XmlStringParaClasse<procEventoNFe>(xml);
-                        retornoDto.ProcEventos.Add(procEvento);
-                        chaveNFe = procEvento?.retEvento?.infEvento?.chNFe;
-                        tipoRetorno = "procEventoNFe";
-                    }
-                    else if (conteudoZip.StartsWith("<nfeProc"))
-                    {
-                        var xml = XmlUtils.ObterTagXml(conteudoZip, "nfeProc");
-                        var nfeProc = XmlUtils.XmlStringParaClasse<nfeProc>(xml);
-                        retornoDto.NFeProcs.Add(nfeProc);
-                        chaveNFe = nfeProc.NFe.infNFe.Id;
-                        tipoRetorno = "nfeProc";
-                    }
-
-                    retornoDto.DistDfeIntDTOs.Add(new RetDistDFeIntDTO(chaveNFe, dfeInt.NSU, conteudoZip, tipoRetorno));
-                }
-            }
-            return retornoDto;
+            return retDistDFeInt;
         }
+
+        //private async Task<string> ManifestarAsync(string chaveAcesso, eTipoEventoNFe tipoEvento, string justificativa = null)
+        //{
+        //    var xmlEvento = GerarXmlEvento(chaveAcesso, tipoEvento, justificativa);
+
+        //    await Arquivo.SalvarArquivoAsync(Configuracao, "Eventos", $"{DateTime.Now.Ticks}-ped-eve.xml", xmlEvento);
+
+        //    var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.ManifestacaoDestinatario, xmlEvento);
+        //    var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.ManifestacaoDestinatario, Configuracao.TipoAmbiente, eModeloDocumento.NFe, eUF.AN);
+        //    var xmlRetorno = await Transmitir.ExecutarAsync(sefazUrl, envelope);
+        //    var xmlRetLimpo = Soap.LimparEnvelope(xmlRetorno, "retEnvEvento").OuterXml;
+        //    await Arquivo.SalvarArquivoAsync(Configuracao, "Eventos", $"{DateTime.Now.Ticks}-ret-eve.xml", xmlRetLimpo);
+        //    return xmlRetLimpo;
+        //}
+
+        //private RetEventoManifestacaoDTO MontarDTO(string xml)
+        //{
+        //    var retEnv = XmlUtils.XmlStringParaClasse<retEnvEvento>(xml);
+        //    if (retEnv.retEvento.Count != 1)
+        //        throw new Exception("Retorno com mais de 1 evento registrado");
+
+        //    var inf = retEnv.retEvento.SingleOrDefault();
+        //    return new RetEventoManifestacaoDTO(inf.infEvento);
+        //}
+
+        //private string GerarXmlEvento(string chaveAcesso, eTipoEventoNFe tipoEvento, string justificativa)
+        //{
+        //    if (tipoEvento != eTipoEventoNFe.OperacaoNaoRealizada)
+        //        justificativa = null;
+        //    else
+        //        throw new ArgumentNullException(nameof(justificativa));
+
+        //    var infEvento = new infEventoEnv
+        //    {
+        //        chNFe = chaveAcesso,
+        //        CNPJ = Configuracao.Emitente.CNPJ,
+        //        CPF = Configuracao.Emitente.CPF,
+        //        cOrgao = eUF.AN,
+        //        dhEvento = DateTime.Now,
+        //        nSeqEvento = nSeqEvento,
+        //        tpAmb = Configuracao.TipoAmbiente,
+        //        tpEvento = tipoEvento,
+        //        verEvento = versao,
+        //        Id = "ID" + ((int)tipoEvento) + chaveAcesso + nSeqEvento.ToString().PadLeft(2, '0'),
+        //        detEvento = new detEvento()
+        //        {
+        //            versao = versao,
+        //            descEvento = tipoEvento.Descricao().RemoverAcentos()
+        //        }
+        //    };
+
+        //    var evento = new evento
+        //    {
+        //        versao = versao,
+        //        infEvento = infEvento
+        //    };
+
+        //    evento.Assinar(ObterCertificado.Obter(Configuracao.ConfigCertificado), Configuracao.ConfigCertificado.SignatureMethodSignedXml, Configuracao.ConfigCertificado.DigestMethodReference);
+
+        //    var pedEvento = new envEvento
+        //    {
+        //        versao = versao,
+        //        idLote = 1,
+        //        evento = new List<evento> { evento }
+        //    };
+
+        //    var xmlEvento = XmlUtils.ClasseParaXmlString<envEvento>(pedEvento);
+        //    return xmlEvento;
+        //}
     }
 }

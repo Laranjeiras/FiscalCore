@@ -1,5 +1,4 @@
 ﻿using FiscalCore.Tipos;
-using System;
 using System.Net;
 using System.Xml;
 

@@ -29,34 +29,50 @@ namespace FiscalCore.ValueObjects
 
         public ChaveFiscal(eUF uf, DateTime dataEmissao, string cnpj, eModeloDocumento modelo, int serie, long numero, eTipoEmissao tipoEmissao, string cNF)
         {
-            this.UF = uf;
-            this.AnoMesEmissao = dataEmissao.ToString("yyMM");
-            this.Cnpj = cnpj;
-            this.Modelo = modelo;
-            this.Serie = serie;
-            this.Numero = numero;
-            this.TipoEmissao = tipoEmissao;
-            this.CNF = cNF;
-            this.chave = GerarChave();
+            try
+            {
+                this.UF = uf;
+                this.AnoMesEmissao = dataEmissao.ToString("yyMM");
+                this.Cnpj = cnpj;
+                this.Modelo = modelo;
+                this.Serie = serie;
+                this.Numero = numero;
+                this.TipoEmissao = tipoEmissao;
+                this.CNF = cNF;
+                this.chave = GerarChave();
+            }
+            catch
+            {
+                throw new Exception("Chave inválida");
+            }
         }
 
         public ChaveFiscal(string chave)
         {
-            if (!(chave.Length == 44))
-                throw new ArgumentOutOfRangeException(nameof(chave));
+            try
+            {
+                if (chave.StartsWith("NFe"))
+                    chave = chave.Replace("NFe", string.Empty);
+                if (!(chave.Length == 44))
+                    throw new Exception();
 
-            chave = new string(chave.Where(Char.IsDigit).ToArray());
-            
-            this.UF = (eUF)Enum.Parse(typeof(eUF), chave.Substring(0, 2));
-            this.AnoMesEmissao = chave.Substring(2, 4);
-            this.Cnpj = chave.Substring(6, 14);
-            this.Modelo = (eModeloDocumento)Enum.Parse(typeof(eModeloDocumento), chave.Substring(20, 2));
-            this.Serie = int.Parse(chave.Substring(22, 3));
-            this.Numero = long.Parse(chave.Substring(25, 9));
-            this.TipoEmissao = (eTipoEmissao)Enum.Parse(typeof(eTipoEmissao), chave.Substring(34, 1));
-            this.CNF = chave.Substring(35, 8);
-            this.digitoVerificador = byte.Parse(chave.Substring(43, 1));
-            this.chave = GerarChave();
+                chave = new string(chave.Where(Char.IsDigit).ToArray());
+
+                this.UF = (eUF)Enum.Parse(typeof(eUF), chave.Substring(0, 2));
+                this.AnoMesEmissao = chave.Substring(2, 4);
+                this.Cnpj = chave.Substring(6, 14);
+                this.Modelo = (eModeloDocumento)Enum.Parse(typeof(eModeloDocumento), chave.Substring(20, 2));
+                this.Serie = int.Parse(chave.Substring(22, 3));
+                this.Numero = long.Parse(chave.Substring(25, 9));
+                this.TipoEmissao = (eTipoEmissao)Enum.Parse(typeof(eTipoEmissao), chave.Substring(34, 1));
+                this.CNF = chave.Substring(35, 8);
+                this.digitoVerificador = byte.Parse(chave.Substring(43, 1));
+                this.chave = GerarChave();
+            }
+            catch
+            {
+                throw new Exception("Chave inválida");
+            }
         }
 
         private string GerarChave()

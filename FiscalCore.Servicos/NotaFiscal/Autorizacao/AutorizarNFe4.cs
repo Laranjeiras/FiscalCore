@@ -17,10 +17,12 @@ namespace FiscalCore.Servicos
     public class AutorizarNFe4 : IAutorizarNFeServico
     {
         private readonly ConfiguracaoServico cfgServico;
+        private readonly ITransmitirSefazCommand transmitir;
 
-        public AutorizarNFe4(ConfiguracaoServico cfgServico)
+        public AutorizarNFe4(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir)
         {
             this.cfgServico = cfgServico;
+            this.transmitir = transmitir;
         }
 
         public async Task<IRetornoAutorizacao> Autorizar(NFe nfe, int idLote = 0)
@@ -62,11 +64,11 @@ namespace FiscalCore.Servicos
         {
             await Arquivo.SalvarArquivoAsync(cfgServico, $"{DateTime.Now.Ticks}-env-nfe.xml", xmlenviNFe4);
 
-            var urlSefaz = SefazServico.ObterUrl(eTipoServico.AutorizarNFe, cfgServico.TipoAmbiente, modeloDocumento, cfgServico.UF);
+            var urlSefaz = Fabrica.FabricarUrl.ObterUrl(eTipoServico.AutorizarNFe, cfgServico.TipoAmbiente, modeloDocumento, cfgServico.UF);
 
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.AutorizarNFe, xmlenviNFe4);
 
-            var retornoXmlString = await SefazServico.EnviarParaSefazAsync(cfgServico, urlSefaz, envelope);
+            var retornoXmlString = await transmitir.TransmitirAsync(urlSefaz, envelope);
             var retornoLimpo = Soap.LimparEnvelope(retornoXmlString, "retEnviNFe").OuterXml;
 
             await Arquivo.SalvarArquivoAsync(cfgServico, $"{DateTime.Now.Ticks}-ret-env-nfe.xml", retornoLimpo);

@@ -11,16 +11,12 @@ using System.Threading.Tasks;
 
 namespace FiscalCore.Servicos.NotaFiscal
 {
-    public class NotaFiscalServico
+    public class NotaFiscalServico :BaseSefazServico
     {
-        private readonly ConfiguracaoServico configuracaoServico;
-
-        public NotaFiscalServico(ConfiguracaoServico configuracaoServico)
+        public NotaFiscalServico(ConfiguracaoServico configuracao, ITransmitirSefazCommand transmitir) : base(configuracao, transmitir)
         {
-            this.configuracaoServico = configuracaoServico;
-
-            if (configuracaoServico.VersaoAutorizacaoNFe == eVersaoServico.Versao400)
-                autorizarNFe = new AutorizarNFe4(configuracaoServico);
+            if (configuracao.VersaoAutorizacaoNFe == eVersaoServico.Versao400)
+                autorizarNFe = new AutorizarNFe4(configuracao, transmitir);
             else
                 throw new NotImplementedException("Versão de autorização da NFe não suportada");
         }
@@ -34,7 +30,7 @@ namespace FiscalCore.Servicos.NotaFiscal
             get
             {
                 if (cancelarNFe == null)
-                    cancelarNFe = new CancelarNFeServico(configuracaoServico);
+                    cancelarNFe = new CancelarNFeServico(Configuracao, Transmitir);
                 return cancelarNFe;
             }
         }
@@ -45,7 +41,7 @@ namespace FiscalCore.Servicos.NotaFiscal
             get
             {
                 if (eventoComprovanteEntregaNFe == null)
-                    eventoComprovanteEntregaNFe = new ComprovanteEntregaNFeServico(configuracaoServico);
+                    eventoComprovanteEntregaNFe = new ComprovanteEntregaNFeServico(Configuracao, Transmitir);
                 return eventoComprovanteEntregaNFe;
             }
         }
@@ -57,7 +53,7 @@ namespace FiscalCore.Servicos.NotaFiscal
             var consSit = new consSitNFe
             {
                 chNFe = chaveAcesso,
-                tpAmb = configuracaoServico.TipoAmbiente,
+                tpAmb = Configuracao.TipoAmbiente,
                 versao = versao
             };
 
@@ -66,15 +62,15 @@ namespace FiscalCore.Servicos.NotaFiscal
             //var modeloDoc = chaveAcesso.Substring(20, 2).ModeloDocumento();
             var modeloDoc = chave.Modelo;
 
-            var sefazUrl = SefazServico.ObterUrl(eTipoServico.ConsultaSituacaoNFe, configuracaoServico.TipoAmbiente, modeloDoc, configuracaoServico.UF);
+            var sefazUrl = Fabrica.FabricarUrl.ObterUrl(eTipoServico.ConsultaSituacaoNFe, Configuracao.TipoAmbiente, modeloDoc, Configuracao.UF);
 
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.ConsultaSituacaoNFe, xmlEvento);
 
-            var retornoXmlString = await SefazServico.EnviarParaSefazAsync(configuracaoServico, sefazUrl, envelope);
+            var retornoXmlString = await Transmitir.TransmitirAsync(sefazUrl, envelope);
 
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retConsSitNFe").OuterXml;
 
-            await Arquivo.SalvarArquivoAsync(configuracaoServico, DateTime.Now.Ticks + "-retConsSitNFe.xml", retornoXmlStringLimpa);
+            await Arquivo.SalvarArquivoAsync(Configuracao, DateTime.Now.Ticks + "-retConsSitNFe.xml", retornoXmlStringLimpa);
 
             var retEnvEvento = new retConsSitNFe().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 
@@ -87,7 +83,7 @@ namespace FiscalCore.Servicos.NotaFiscal
             get
             {
                 if (cartaCorrecaoServico == null)
-                    cartaCorrecaoServico = new CartaCorrecaoServico(configuracaoServico);
+                    cartaCorrecaoServico = new CartaCorrecaoServico(Configuracao, Transmitir);
                 return cartaCorrecaoServico;
             }
         }
@@ -98,7 +94,7 @@ namespace FiscalCore.Servicos.NotaFiscal
             get
             {
                 if (inutilizarNFeServico == null)
-                    inutilizarNFeServico = new InutilizarNFeServico(configuracaoServico);
+                    inutilizarNFeServico = new InutilizarNFeServico(Configuracao, Transmitir);
                 return inutilizarNFeServico;
             }
         }

@@ -13,10 +13,12 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
     public class InutilizarNFeServico : IEventoServico
     {
         private ConfiguracaoServico cfgServico;
+        private readonly ITransmitirSefazCommand transmitir;
 
-        public InutilizarNFeServico(ConfiguracaoServico cfgServico)
+        public InutilizarNFeServico(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir)
         {
             this.cfgServico = cfgServico;
+            this.transmitir = transmitir;
         }
 
         public async Task<retInutNFe> Inutilizar(int ano, eModeloDocumento modeloDocumento, int serie, int numeroInicial, int numeroFinal, string justificativa) 
@@ -31,8 +33,8 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             await Arquivo.SalvarArquivoAsync(cfgServico.DiretorioSalvarXml, $"{DateTime.Now.Ticks} - {pedInutilizacao.infInut.Id} -ped-inut.xml", xmlInutilizacao);
 
             var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.InutilizacaoNFe, xmlInutilizacao);
-            var sefazUrl = SefazServico.ObterUrl(eTipoServico.InutilizacaoNFe, cfgServico.TipoAmbiente, modeloDocumento, cfgServico.UF);
-            var retornoXmlString = await SefazServico.EnviarParaSefazAsync(cfgServico, sefazUrl, envelope);
+            var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.InutilizacaoNFe, cfgServico.TipoAmbiente, modeloDocumento, cfgServico.UF);
+            var retornoXmlString = await transmitir.TransmitirAsync(sefazUrl, envelope);
             var retornoLimpo = Soap.LimparEnvelope(retornoXmlString, "retInutNFe").OuterXml;
 
             await Arquivo.SalvarArquivoAsync(cfgServico.DiretorioSalvarXml, $"{DateTime.Now.Ticks} - {pedInutilizacao.infInut.Id} -inut.xml", retornoLimpo);

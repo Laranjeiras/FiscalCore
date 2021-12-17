@@ -1,7 +1,8 @@
 ﻿using FiscalCore.Configuracoes;
+using FiscalCore.DistribuicaoDFe.Servicos;
 using FiscalCore.Exceptions;
 using FiscalCore.Servicos;
-using FiscalCore.Servicos.ManifestacaoDestinatario;
+using FiscalCore.Servicos.NotaFiscal;
 using FiscalCore.Testes.NFes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -28,9 +29,11 @@ namespace FiscalCore.Testes
 
             var services = new ServiceCollection();
             services.AddSingleton<ConfiguracaoServico>(config);
-            services.AddScoped<ManifestacaoDestinatarioServico>();
+            services.AddScoped<DistribuicaoDFeServico>();
+            services.AddScoped<SefazServico>();
             services.AddScoped<INFeExemplosTeste, NFe_1>();
             services.AddScoped<IAutorizarNFeServico, AutorizarNFe4>();
+            services.AddScoped<NotaFiscalServico>();
             ServiceProvider = services.BuildServiceProvider();
         }
     }

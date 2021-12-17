@@ -43,11 +43,11 @@ namespace FiscalCore.Modelos.DistribuicaoDFe
         [XmlIgnore]
         public procEventoNFe ProcEventoNFe { get; set; }
 
-        ///// <summary>
-        ///// Resumos de eventos
-        ///// </summary>
-        //[XmlIgnore]
-        //public resEvento ResEvento { get; set; }
+        /// <summary>
+        /// Resumos de eventos
+        /// </summary>
+        [XmlIgnore]
+        public resEvento ResEvento { get; set; }
 
         ///// <summary>
         ///// NF-e processada

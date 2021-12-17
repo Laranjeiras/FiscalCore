@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace FiscalCore.Modelos.DistribuicaoDFe
 {
+    /// <summary>
+    /// Estrutura XML com os documentos de interesse do ator (qtde máxima=50)
+    /// </summary>
     [XmlRoot("retDistDFeInt", Namespace = "http://www.portalfiscal.inf.br/nfe", IsNullable = false)]
     public class retDistDFeInt
     {
@@ -35,5 +39,14 @@ namespace FiscalCore.Modelos.DistribuicaoDFe
         /// </summary>
         [XmlArrayItem("docZip", IsNullable = false)]
         public loteDistDFeInt[] loteDistDFeInt { get; set; }
+
+        public void AddLoteDistDFe(loteDistDFeInt value)
+        {
+            List<loteDistDFeInt> termsList = new List<loteDistDFeInt>(loteDistDFeInt);
+            termsList.Add(value);
+
+            // You can convert it back to an array if you would like to
+            loteDistDFeInt = termsList.ToArray();
+        }
     }
 }

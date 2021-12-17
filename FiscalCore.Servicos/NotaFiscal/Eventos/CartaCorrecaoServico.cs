@@ -13,11 +13,13 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
     public class CartaCorrecaoServico : IEventoServico
     {
         private readonly ConfiguracaoServico cfgServico;
+        private readonly ITransmitirSefazCommand transmitir;
         private readonly string _versao;
 
-        public CartaCorrecaoServico(ConfiguracaoServico cfgServico)
+        public CartaCorrecaoServico(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir)
         {
             this.cfgServico = cfgServico;
+            this.transmitir = transmitir;
             _versao = "1.00";
         }
 
@@ -85,10 +87,10 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
 
             await Arquivo.SalvarArquivoAsync(cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ped-eve.xml", xmlEvento);
 
-            var sefazUrl = SefazServico.ObterUrl(eTipoServico.CartaCorrecao, cfgServico.TipoAmbiente, eModeloDocumento.NFe, cfgServico.UF);
+            var sefazUrl = Fabrica.FabricarUrl.ObterUrl(eTipoServico.CartaCorrecao, cfgServico.TipoAmbiente, eModeloDocumento.NFe, cfgServico.UF);
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.CartaCorrecao, xmlEvento);
 
-            var retornoXmlString = await SefazServico.EnviarParaSefazAsync(cfgServico, sefazUrl, envelope);
+            var retornoXmlString = await transmitir.TransmitirAsync(sefazUrl, envelope);
 
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retEnvEvento").OuterXml;
 

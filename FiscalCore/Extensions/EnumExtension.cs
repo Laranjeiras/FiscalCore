@@ -10,6 +10,8 @@ namespace FiscalCore.Extensions
         {
             try
             {
+                if (value is null)
+                    return null;
                 var type = value.GetType();
                 var memberInfo = type.GetMember(value.ToString());
                 var attributes = memberInfo[0].GetCustomAttributes(typeof(T), false);
@@ -26,6 +28,8 @@ namespace FiscalCore.Extensions
             try
             {
                 var attribute = value.ObterAtributo<DescriptionAttribute>();
+                if (value is null)
+                    return null;
                 return attribute == null ? value.ToString() : attribute.Description;
             } 
             catch

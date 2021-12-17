@@ -6,18 +6,21 @@ using FiscalCore.Utils;
 using System;
 using System.Threading.Tasks;
 using FiscalCore.Tipos;
+using FiscalCore.Fabrica;
 
 namespace FiscalCore.Servicos
 {
     public class ConsultaSituacaoNFeServico
     {
         private readonly ConfiguracaoServico _cfgServico;
+        private readonly ITransmitirSefazCommand sefaz;
         private readonly string _versao;
 
-        public ConsultaSituacaoNFeServico(ConfiguracaoServico cfgServico, string versao)
+        public ConsultaSituacaoNFeServico(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir)
         {
             _cfgServico = cfgServico;
-            _versao = versao;
+            this.sefaz = transmitir;
+            _versao = "0.00";
         }
 
         public async Task<retConsSitNFe> ConsultarPelaChave(string chaveAcesso) 
@@ -34,10 +37,10 @@ namespace FiscalCore.Servicos
 
             var modeloDoc = chaveAcesso.Substring(20, 2).ModeloDocumento();
 
-            var sefazUrl = SefazServico.ObterUrl(eTipoServico.ConsultaSituacaoNFe, _cfgServico.TipoAmbiente, modeloDoc, _cfgServico.UF);
-            var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.ConsultaSituacaoNFe, xmlEvento);
+            var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.ConsultaSituacaoNFe, _cfgServico.TipoAmbiente, modeloDoc, _cfgServico.UF);
+            var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.ConsultaSituacaoNFe, xmlEvento);
 
-            var retornoXmlString = await SefazServico.EnviarParaSefazAsync(_cfgServico, sefazUrl, envelope);
+            var retornoXmlString = await sefaz.TransmitirAsync(sefazUrl, envelope);
 
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retConsSitNFe").OuterXml;
 

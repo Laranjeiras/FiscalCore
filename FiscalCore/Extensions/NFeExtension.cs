@@ -36,7 +36,7 @@ namespace FiscalCore.Extensions
         {
             if (arquivo is null)
                 throw new ArgumentNullException(nameof(arquivo));
-            
+
             if (string.IsNullOrEmpty(diretorio))
                 diretorio = Path.GetTempPath();
 

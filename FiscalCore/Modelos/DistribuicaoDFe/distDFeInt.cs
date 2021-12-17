@@ -11,7 +11,7 @@ namespace FiscalCore.Modelos.DistribuicaoDFe
         public string Versao { get; set; }
 
         [XmlElement("tpAmb")]
-        public eTipoAmbiente TpAmb { get; set; } = eTipoAmbiente.Producao;
+        public eTipoAmbiente TpAmb { get; set; } = eTipoAmbiente.Homologacao;
 
         [XmlElement("cUFAutor")]
         public string cUFAutor { get; set; }

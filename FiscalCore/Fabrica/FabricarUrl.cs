@@ -1,50 +1,22 @@
-﻿using FiscalCore.Configuracoes;
-using FiscalCore.Fabrica;
-using FiscalCore.Tipos;
-using FiscalCore.Utils;
+﻿using FiscalCore.Tipos;
+using FiscalCore.ValueObjects;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using System.Xml;
 
-namespace FiscalCore.Servicos
+namespace FiscalCore.Fabrica
 {
-    public class SefazServico
+    public class FabricarUrl
     {
-        public async static Task<string> EnviarParaSefazAsync(ConfiguracaoServico cfgServico, UrlSefaz sefazUrl, XmlDocument envelope)
-        {
-            HttpWebRequest webRequest = SoapEnvelopeFabrica.CriarWebRequest(sefazUrl.Url, "application/soap+xml;charset=utf-8");
-
-            Soap.InserirSoapEnvelopeWebRequest(envelope, webRequest);
-
-            webRequest.ClientCertificates.Add(ObterCertificado.Obter(cfgServico.ConfigCertificado));
-
-            IAsyncResult asyncResult = webRequest.BeginGetResponse(null, null);
-
-            string soapResult;
-            using (WebResponse webResponse = webRequest.EndGetResponse(asyncResult))
-            {
-                using (StreamReader rd = new StreamReader(webResponse.GetResponseStream()))
-                {
-                    soapResult = await rd.ReadToEndAsync();
-                }
-            }
-
-            return soapResult;
-        }
-
         public static UrlSefaz ObterUrl(eTipoServico tipoServico, eTipoAmbiente tipoAmbiente, eModeloDocumento modeloDocumento, eUF uf)
         {
             var urlAction = UrlsSefaz().Where(x => x.Servico == tipoServico && x.UF == uf && x.TipoAmbiente == tipoAmbiente && x.ModeloDocumento == modeloDocumento).FirstOrDefault();
             if (urlAction == null)
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException("Nenhuma URL do Webservice encontrada");
             return urlAction;
         }
 
-        public static IList<UrlSefaz> UrlsSefaz()
+        private static IList<UrlSefaz> UrlsSefaz()
         {
             var urls = new List<UrlSefaz>();
             urls.Add(new UrlSefaz(eTipoServico.AutorizarNFe, eUF.RJ, eTipoAmbiente.Producao, eModeloDocumento.NFe, "https://nfe.svrs.rs.gov.br/ws/NfeAutorizacao/NFeAutorizacao.asmx", "https://nfe.svrs.rs.gov.br/ws/NfeAutorizacao/NFeAutorizacao.asmx?op=nfeAutorizacaoLote"));
@@ -76,30 +48,12 @@ namespace FiscalCore.Servicos
             #region Ambiente Nacional
             // Distribuicao DFe - Consultar Documentos Destinados
             urls.Add(new UrlSefaz(eTipoServico.NFeDistribuicaoDFe, eUF.AN, eTipoAmbiente.Producao, eModeloDocumento.NFe, "https://www1.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx", "https://www1.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx?op=nfeDistDFeInteresse"));
+            urls.Add(new UrlSefaz(eTipoServico.NFeDistribuicaoDFe, eUF.AN, eTipoAmbiente.Homologacao, eModeloDocumento.NFe, "https://hom1.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx", "https://hom1.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx?op=nfeDistDFeInteresse"));
             // Manifestação Destinatário
             urls.Add(new UrlSefaz(eTipoServico.ManifestacaoDestinatario, eUF.AN, eTipoAmbiente.Producao, eModeloDocumento.NFe, "https://www.nfe.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx", "https://www.nfe.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx?op=nfeRecepcaoEventoNF"));
+            urls.Add(new UrlSefaz(eTipoServico.ManifestacaoDestinatario, eUF.AN, eTipoAmbiente.Homologacao, eModeloDocumento.NFe, "https://hom1.nfe.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx", "https://hom1.nfe.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx?op=nfeRecepcaoEventoNF"));
             #endregion
             return urls;
-        }
-    }
-
-    public class UrlSefaz
-    {
-        public string Url { get; private set; }
-        public string Action { get; private set; }
-        public eModeloDocumento ModeloDocumento { get; private set; }
-        public eTipoAmbiente TipoAmbiente { get; private set; }
-        public eUF UF { get; private set; }
-        public eTipoServico Servico { get; set; }
-
-        public UrlSefaz(eTipoServico servico, eUF uf, eTipoAmbiente tipoAmbiente, eModeloDocumento modeloDocumento, string url, string action)
-        {
-            Url = url;
-            Action = action;
-            UF = uf;
-            TipoAmbiente = tipoAmbiente;
-            ModeloDocumento = modeloDocumento;
-            Servico = servico;
         }
     }
 }
