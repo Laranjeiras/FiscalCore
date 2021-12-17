@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace FiscalCore.Servicos.NotaFiscal
 {
-    public class NotaFiscalServico :BaseSefazServico
+    public class NotaFiscalServico : BaseSefazServico
     {
         public NotaFiscalServico(ConfiguracaoServico configuracao, ITransmitirSefazCommand transmitir) : base(configuracao, transmitir)
         {
