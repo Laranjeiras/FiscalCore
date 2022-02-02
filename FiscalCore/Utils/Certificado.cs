@@ -70,7 +70,7 @@ namespace FiscalCore.Utils
 
             var matches = Regex.Matches(texto, @"(?<!\d)\d{14}(?!\d)");
 
-            var cnpjValido = matches.FirstOrDefault(p => new Cnpj(p.Value).EhValido);
+            var cnpjValido = matches.FirstOrDefault(p => new Cnpj(p.Value).Valido);
             return cnpjValido?.Value;
         }
 

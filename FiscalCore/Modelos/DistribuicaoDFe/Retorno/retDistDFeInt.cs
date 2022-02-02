@@ -10,6 +10,12 @@ namespace FiscalCore.Modelos.DistribuicaoDFe
     [XmlRoot("retDistDFeInt", Namespace = "http://www.portalfiscal.inf.br/nfe", IsNullable = false)]
     public class retDistDFeInt
     {
+        public retDistDFeInt()
+        {
+            var termsList = new List<loteDistDFeInt>();
+            loteDistDFeInt = termsList.ToArray();
+        }
+
         [XmlAttribute("versao")]
         public decimal Versao { get; set; }
 
@@ -41,7 +47,7 @@ namespace FiscalCore.Modelos.DistribuicaoDFe
         public loteDistDFeInt[] loteDistDFeInt { get; set; }
 
         public void AddLoteDistDFe(loteDistDFeInt value)
-        {
+        {          
             List<loteDistDFeInt> termsList = new List<loteDistDFeInt>(loteDistDFeInt);
             termsList.Add(value);
 

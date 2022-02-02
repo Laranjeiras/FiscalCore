@@ -4,7 +4,7 @@
     {
         private readonly string _value;
 
-        public readonly bool EhValido;
+        public readonly bool Valido;
         static readonly int[] Multiplicador1 = { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
         static readonly int[] Multiplicador2 = { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
 
@@ -14,7 +14,7 @@
 
             if (value == null)
             {
-                EhValido = false;
+                Valido = false;
                 return;
             }
 
@@ -49,7 +49,7 @@
 
                         if (digito != dv1)
                         {
-                            EhValido = false;
+                            Valido = false;
                             return;
                         }
 
@@ -65,7 +65,7 @@
 
                         if (digito != dv2)
                         {
-                            EhValido = false;
+                            Valido = false;
                             return;
                         }
                     }
@@ -74,7 +74,7 @@
                 }
             }
 
-            EhValido = (posicao == 14) && !digitosIdenticos;
+            Valido = (posicao == 14) && !digitosIdenticos;
         }
 
         public static implicit operator Cnpj(string value)
@@ -84,6 +84,6 @@
             => _value;
 
         public static bool ValidarCNPJ(Cnpj cnpj)
-            => cnpj.EhValido;
+            => cnpj.Valido;
     }
 }

@@ -7,7 +7,6 @@ namespace FiscalCore.Utils
 {
     public static class Arquivo
     {
-        [Obsolete]
         public static async Task<string> SalvarArquivoAsync(ConfiguracaoServico configuracao, string subDiretorio, string nomeArquivo, string conteudo, DateTime? dataFiscal = null)
         {
             var dir = Path.Combine(configuracao.DiretorioSalvarXml, subDiretorio);
@@ -16,7 +15,7 @@ namespace FiscalCore.Utils
 
             return await SalvarArquivoAsync(dir, nomeArquivo, conteudo);
         }
-        [Obsolete]
+
         public static async Task<string> SalvarArquivoAsync(ConfiguracaoServico configuracao, string nomeArquivo, string conteudo, DateTime? dataFiscal = null)
         {
             var dir = Path.Combine(configuracao.DiretorioSalvarXml);
@@ -25,7 +24,7 @@ namespace FiscalCore.Utils
 
             return await SalvarArquivoAsync(dir, nomeArquivo, conteudo);
         }
-        [Obsolete]
+
         public static async Task<string> SalvarArquivoAsync(string dir, string nomeArquivo, string conteudo)
         {
             if (dir == null)

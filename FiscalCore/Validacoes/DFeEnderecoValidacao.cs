@@ -4,35 +4,35 @@ using FiscalCore.Utils;
 
 namespace FiscalCore.Validacoes.Sefaz
 {
-    public class DFeAddressValidation
+    public class DFeEnderecoValidacao
     {
         public Contrato Contrato { get; private set; } = new Contrato();
 
-        BaseEndereco _address;
+        BaseEndereco address;
 
-        public DFeAddressValidation(BaseEndereco address)
+        public DFeEnderecoValidacao(BaseEndereco address)
         {
-            _address = address;
+            this.address = address;
         }
 
-        public DFeAddressValidation(string xLgr, string nro, string xCpl, string xBairro, long cMun, string xMun, eUF UF, string cep, int? cPais, string xPais, long? fone) 
+        public DFeEnderecoValidacao(string xLgr, string nro, string xCpl, string xBairro, long cMun, string xMun, eUF UF, string cep, int? cPais, string xPais, long? fone) 
         {
-            this._address = new BaseEndereco(xLgr, nro, xCpl, xBairro, cMun, xMun, UF, cep, cPais, xPais, fone);
+            this.address = new BaseEndereco(xLgr, nro, xCpl, xBairro, cMun, xMun, UF, cep, cPais, xPais, fone);
         }
 
         public bool IsValid()
         {
-            if (!AddressValidation.xLgr_IsValid(_address.xLgr))
+            if (!AddressValidation.xLgr_IsValid(address.xLgr))
                 Contrato.Add(new Notificacao("xLgr", "Logradouro inválido"));
-            if (!AddressValidation.nro_IsValid(_address.nro))
+            if (!AddressValidation.nro_IsValid(address.nro))
                 Contrato.Add(new Notificacao("nro", "Número do endereço inválido"));
-            if (!AddressValidation.xBairro_IsValid(_address.xBairro))
+            if (!AddressValidation.xBairro_IsValid(address.xBairro))
                 Contrato.Add(new Notificacao("xBairro", "Bairro inválido"));
-            if (!AddressValidation.cMun_IsValid(_address.cMun))
+            if (!AddressValidation.cMun_IsValid(address.cMun))
                 Contrato.Add(new Notificacao("cMun", "Município inválido"));
-            if (!AddressValidation.xMun_IsValid(_address.xMun))
+            if (!AddressValidation.xMun_IsValid(address.xMun))
                 Contrato.Add(new Notificacao("xMun", "Município inválido"));
-            if (!AddressValidation.UF_IsValid(_address.UF.ToString()))
+            if (!AddressValidation.UF_IsValid(address.UF.ToString()))
                 Contrato.Add(new Notificacao("UF", "UF inválido"));
 
             return Contrato.Valido;
