@@ -23,6 +23,14 @@ namespace FiscalCore.Tipos
         [XmlEnum("110112")]
         NFeCancelamentoSubstituicao = 110112,
 
+        [Description("Comprovante de Entrega da NF-e")]
+        [XmlEnum("110130")]
+        ComprovanteEntregaNFe = 110130,
+
+        [Description("Cancelamento do Comprovante de Entrega da NF-e")]
+        [XmlEnum("110131")]
+        CancelamentoComprovanteEntregaNFe = 110131,
+
         [Description("EPEC")]
         [XmlEnum("110140")]
         NFceEpec = 110140,
