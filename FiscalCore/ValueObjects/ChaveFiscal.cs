@@ -27,6 +27,8 @@ namespace FiscalCore.ValueObjects
         public eTipoEmissao TipoEmissao { get; private set; }
         public string CNF { get; private set; }
 
+        protected ChaveFiscal() { }
+
         public ChaveFiscal(eUF uf, DateTime dataEmissao, string cnpj, eModeloDocumento modelo, int serie, long numero, eTipoEmissao tipoEmissao, string cNF)
         {
             try
