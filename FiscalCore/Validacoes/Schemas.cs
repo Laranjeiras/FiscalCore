@@ -18,79 +18,55 @@ namespace FiscalCore.Validacoes
         public static void ValidarSchema(eTipoServico tipoServico, string xml, ConfiguracaoServico cfgServico)
         {
             var caminhoSchema = cfgServico.DiretorioSchemas;
+            var erros = new List<string>();
 
             if (!Directory.Exists(caminhoSchema))
-                throw new Exception("Diretório de Schemas não encontrado: \n" + caminhoSchema);
+                throw new Exception("Diretório de Schemas não encontrado: " + caminhoSchema);
+
+            var arquivoSchema = Path.Combine(caminhoSchema, ObterSchema(tipoServico));
+
+            if (!File.Exists(arquivoSchema))
+                throw new FileNotFoundException($"Arquivo não encontrado: {arquivoSchema}");
 
             var cfg = new XmlReaderSettings { ValidationType = ValidationType.Schema };
-            var schemas = ObterSchema(tipoServico);
+            cfg.Schemas.XmlResolver = new XmlUrlResolver();
+            cfg.Schemas.Add(null, arquivoSchema);
 
-            foreach (var schema in schemas)
+            cfg.ValidationEventHandler += delegate (object sender, ValidationEventArgs args)
             {
-                var arquivoSchema = Path.Combine(caminhoSchema, schema);
-                if (!File.Exists(arquivoSchema))
-                    throw new FileNotFoundException($"Arquivo não encontrado: {arquivoSchema}");
-                cfg.Schemas.Add(null, arquivoSchema);
-            }
-
-            cfg.ValidationEventHandler += ValidationEventHandler;
+                erros.Add($"[{args.Severity}] {args.Message}");
+                //Console.WriteLine($"[{args.Severity}] - {args.Message} {args.Exception?.Message} na linha {args.Exception.LineNumber} posição {args.Exception.LinePosition} em {args.Exception.SourceUri}".ToString()));
+            };
 
             var reader = XmlReader.Create(new StringReader(xml), cfg);
             var document = new XmlDocument();
             document.Load(reader);
 
-            //Valida xml
-            document.Validate(ValidationEventHandler);
+            if (erros.Count > 0)
+            {
+                var result = string.Join(Environment.NewLine, erros);
+                throw new FalhaValidacaoException($"Erro ao validar XML contra Schema Xsd: {Environment.NewLine}{result}");
+            }
         }
 
-        public static IList<string> ObterSchema(eTipoServico tiposervico)
+        public static string ObterSchema(eTipoServico tipoServico)
         {
-            var schema = ListaSchemas.Where(x => x.TipoServico == tiposervico).SingleOrDefault();
-            return schema.Arquivos.ToList();
+            var schema = ListaSchemas.Where(x => x.TipoServico == tipoServico).SingleOrDefault();
+            return schema.Arquivo;
         }
 
         private static IList<Schema> ListaSchemas => new List<Schema>
         {
-            new Schema {
-                TipoServico = eTipoServico.AutorizarNFe ,
-                Arquivos = new string[] { "enviNFe_v4.00.xsd", "leiauteNFe_v4.00.xsd", "tiposBasico_v4.00.xsd", "nfe_v4.00.xsd","xmldsig-core-schema_v1.01.xsd" }
-            },
-            new Schema
-            {
-                TipoServico = eTipoServico.NFeDistribuicaoDFe,
-                Arquivos = new string[] { "distDFeInt_v1.01.xsd", "tiposDistDFe_v1.01.xsd" }
-            }
+            new Schema { TipoServico = eTipoServico.AutorizarNFe , Arquivo = "enviNFe_v4.00.xsd" },
+            new Schema { TipoServico = eTipoServico.NFeDistribuicaoDFe, Arquivo = "distDFeInt_v1.01.xsd"         },
+            new Schema { TipoServico = eTipoServico.ManifestacaoDestinatario, Arquivo = "envConfRecebto_v1.00.xsd" }
         };
-
-        private static void ValidationEventHandler(object sender, ValidationEventArgs ex)
-        {
-            var msg = $"Erro ao validar xml contra Schema Xsd.\n{ex.Message}";
-            TraceException(ex.Exception, msg);
-            throw new FalhaValidacaoSchemaException(msg);
-        }
-
-        public static void TraceException(Exception ex, string msg)
-        {
-            var str = new StringBuilder();
-            var error = new ErrorTrace
-            {
-                Data = DateTime.Now.ToString("g"),
-                Detalhe = ex.GetType().Name,
-                Mensagem = $"{ex.Message}.{msg}",
-                StackTrace = ex.StackTrace
-            };
-            var content = JsonConvert.SerializeObject(error);
-            str.Append(content);
-            str.Append('?');
-            str.Append(Environment.NewLine);
-            Console.WriteLine(str.ToString());
-        }
     }
 
     public class Schema
     {
         public eTipoServico TipoServico { get; set; }
 
-        public string[] Arquivos { get; set; }
+        public string Arquivo { get; set; }
     }
 }

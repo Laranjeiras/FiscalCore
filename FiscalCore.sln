@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29324.140
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{D37B8CEA-3215-462F-A652-C90A6F52A687}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FiscalCore", "FiscalCore\FiscalCore.csproj", "{4F86A89E-5FD4-474B-AD86-0B876A71E25A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FiscalCore.WebPrint", "FiscalCore.WebPrint\FiscalCore.WebPrint.csproj", "{DDE2A254-BC13-499D-BB0A-DFE1CCFAFF2A}"
@@ -15,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testes", "Testes", "{FCBF37
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F910B40D-3FF5-460E-846E-022E42602242}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiscalCore.Testes", "FiscalCore.Testes\FiscalCore.Testes.csproj", "{1C87443E-776E-461C-A91B-D6ED044C183D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FiscalCore.Testes", "FiscalCore.Testes\FiscalCore.Testes.csproj", "{1C87443E-776E-461C-A91B-D6ED044C183D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +21,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D37B8CEA-3215-462F-A652-C90A6F52A687}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D37B8CEA-3215-462F-A652-C90A6F52A687}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D37B8CEA-3215-462F-A652-C90A6F52A687}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D37B8CEA-3215-462F-A652-C90A6F52A687}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4F86A89E-5FD4-474B-AD86-0B876A71E25A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4F86A89E-5FD4-474B-AD86-0B876A71E25A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F86A89E-5FD4-474B-AD86-0B876A71E25A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -48,7 +42,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{D37B8CEA-3215-462F-A652-C90A6F52A687} = {FCBF3709-48DF-4090-869B-15973C92F2F5}
 		{4F86A89E-5FD4-474B-AD86-0B876A71E25A} = {F910B40D-3FF5-460E-846E-022E42602242}
 		{DDE2A254-BC13-499D-BB0A-DFE1CCFAFF2A} = {F910B40D-3FF5-460E-846E-022E42602242}
 		{52D7ED58-4329-477C-8E21-E2035D036666} = {F910B40D-3FF5-460E-846E-022E42602242}

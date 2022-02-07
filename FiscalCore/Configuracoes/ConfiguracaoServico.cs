@@ -1,7 +1,6 @@
 ﻿using FiscalCore.Exceptions;
 using FiscalCore.Modelos.NotaFiscal.Emitente;
 using FiscalCore.Tipos;
-using FiscalCore.Utils;
 using System.IO;
 
 namespace FiscalCore.Configuracoes
@@ -80,6 +79,7 @@ namespace FiscalCore.Configuracoes
         public eVersaoServico VersaoInutilizacaoNFe { get; set; }
         public eVersaoServico VersaoCancelamentoNFe { get; set; }
         public eVersaoServico VersaoAutorizacaoNFe { get; set; }
+        public eVersaoServico VersaoManifestacaoDestinatario { get; set; }
         public string ImpressoraCupom { get; set; }
         public int NFeSerie { get; set; }
         public int NFCeSerie { get; set; }

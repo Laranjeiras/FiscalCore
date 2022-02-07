@@ -42,11 +42,11 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
             };
 
             var retorno = await Transmitir.TransmitirAsync(distDFeInt, validarXmlConsulta);
-            var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retorno);
+             var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retorno);
             return retDistDFeInt;
         }
 
-        public async Task<retDistDFeInt> ConsultarPorNSUAsync(string nsu)
+        public async Task<retDistDFeInt> ConsultarPorNSUAsync(string nsu, bool validarXmlConsulta = true)
         {
             logger.LogInformation($"Consultar documentos destinados por NSU {nsu}");
             if (string.IsNullOrEmpty(nsu))
@@ -65,12 +65,12 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
                 TpAmb = Configuracao.TipoAmbiente
             };
 
-            var retorno = await Transmitir.TransmitirAsync(distDFeInt);
+            var retorno = await Transmitir.TransmitirAsync(distDFeInt, validarXmlConsulta);
             var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retorno);
             return retDistDFeInt;
         }
 
-        public async Task<retDistDFeInt> ConsultarDFePorChaveAsync(ChaveFiscal chaveNFe, bool validarXmlConsulta = true)
+        public async Task<retDistDFeInt> ConsultarPorChaveAsync(ChaveFiscal chaveNFe, bool validarXmlConsulta = true)
         {
             var distDFeInt = new distDFeInt
             {
@@ -89,74 +89,5 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
 
             return retDistDFeInt;
         }
-
-        //private async Task<string> ManifestarAsync(string chaveAcesso, eTipoEventoNFe tipoEvento, string justificativa = null)
-        //{
-        //    var xmlEvento = GerarXmlEvento(chaveAcesso, tipoEvento, justificativa);
-
-        //    await Arquivo.SalvarArquivoAsync(Configuracao, "Eventos", $"{DateTime.Now.Ticks}-ped-eve.xml", xmlEvento);
-
-        //    var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.ManifestacaoDestinatario, xmlEvento);
-        //    var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.ManifestacaoDestinatario, Configuracao.TipoAmbiente, eModeloDocumento.NFe, eUF.AN);
-        //    var xmlRetorno = await Transmitir.ExecutarAsync(sefazUrl, envelope);
-        //    var xmlRetLimpo = Soap.LimparEnvelope(xmlRetorno, "retEnvEvento").OuterXml;
-        //    await Arquivo.SalvarArquivoAsync(Configuracao, "Eventos", $"{DateTime.Now.Ticks}-ret-eve.xml", xmlRetLimpo);
-        //    return xmlRetLimpo;
-        //}
-
-        //private RetEventoManifestacaoDTO MontarDTO(string xml)
-        //{
-        //    var retEnv = XmlUtils.XmlStringParaClasse<retEnvEvento>(xml);
-        //    if (retEnv.retEvento.Count != 1)
-        //        throw new Exception("Retorno com mais de 1 evento registrado");
-
-        //    var inf = retEnv.retEvento.SingleOrDefault();
-        //    return new RetEventoManifestacaoDTO(inf.infEvento);
-        //}
-
-        //private string GerarXmlEvento(string chaveAcesso, eTipoEventoNFe tipoEvento, string justificativa)
-        //{
-        //    if (tipoEvento != eTipoEventoNFe.OperacaoNaoRealizada)
-        //        justificativa = null;
-        //    else
-        //        throw new ArgumentNullException(nameof(justificativa));
-
-        //    var infEvento = new infEventoEnv
-        //    {
-        //        chNFe = chaveAcesso,
-        //        CNPJ = Configuracao.Emitente.CNPJ,
-        //        CPF = Configuracao.Emitente.CPF,
-        //        cOrgao = eUF.AN,
-        //        dhEvento = DateTime.Now,
-        //        nSeqEvento = nSeqEvento,
-        //        tpAmb = Configuracao.TipoAmbiente,
-        //        tpEvento = tipoEvento,
-        //        verEvento = versao,
-        //        Id = "ID" + ((int)tipoEvento) + chaveAcesso + nSeqEvento.ToString().PadLeft(2, '0'),
-        //        detEvento = new detEvento()
-        //        {
-        //            versao = versao,
-        //            descEvento = tipoEvento.Descricao().RemoverAcentos()
-        //        }
-        //    };
-
-        //    var evento = new evento
-        //    {
-        //        versao = versao,
-        //        infEvento = infEvento
-        //    };
-
-        //    evento.Assinar(ObterCertificado.Obter(Configuracao.ConfigCertificado), Configuracao.ConfigCertificado.SignatureMethodSignedXml, Configuracao.ConfigCertificado.DigestMethodReference);
-
-        //    var pedEvento = new envEvento
-        //    {
-        //        versao = versao,
-        //        idLote = 1,
-        //        evento = new List<evento> { evento }
-        //    };
-
-        //    var xmlEvento = XmlUtils.ClasseParaXmlString<envEvento>(pedEvento);
-        //    return xmlEvento;
-        //}
     }
 }
