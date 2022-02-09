@@ -7,24 +7,6 @@ namespace FiscalCore.Utils
 {
     public static class Arquivo
     {
-        public static async Task<string> SalvarArquivoAsync(ConfiguracaoServico configuracao, string subDiretorio, string nomeArquivo, string conteudo, DateTime? dataFiscal = null)
-        {
-            var dir = Path.Combine(configuracao.DiretorioSalvarXml, subDiretorio);
-            if (dataFiscal != null)
-                dir = Path.Combine(dir, dataFiscal?.ToString("MM_yyyy"));
-
-            return await SalvarArquivoAsync(dir, nomeArquivo, conteudo);
-        }
-
-        public static async Task<string> SalvarArquivoAsync(ConfiguracaoServico configuracao, string nomeArquivo, string conteudo, DateTime? dataFiscal = null)
-        {
-            var dir = Path.Combine(configuracao.DiretorioSalvarXml);
-            if (dataFiscal != null)
-                dir = Path.Combine(dir, dataFiscal?.ToString("MM_yyyy"));
-
-            return await SalvarArquivoAsync(dir, nomeArquivo, conteudo);
-        }
-
         public static async Task<string> SalvarArquivoAsync(string dir, string nomeArquivo, string conteudo)
         {
             if (dir == null)
@@ -41,6 +23,11 @@ namespace FiscalCore.Utils
             await stw.WriteLineAsync(conteudo);
             stw.Close();
             return filename;
+        }
+
+        public static string MontarNomeArquivo(string sufixo, ConfiguracaoServico config)
+        {
+            return $"{config.Emitente.CNPJ ?? config.Emitente.CPF}-{DateTime.Now.Ticks}-{sufixo}";
         }
 
         public static string CriarDiretorioSeNaoExistir(string diretorio)

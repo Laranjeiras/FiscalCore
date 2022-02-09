@@ -7,20 +7,30 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FiscalCore.Tipos;
+using System.IO;
+using AlgoPlus.Storage.Services;
+using FiscalCore.Exceptions;
 
 namespace FiscalCore.Servicos.NotaFiscal.Eventos
 {
     public class CartaCorrecaoServico : IEventoServico
     {
         private readonly ConfiguracaoServico cfgServico;
+        private readonly IStorage storage;
         private readonly ITransmitirSefazCommand transmitir;
         private readonly string _versao;
 
-        public CartaCorrecaoServico(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir)
+        public CartaCorrecaoServico(ConfiguracaoServico cfgServico, IStorage storage, ITransmitirSefazCommand transmitir)
         {
             this.cfgServico = cfgServico;
+            this.storage = storage;
             this.transmitir = transmitir;
             _versao = "1.00";
+        }
+
+        public async Task<retEnvEvento> TransmitirCorrecao(InfoCartaCorrecao info)
+        {
+            return await TransmitirCorrecao(new List<InfoCartaCorrecao> { info });
         }
 
         public async Task<retEnvEvento> TransmitirCorrecao(IList<InfoCartaCorrecao> infos) 
@@ -42,8 +52,11 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
                 chave = chave.Replace("NFe", "");
                 eModeloDocumento _modeloDocumento = chave.Substring(20, 2).ModeloDocumento();
 
+                if (item.Correcao.Length < 15 || item.Correcao.Length > 1000)
+                    throw new FalhaValidacaoException("A descrição da correção deve conter entre 15 e 1000 caracteres");
+
                 if (_modeloDocumento != eModeloDocumento.NFe)
-                    throw new Exception("Somente NFe podem ter Carta Correção");
+                    throw new FalhaValidacaoException("Somente NFe pode ter Carta Correção");
 
                 var infEvento = new infEventoEnv
                 {
@@ -76,7 +89,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
                 eventoTmp.Assinar(_certificado, cfgServico.ConfigCertificado.SignatureMethodSignedXml, cfgServico.ConfigCertificado.DigestMethodReference);
             }
 
-            var pedEvento = new envEvento
+            var pedEvento = new envEvento 
             {
                 versao = _versao,
                 idLote = 1,
@@ -85,7 +98,8 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
 
             var xmlEvento = XmlUtils.ClasseParaXmlString<envEvento>(pedEvento);
 
-            await Arquivo.SalvarArquivoAsync(cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ped-eve.xml", xmlEvento);
+            var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ped-eve.xml", cfgServico));
+            await storage.SaveAsync(arqEnv, xmlEvento);
 
             var sefazUrl = Fabrica.FabricarUrl.ObterUrl(eTipoServico.CartaCorrecao, cfgServico.TipoAmbiente, eModeloDocumento.NFe, cfgServico.UF);
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.CartaCorrecao, xmlEvento);
@@ -94,27 +108,12 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
 
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retEnvEvento").OuterXml;
 
-            await Arquivo.SalvarArquivoAsync(cfgServico.DiretorioSalvarXml, DateTime.Now.Ticks + "-ret-eve.xml", retornoXmlStringLimpa);
+            var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ret-eve.xml", cfgServico));
+            await storage.SaveAsync(arqRet, retornoXmlStringLimpa);
 
-            var retorno = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
+             var retorno = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 
             return retorno;
         }
-    }
-
-    public class InfoCartaCorrecao 
-    {
-        public InfoCartaCorrecao(string chaveAcesso, string correcao, int nSequenciaEvento)
-        {
-            ChaveAcesso = chaveAcesso;
-            Correcao = correcao;
-            nSeqEvento = nSequenciaEvento;
-        }
-
-        public string ChaveAcesso { get; private set; }
-
-        public string Correcao { get; private set; }
-
-        public int nSeqEvento { get; private set; }
     }
 }

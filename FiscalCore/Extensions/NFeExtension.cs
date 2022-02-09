@@ -23,25 +23,25 @@ namespace FiscalCore.Extensions
             return modeloDoc;
         }
 
-        public static async Task<string> SalvarArquivoAsync(this NFe nfe)
-        {
-            var caminho = Path.GetTempFileName();
-            var nome = Path.GetFileName(caminho);
-            var diretorio = Path.GetDirectoryName(caminho);
+        //public static async Task<string> SalvarArquivoAsync(this NFe nfe)
+        //{
+        //    var caminho = Path.GetTempFileName();
+        //    var nome = Path.GetFileName(caminho);
+        //    var diretorio = Path.GetDirectoryName(caminho);
 
-            return await nfe.SalvarArquivoAsync(nome, diretorio);
-        }
+        //    return await nfe.SalvarArquivoAsync(nome, diretorio);
+        //}
 
-        public static async Task<string> SalvarArquivoAsync(this NFe nfe, string arquivo, string diretorio = null)
+        public static async Task<string> SalvarArquivoAsync(this NFe nfe, string nomeArquivo, string diretorio)
         {
-            if (arquivo is null)
-                throw new ArgumentNullException(nameof(arquivo));
+            if (nomeArquivo is null)
+                throw new ArgumentNullException(nameof(nomeArquivo));
 
             if (string.IsNullOrEmpty(diretorio))
                 diretorio = Path.GetTempPath();
 
             var str = XmlUtils.ClasseParaXmlString<NFe>(nfe);
-            return await Arquivo.SalvarArquivoAsync(diretorio, arquivo, str);
+            return await Arquivo.SalvarArquivoAsync(diretorio, nomeArquivo, str);
         }
     }
 }

@@ -7,17 +7,21 @@ using System;
 using System.Threading.Tasks;
 using FiscalCore.Tipos;
 using FiscalCore.Fabrica;
+using System.IO;
+using AlgoPlus.Storage.Services;
 
 namespace FiscalCore.Servicos.NotaFiscal.Eventos
 {
     public class InutilizarNFeServico : IEventoServico
     {
         private ConfiguracaoServico cfgServico;
+        private readonly IStorage storage;
         private readonly ITransmitirSefazCommand transmitir;
 
-        public InutilizarNFeServico(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir)
+        public InutilizarNFeServico(ConfiguracaoServico cfgServico, IStorage storage, ITransmitirSefazCommand transmitir)
         {
             this.cfgServico = cfgServico;
+            this.storage = storage;
             this.transmitir = transmitir;
         }
 
@@ -30,14 +34,16 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
                         
             var xmlInutilizacao = XmlUtils.ClasseParaXmlString<inutNFe>(pedInutilizacao);
 
-            await Arquivo.SalvarArquivoAsync(cfgServico.DiretorioSalvarXml, $"{DateTime.Now.Ticks} - {pedInutilizacao.infInut.Id} -ped-inut.xml", xmlInutilizacao);
+            var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ped-inut.xml", cfgServico));
+            await storage.SaveAsync(arqEnv, xmlInutilizacao);
 
             var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.InutilizacaoNFe, xmlInutilizacao);
             var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.InutilizacaoNFe, cfgServico.TipoAmbiente, modeloDocumento, cfgServico.UF);
             var retornoXmlString = await transmitir.TransmitirAsync(sefazUrl, envelope);
             var retornoLimpo = Soap.LimparEnvelope(retornoXmlString, "retInutNFe").OuterXml;
 
-            await Arquivo.SalvarArquivoAsync(cfgServico.DiretorioSalvarXml, $"{DateTime.Now.Ticks} - {pedInutilizacao.infInut.Id} -inut.xml", retornoLimpo);
+            var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ret-inut.xml", cfgServico));
+            await storage.SaveAsync(arqRet, retornoLimpo);
 
             return XmlUtils.XmlStringParaClasse<retInutNFe>(retornoLimpo);
         }

@@ -10,18 +10,22 @@ using FiscalCore.Tipos;
 using FiscalCore.ValueObjects;
 using System.Linq;
 using DFeBR.EmissorNFe.Utilidade.Exceptions;
+using AlgoPlus.Storage.Services;
+using System.IO;
 
 namespace FiscalCore.Servicos.NotaFiscal.Eventos
 {
     public class CancelarNFeServico : IEventoServico
     {
         private readonly ConfiguracaoServico cfgServico;
+        private readonly IStorage storage;
         private readonly ITransmitirSefazCommand transmitir;
         string versao;
 
-        public CancelarNFeServico(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir)
+        public CancelarNFeServico(ConfiguracaoServico cfgServico, IStorage storage, ITransmitirSefazCommand transmitir)
         {
             this.cfgServico = cfgServico;
+            this.storage = storage;
             this.transmitir = transmitir;
             versao = "1.00";
         }
@@ -107,7 +111,8 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
 
             var xmlEvento = XmlUtils.ClasseParaXmlString<envEvento>(pedEvento);
 
-            await Arquivo.SalvarArquivoAsync(cfgServico, DateTime.Now.Ticks + "-ped-eve.xml", xmlEvento);
+            var arqEnv = Path.Combine("Logs", $"{DateTime.Now.Ticks}-ped-eve.xml");
+            await storage.SaveAsync(arqEnv, xmlEvento);
 
             var sefazUrl = Fabrica.FabricarUrl.ObterUrl(eTipoServico.CancelarNFe, cfgServico.TipoAmbiente, modeloDoc, cfgServico.UF);
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.CancelarNFe, xmlEvento);
@@ -116,7 +121,8 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
 
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retEnvEvento").OuterXml;
 
-            await Arquivo.SalvarArquivoAsync(cfgServico, DateTime.Now.Ticks + "-ret-eve.xml", retornoXmlStringLimpa);
+            var arqRet = Path.Combine("Logs", $"{DateTime.Now.Ticks}-ret-eve.xml");
+            await storage.SaveAsync(arqRet, retornoXmlStringLimpa);
 
             var retEnvEvento = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 

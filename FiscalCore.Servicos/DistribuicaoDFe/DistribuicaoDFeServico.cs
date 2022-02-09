@@ -1,21 +1,29 @@
-﻿using FiscalCore.Configuracoes;
+﻿using AlgoPlus.Storage;
+using AlgoPlus.Storage.Services;
+using FiscalCore.Configuracoes;
+using FiscalCore.Fabrica;
 using FiscalCore.Modelos.DistribuicaoDFe;
-using FiscalCore.Servicos;
+using FiscalCore.Tipos;
 using FiscalCore.Utils;
+using FiscalCore.Validacoes;
 using FiscalCore.ValueObjects;
 using Microsoft.Extensions.Logging;
 using System;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace FiscalCore.DistribuicaoDFe.Servicos
+namespace FiscalCore.Servicos.DistribuicaoDFe
 {
     public class DistribuicaoDFeServico : BaseSefazServico
     {
+        private readonly IStorage storage;
         private readonly ILogger logger;
 
-        public DistribuicaoDFeServico(ConfiguracaoServico configuracao, ITransmitirSefazCommand transmitir, ILogger<DistribuicaoDFeServico> logger)
+        public DistribuicaoDFeServico(ConfiguracaoServico configuracao, ITransmitirSefazCommand transmitir, IStorage storage, ILogger<DistribuicaoDFeServico> logger)
             : base(configuracao, transmitir)
         {
+            this.storage = storage;
             this.logger = logger;
         }
 
@@ -41,8 +49,8 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
                 TpAmb = Configuracao.TipoAmbiente
             };
 
-            var retorno = await Transmitir.TransmitirAsync(distDFeInt, validarXmlConsulta);
-             var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retorno);
+            var retorno = await PrepararTransmissao(distDFeInt, validarXmlConsulta);
+            var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retorno);
             return retDistDFeInt;
         }
 
@@ -65,7 +73,7 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
                 TpAmb = Configuracao.TipoAmbiente
             };
 
-            var retorno = await Transmitir.TransmitirAsync(distDFeInt, validarXmlConsulta);
+            var retorno = await PrepararTransmissao(distDFeInt, validarXmlConsulta);
             var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retorno);
             return retDistDFeInt;
         }
@@ -84,10 +92,34 @@ namespace FiscalCore.DistribuicaoDFe.Servicos
                 TpAmb = Configuracao.TipoAmbiente
             };
 
-            var retorno = await Transmitir.TransmitirAsync(distDFeInt, validarXmlConsulta);
+            var retorno = await PrepararTransmissao(distDFeInt, validarXmlConsulta);
             var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retorno);
-
             return retDistDFeInt;
+        }
+
+        private async Task<string> PrepararTransmissao(distDFeInt distDFeInt, bool validarXmlConsulta = true)
+        {
+            var xml = XmlUtils.ClasseParaXmlString<distDFeInt>(distDFeInt);
+
+            if (validarXmlConsulta)
+                Schemas.ValidarSchema(eTipoServico.NFeDistribuicaoDFe, xml, Configuracao);
+
+            var nomeArqEnv = $"{Configuracao.Emitente.CNPJ ?? Configuracao.Emitente.CPF}-{DateTime.Now.Ticks}-ped-DistDFeInt.xml";
+            var arqEnv = Path.Combine("Logs", nomeArqEnv);
+            var stRet = await storage.SaveAsync(arqEnv, xml);
+
+            var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.NFeDistribuicaoDFe, xml);
+
+            var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.NFeDistribuicaoDFe, Configuracao.TipoAmbiente, eModeloDocumento.NFe, eUF.AN);
+            var retorno = await Transmitir.TransmitirAsync(sefazUrl, envelope);
+
+            var retornoLimpo = Soap.LimparEnvelope(retorno, "retDistDFeInt").OuterXml;
+
+            var nomeArqRetorno = $"{Configuracao.Emitente.CNPJ ?? Configuracao.Emitente.CPF}-{DateTime.Now.Ticks}-retDistDFeInt.xml";
+            var arqRet = Path.Combine("Logs", nomeArqRetorno);
+            await storage.SaveAsync(arqRet, retornoLimpo);
+
+            return retornoLimpo;
         }
     }
 }

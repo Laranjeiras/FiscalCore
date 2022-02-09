@@ -3,13 +3,13 @@ using FiscalCore.Configuracoes;
 using FiscalCore.Extensions;
 using FiscalCore.Fabrica;
 using FiscalCore.Modelos.Eventos;
+using FiscalCore.Modelos.Retornos;
 using FiscalCore.Tipos;
 using FiscalCore.Utils;
 using FiscalCore.Validacoes;
 using FiscalCore.ValueObjects;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FiscalCore.Servicos.DistribuicaoDFe
@@ -29,7 +29,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             this.nSeqEvento = 1;
         }
 
-        public async Task<string> ManifestarAsync(ChaveFiscal chaveNFe, eTipoEventoNFe tipoEvento, string justificativa = null)
+        public async Task<retEnvEvento> ManifestarAsync(ChaveFiscal chaveNFe, eTipoEventoNFe tipoEvento, string justificativa = null)
         {
             if(tipoEvento != eTipoEventoNFe.CienciaOperacao 
                 && tipoEvento != eTipoEventoNFe.ConfirmacaoOperacao
@@ -49,7 +49,8 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
 
             await storage.SaveAsync($"{DateTime.Now.Ticks}-ret-eve.xml", xmlRetLimpo);
 
-            return xmlRetLimpo;
+            var retEnvEvento = XmlUtils.XmlStringParaClasse<retEnvEvento>(xmlRetLimpo);
+            return retEnvEvento;
         }
 
         private string GerarXmlEvento(string chaveAcesso, eTipoEventoNFe tipoEvento, string justificativa = null)

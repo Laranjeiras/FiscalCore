@@ -11,6 +11,8 @@ using System.Linq;
 using FiscalCore.Validacoes;
 using System.Threading.Tasks;
 using FiscalCore.Tipos;
+using AlgoPlus.Storage.Services;
+using System.IO;
 
 namespace FiscalCore.Servicos
 {
@@ -18,11 +20,19 @@ namespace FiscalCore.Servicos
     {
         private readonly ConfiguracaoServico cfgServico;
         private readonly ITransmitirSefazCommand transmitir;
+        private readonly IStorage storage;
 
         public AutorizarNFe4(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir)
         {
             this.cfgServico = cfgServico;
             this.transmitir = transmitir;
+        }
+
+        public AutorizarNFe4(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir, IStorage storage)
+        {
+            this.cfgServico = cfgServico;
+            this.transmitir = transmitir;
+            this.storage = storage;
         }
 
         public async Task<IRetornoAutorizacao> Autorizar(NFe nfe, int idLote = 0)
@@ -45,6 +55,7 @@ namespace FiscalCore.Servicos
             {
                 var nfeAssinada = nfe.Assinar(ObterCertificado.Obter(cfgServico.ConfigCertificado));
                 var xml = XmlUtils.ClasseParaXmlString<NFe>(nfeAssinada);
+                xml = xml.Replace("xmlns=\"http://www.portalfiscal.inf.br/nfe\"", string.Empty);
                 Schemas.ValidarSchema(eTipoServico.AutorizarNFe, xml, cfgServico);
                 nfesAssinadas.Add(nfeAssinada);
             }
@@ -62,7 +73,8 @@ namespace FiscalCore.Servicos
 
         private async Task<IRetornoAutorizacao> Autorizar(string xmlenviNFe4, eModeloDocumento modeloDocumento)
         {
-            await Arquivo.SalvarArquivoAsync(cfgServico, $"{DateTime.Now.Ticks}-env-nfe.xml", xmlenviNFe4);
+            var arqEnv = Path.Combine(cfgServico.DiretorioSalvarXml, "Logs", $"{DateTime.Now.Ticks}-env-nfe.xml", xmlenviNFe4);
+            await storage.SaveAsync(arqEnv, xmlenviNFe4);
 
             var urlSefaz = Fabrica.FabricarUrl.ObterUrl(eTipoServico.AutorizarNFe, cfgServico.TipoAmbiente, modeloDocumento, cfgServico.UF);
 
@@ -71,7 +83,8 @@ namespace FiscalCore.Servicos
             var retornoXmlString = await transmitir.TransmitirAsync(urlSefaz, envelope);
             var retornoLimpo = Soap.LimparEnvelope(retornoXmlString, "retEnviNFe").OuterXml;
 
-            await Arquivo.SalvarArquivoAsync(cfgServico, $"{DateTime.Now.Ticks}-ret-env-nfe.xml", retornoLimpo);
+            var arqRet = Path.Combine("Logs", $"{DateTime.Now.Ticks}-ret-env-nfe.xml");
+            await storage.SaveAsync(arqRet, retornoLimpo);
 
             var retEnviNFe = new RetNFeAutorizacao4(retornoLimpo);
             retEnviNFe.XmlEnviado = xmlenviNFe4;
