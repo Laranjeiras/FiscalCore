@@ -18,14 +18,14 @@ namespace FiscalCore.ValueObjects
         private string ModeloToString =>
             Modelo == eModeloDocumento.NFCe || Modelo == eModeloDocumento.NFe ? "NFe" : throw new ArgumentOutOfRangeException("Modelo documento");
 
-        public eUF UF { get; private set; }
-        public string AnoMesEmissao { get; private set; }
-        public string Cnpj { get; private set; }
-        public eModeloDocumento Modelo { get; private set; }
-        public int Serie { get; private set; }
-        public long Numero { get; private set; }
-        public eTipoEmissao TipoEmissao { get; private set; }
-        public string CNF { get; private set; }
+        public eUF UF { get; protected set; }
+        public string AnoMesEmissao { get; protected set; }
+        public string Cnpj { get; protected set; }
+        public eModeloDocumento Modelo { get; protected set; }
+        public int Serie { get; protected set; }
+        public long Numero { get; protected set; }
+        public eTipoEmissao TipoEmissao { get; protected set; }
+        public string CNF { get; protected set; }
 
         protected ChaveFiscal() { }
 

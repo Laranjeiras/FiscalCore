@@ -102,7 +102,7 @@ namespace FiscalCore.Servicos.NotaFiscal
             get
             {
                 if (inutilizarNFeServico == null)
-                    inutilizarNFeServico = new InutilizarNFeServico(Configuracao, Transmitir);
+                    inutilizarNFeServico = new InutilizarNFeServico(Configuracao, storage, Transmitir);
                 return inutilizarNFeServico;
             }
         }

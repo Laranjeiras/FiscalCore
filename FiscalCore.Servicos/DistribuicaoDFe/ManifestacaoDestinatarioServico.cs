@@ -10,6 +10,7 @@ using FiscalCore.Validacoes;
 using FiscalCore.ValueObjects;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace FiscalCore.Servicos.DistribuicaoDFe
@@ -39,6 +40,9 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
 
             var xmlEvento = GerarXmlEvento(chaveNFe.Chave, tipoEvento, justificativa);
 
+            var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ped-eve.xml", config));
+            await storage.SaveAsync(arqEnv, xmlEvento);
+
             await storage.SaveAsync($"{DateTime.Now.Ticks}-ped-eve.xml", xmlEvento);
 
             Schemas.ValidarSchema(eTipoServico.ManifestacaoDestinatario, xmlEvento, config);
@@ -47,7 +51,8 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             var xmlRetorno = await transmitir.TransmitirAsync(sefazUrl, envelope);
             var xmlRetLimpo = Soap.LimparEnvelope(xmlRetorno, "retEnvEvento").OuterXml;
 
-            await storage.SaveAsync($"{DateTime.Now.Ticks}-ret-eve.xml", xmlRetLimpo);
+            var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ret-eve.xml", config));
+            await storage.SaveAsync(arqRet, xmlRetLimpo);
 
             var retEnvEvento = XmlUtils.XmlStringParaClasse<retEnvEvento>(xmlRetLimpo);
             return retEnvEvento;

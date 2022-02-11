@@ -32,6 +32,7 @@ namespace FiscalCore.Configuracoes
             VersaoCancelamentoNFe = eVersaoServico.Versao100;
             VersaoInutilizacaoNFe = eVersaoServico.Versao400;
             VersaoAutorizacaoNFe = eVersaoServico.Versao400;
+            VersaoManifestacaoDestinatario = eVersaoServico.Versao100;
             ConfigDanfe = configDanfe;
         }
 
@@ -113,6 +114,8 @@ namespace FiscalCore.Configuracoes
                 throw new FalhaValidacaoException("Versão cancelamento NFe não informado");
             if ((int)VersaoInutilizacaoNFe == 0)
                 throw new FalhaValidacaoException("Versão inutilização NFe não informado");
+            if ((int)VersaoManifestacaoDestinatario == 0)
+                throw new FalhaValidacaoException("Versão Manifestação Destinatário NFe não informado");
         }
     }
 }
