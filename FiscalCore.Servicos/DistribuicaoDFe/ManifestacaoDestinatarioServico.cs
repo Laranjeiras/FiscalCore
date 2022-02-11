@@ -75,7 +75,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
                 dhEvento = DateTime.Now,
                 nSeqEvento = 1,
                 tpAmb = config.TipoAmbiente,
-                tpEvento = eTipoEventoNFe.CienciaOperacao,
+                tpEvento = tipoEvento,
                 verEvento = config.VersaoManifestacaoDestinatario.Descricao(),
                 Id = "ID" + ((int)tipoEvento) + chaveAcesso + nSeqEvento.ToString().PadLeft(2, '0'),                
                 detEvento = new detEvento()
