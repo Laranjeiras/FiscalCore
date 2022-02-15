@@ -1,5 +1,4 @@
-﻿using AlgoPlus.Storage;
-using AlgoPlus.Storage.Services;
+﻿using AlgoPlus.Storage.Services;
 using FiscalCore.Configuracoes;
 using FiscalCore.Fabrica;
 using FiscalCore.Modelos.DistribuicaoDFe;
@@ -10,7 +9,6 @@ using FiscalCore.ValueObjects;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FiscalCore.Servicos.DistribuicaoDFe
@@ -27,7 +25,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             this.logger = logger;
         }
 
-        public async Task<retDistDFeInt> ConsultarDocumentosDestinadosAsync(string ultimoNsu, bool validarXmlConsulta = true)
+        public async Task<retDistDFeInt> ConsultarPorUltimoNSUAsync(string ultimoNsu, bool validarXmlConsulta = true)
         {
             logger.LogInformation($"Consultar documentos destinados, ultimo NSU {ultimoNsu}");
             if (string.IsNullOrEmpty(ultimoNsu))
@@ -49,8 +47,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
                 TpAmb = Configuracao.TipoAmbiente
             };
 
-            var retorno = await PrepararTransmissao(distDFeInt, validarXmlConsulta);
-            var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retorno);
+            var retDistDFeInt = await PrepararTransmissao(distDFeInt, validarXmlConsulta);
             return retDistDFeInt;
         }
 
@@ -73,8 +70,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
                 TpAmb = Configuracao.TipoAmbiente
             };
 
-            var retorno = await PrepararTransmissao(distDFeInt, validarXmlConsulta);
-            var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retorno);
+            var retDistDFeInt = await PrepararTransmissao(distDFeInt, validarXmlConsulta);
             return retDistDFeInt;
         }
 
@@ -92,12 +88,11 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
                 TpAmb = Configuracao.TipoAmbiente
             };
 
-            var retorno = await PrepararTransmissao(distDFeInt, validarXmlConsulta);
-            var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retorno);
+            var retDistDFeInt = await PrepararTransmissao(distDFeInt, validarXmlConsulta);
             return retDistDFeInt;
         }
 
-        private async Task<string> PrepararTransmissao(distDFeInt distDFeInt, bool validarXmlConsulta = true)
+        private async Task<retDistDFeInt> PrepararTransmissao(distDFeInt distDFeInt, bool validarXmlConsulta = true)
         {
             var xml = XmlUtils.ClasseParaXmlString<distDFeInt>(distDFeInt);
 
@@ -118,8 +113,9 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             var nomeArqRetorno = $"{Configuracao.Emitente.CNPJ ?? Configuracao.Emitente.CPF}-{DateTime.Now.Ticks}-retDistDFeInt.xml";
             var arqRet = Path.Combine("Logs", nomeArqRetorno);
             await storage.SaveAsync(arqRet, retornoLimpo);
+            var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retorno);
 
-            return retornoLimpo;
+            return retDistDFeInt;
         }
     }
 }
