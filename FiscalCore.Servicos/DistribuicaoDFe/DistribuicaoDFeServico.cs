@@ -113,7 +113,8 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             var nomeArqRetorno = $"{Configuracao.Emitente.CNPJ ?? Configuracao.Emitente.CPF}-{DateTime.Now.Ticks}-retDistDFeInt.xml";
             var arqRet = Path.Combine("Logs", nomeArqRetorno);
             await storage.SaveAsync(arqRet, retornoLimpo);
-            var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retorno);
+
+            var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retornoLimpo);
 
             return retDistDFeInt;
         }

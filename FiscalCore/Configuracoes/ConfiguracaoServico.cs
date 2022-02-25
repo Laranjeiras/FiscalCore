@@ -58,7 +58,7 @@ namespace FiscalCore.Configuracoes
             set { _diretorioSchemas = value; }
         }
 
-        public string _diretorioSalvarDanfe;
+        private string _diretorioSalvarDanfe;
         public string DiretorioSalvarDanfe
         {
             get { return _diretorioSalvarDanfe ?? Directory.GetCurrentDirectory(); }
