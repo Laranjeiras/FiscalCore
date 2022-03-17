@@ -18,7 +18,7 @@ namespace FiscalCore.Servicos.NotaFiscal
         public NotaFiscalServico(ConfiguracaoServico configuracao, IStorage storage, ITransmitirSefazCommand transmitir) : base(configuracao, transmitir)
         {
             if (configuracao.VersaoAutorizacaoNFe == eVersaoServico.Versao400)
-                autorizarNFe = new AutorizarNFe4(configuracao, transmitir);
+                autorizarNFe = new AutorizarNFe4(configuracao, transmitir, storage);
             else
                 throw new NotImplementedException("Versão de autorização da NFe não suportada");
             this.storage = storage;

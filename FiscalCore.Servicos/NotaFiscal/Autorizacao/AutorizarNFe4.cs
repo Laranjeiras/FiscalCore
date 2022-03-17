@@ -22,12 +22,6 @@ namespace FiscalCore.Servicos
         private readonly ITransmitirSefazCommand transmitir;
         private readonly IStorage storage;
 
-        public AutorizarNFe4(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir)
-        {
-            this.cfgServico = cfgServico;
-            this.transmitir = transmitir;
-        }
-
         public AutorizarNFe4(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir, IStorage storage)
         {
             this.cfgServico = cfgServico;
