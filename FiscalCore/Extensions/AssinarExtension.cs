@@ -1,4 +1,4 @@
-﻿using DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica;
+﻿using FiscalCore.NotaFiscal;
 using FiscalCore.Utils;
 using System;
 using System.Security.Cryptography.X509Certificates;
@@ -10,7 +10,7 @@ namespace FiscalCore.Extensions
         public static NFe Assinar(this NFe nfe, X509Certificate2 certificadoDigital)
         {
             var assinatura = Assinador.ObterAssinatura<NFe>(nfe, nfe.infNFe.Id, certificadoDigital);
-            nfe.Signature = assinatura.Parse();
+            nfe.Signature = assinatura;
             return nfe;
         }
 

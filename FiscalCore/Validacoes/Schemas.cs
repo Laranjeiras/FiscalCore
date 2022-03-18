@@ -1,8 +1,6 @@
-﻿using DFeBR.EmissorNFe.Utilidade.Entidades;
-using FiscalCore.Configuracoes;
+﻿using FiscalCore.Configuracoes;
 using FiscalCore.Exceptions;
 using FiscalCore.Tipos;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;

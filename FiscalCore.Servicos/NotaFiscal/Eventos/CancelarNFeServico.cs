@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 using FiscalCore.Tipos;
 using FiscalCore.ValueObjects;
 using System.Linq;
-using DFeBR.EmissorNFe.Utilidade.Exceptions;
 using AlgoPlus.Storage.Services;
 using System.IO;
+using FiscalCore.Exceptions;
 
 namespace FiscalCore.Servicos.NotaFiscal.Eventos
 {

@@ -1,5 +1,5 @@
 ﻿using FiscalCore.Modelos.Consulta;
-using FiscalCore.Modelos.Protocolos;
+using FiscalCore.NotaFiscal.Protocolo;
 using FiscalCore.Tipos;
 using System.Collections.Generic;
 using System.Xml.Serialization;

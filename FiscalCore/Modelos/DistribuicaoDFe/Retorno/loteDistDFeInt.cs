@@ -1,4 +1,5 @@
-﻿using DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica.RetornoServicos.DistribuicaoDFe.Schemas;
+﻿using FiscalCore.Modelos.Consulta;
+using FiscalCore.Modelos.Retornos;
 using System.Xml.Serialization;
 
 namespace FiscalCore.Modelos.DistribuicaoDFe
@@ -53,6 +54,6 @@ namespace FiscalCore.Modelos.DistribuicaoDFe
         ///// NF-e processada
         ///// </summary>
         //[XmlIgnore]
-        //public DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica.nfeProc NfeProc { get; set; }
+        //public FiscalCore.NotaFiscal.nfeProc NfeProc { get; set; }
     }
 }

@@ -1,5 +1,5 @@
-﻿using DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica;
-using FiscalCore.Modelos.Retornos;
+﻿using FiscalCore.Modelos.Retornos;
+using FiscalCore.NotaFiscal;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

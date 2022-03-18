@@ -2,17 +2,16 @@
 using FiscalCore.Modelos.Retornos;
 using FiscalCore.Utils;
 using System;
-using DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica;
 using FiscalCore.Extensions;
-using DFeBR.EmissorNFe.Utilidade.Tipos;
 using System.Collections.Generic;
-using DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica.RetornoServicos.Autorizacao;
 using System.Linq;
 using FiscalCore.Validacoes;
 using System.Threading.Tasks;
 using FiscalCore.Tipos;
 using AlgoPlus.Storage.Services;
 using System.IO;
+using FiscalCore.NotaFiscal.RetornoServicos.Autorizacao;
+using FiscalCore.NotaFiscal;
 
 namespace FiscalCore.Servicos
 {
@@ -38,9 +37,17 @@ namespace FiscalCore.Servicos
         public async Task<IRetornoAutorizacao> Autorizar(IList<NFe> nfes, int idLote = 0)
         {
             new ValidarNFeAutorizacao(nfes, cfgServico).Validar();
-            new TratarNFeAutorizacao(ref nfes, cfgServico).Tratar();
+            try
+            {
+                new TratarNFeAutorizacao(ref nfes, cfgServico).Tratar();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw new Exception("Ocorreu um erro ao Tratar a NFe");
+            }
 
-            if(idLote <= 0)
+            if (idLote <= 0)
                 idLote = new Random().Next(10000000, 99999999);
 
             var nfesAssinadas = new List<NFe>();
@@ -54,13 +61,12 @@ namespace FiscalCore.Servicos
                 nfesAssinadas.Add(nfeAssinada);
             }
 
-            var mod = nfes.Select(x=>x.infNFe.ide.mod)
+            var mod = nfes.Select(x => x.infNFe.ide.mod)
                 .Distinct()
-                .SingleOrDefault()
-                .Parse();
-
+                .SingleOrDefault();
+                
             var versaoServico = cfgServico.VersaoAutorizacaoNFe.Descricao();
-            var enviNFe = new enviNFe(versaoServico, idLote, IndicadorSincronizacao.Sincrono, nfesAssinadas);
+            var enviNFe = new enviNFe(versaoServico, idLote, eIndicadorSincronizacao.Sincrono, nfesAssinadas);
             var xmlEnviNFe = XmlUtils.ClasseParaXmlString<enviNFe>(enviNFe);
             return await Autorizar(xmlEnviNFe, mod);
         }

@@ -1,4 +1,4 @@
-﻿using FiscalCore.Modelos.Protocolos;
+﻿using FiscalCore.NotaFiscal.Protocolo;
 using FiscalCore.Tipos;
 using System;
 using System.Xml.Serialization;

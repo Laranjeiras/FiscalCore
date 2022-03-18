@@ -1,6 +1,6 @@
-﻿using DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica;
-using FiscalCore.Configuracoes;
+﻿using FiscalCore.Configuracoes;
 using FiscalCore.Exceptions;
+using FiscalCore.NotaFiscal;
 using System;
 using System.Collections.Generic;
 using System.Linq;

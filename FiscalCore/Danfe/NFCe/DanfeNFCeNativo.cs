@@ -1,7 +1,4 @@
-﻿using DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica;
-using DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica.Informacoes.Destinatario;
-using DFeBR.EmissorNFe.Dominio.NotaFiscalEletronica.Informacoes.Pagamento;
-using FiscalCore.Configuracoes;
+﻿using FiscalCore.Configuracoes;
 using FiscalCore.Danfe.NFCe.Nativo;
 using FiscalCore.Extensions;
 using FiscalCore.Utils;
@@ -13,6 +10,9 @@ using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using FiscalCore.NotaFiscal;
+using FiscalCore.NotaFiscal.Informacoes.Destinatario;
+using FiscalCore.Tipos;
 
 namespace FiscalCore.Danfe.NFCe
 {
@@ -429,7 +429,7 @@ namespace FiscalCore.Danfe.NFCe
 
         private void DesenharDadosAutorizacao(Graphics g)
         {
-            if (_nfe.infNFe.ide.tpEmis == DFeBR.EmissorNFe.Utilidade.Tipos.TipoEmissao.Normal)
+            if (_nfe.infNFe.ide.tpEmis == eTipoEmissao.Normal)
             {
                 var protocolo = _proc.protNFe.infProt;
                 var textoProtocoloAutorizacao = new StringBuilder("Protocolo de autorização: ");
@@ -438,7 +438,7 @@ namespace FiscalCore.Danfe.NFCe
                 AdicionarTextoCentralizado(protocoloAutorizacao);
 
                 StringBuilder textoDataAutorizacao = new StringBuilder("Data de autorização ");
-                textoDataAutorizacao.Append(_proc.protNFe.infProt.dhRecbto.ToString("G"));
+                textoDataAutorizacao.Append(_proc.protNFe.infProt.dhRecbto);
                 AdicionarTexto dataAutorizacao = new AdicionarTexto(g, textoDataAutorizacao.ToString(), 7);
                 AdicionarTextoCentralizado(dataAutorizacao);
             }
@@ -514,7 +514,7 @@ namespace FiscalCore.Danfe.NFCe
 
         private void DesenharMensagemContingencia(Graphics g)
         {
-            if (_nfe.infNFe.ide.tpEmis != DFeBR.EmissorNFe.Utilidade.Tipos.TipoEmissao.Normal)
+            if (_nfe.infNFe.ide.tpEmis != eTipoEmissao.Normal)
             {
                 y += 2;
                 AdicionarTexto contingenciaTitulo = new AdicionarTexto(g, "EMITIDA EM CONTINGÊNCIA", 10);
@@ -527,7 +527,7 @@ namespace FiscalCore.Danfe.NFCe
             }
         }
 
-        private void DesenharFormaPagamento(int x, int larguraLinhaMargemDireita, Graphics g, FormaPagamento? formaPagamento, decimal? vPag)
+        private void DesenharFormaPagamento(int x, int larguraLinhaMargemDireita, Graphics g, eFormaPagamento? formaPagamento, decimal? vPag)
         {
             var _formaPagamento = formaPagamento.Descricao();
             AdicionarTexto textoFormaPagamento = new AdicionarTexto(g, _formaPagamento, 7);
@@ -700,7 +700,7 @@ namespace FiscalCore.Danfe.NFCe
 
             string dadosBase;
 
-            if (_nfe.infNFe.ide.tpEmis == DFeBR.EmissorNFe.Utilidade.Tipos.TipoEmissao.ContingenciaOffLineNfce)
+            if (_nfe.infNFe.ide.tpEmis == eTipoEmissao.OffLine)
             {
                 var diaEmi = _nfe.infNFe.ide.dhEmi.Day.ToString("D2");
                 var valorNfce = _nfe.infNFe.total.ICMSTot.vNF.ToString("0.00").Replace(',', '.');

@@ -1,5 +1,5 @@
-﻿using FiscalCore.Exceptions;
-using FiscalCore.Modelos.NotaFiscal.Emitente;
+﻿using FiscalCore.Configuracoes.Emitente;
+using FiscalCore.Exceptions;
 using FiscalCore.Tipos;
 using System.IO;
 
