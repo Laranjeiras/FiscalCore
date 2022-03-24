@@ -1,5 +1,5 @@
 ﻿using FiscalCore.Tipos;
-using FiscalCore.Utils;
+using FiscalCore.Extensions;
 using System;
 using System.Xml.Serialization;
 

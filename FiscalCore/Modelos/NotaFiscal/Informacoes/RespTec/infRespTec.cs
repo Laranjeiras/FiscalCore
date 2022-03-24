@@ -1,35 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
-namespace FiscalCore.NotaFiscal.Informacoes
+namespace FiscalCore.NotaFiscal.Informacoes.RespTec
 {
-    public class respTec
+    public class infRespTec
     {
-        #region Propriedades
         /// <summary>
-        ///     ZD02 - CNPJ responsável pelo sistema emissor
+        ///    ZD02 - Informar o CNPJ da pessoa jurídica responsável pelo sistema utilizado na emissão do documento fiscal eletrônico.
         /// </summary>
         public string CNPJ { get; set; }
 
         /// <summary>
-        ///     ZD04 - Nome da pessoa a ser contatada
+        ///     ZD04 - Informar o nome da pessoa a ser contatada na empresa desenvolvedora do sistema utilizado na emissão do documento fiscal eletrônico.
         /// </summary>
         public string xContato { get; set; }
 
         /// <summary>
-        ///     ZD05 - Email da pessoa jurídica a ser contatada
+        ///     ZD05 - Informar o e-mail da pessoa a ser contatada na empresa desenvolvedora do sistema.
         /// </summary>
         public string email { get; set; }
 
         /// <summary>
-        ///     ZD06 - Telefone da pessoa física/jurídica a ser contatada
+        ///     ZD06 - Informar o telefone da pessoa a ser contatada na empresa desenvolvedora do sistema. Preencher com o Código DDD + número do telefone.
         /// </summary>
         public string fone { get; set; }
 
         /// <summary>
-        ///     ZD08 - Identificador do CSRT
+        ///     ZD08 - Identificador do CSRT utilizado para montar o hash do CSRT
         /// </summary>
         [XmlIgnore]
         public int? idCSRT { get; set; }
@@ -60,7 +56,5 @@ namespace FiscalCore.NotaFiscal.Informacoes
         ///     ZD09 - Hash do CSRT
         /// </summary>
         public string hashCSRT { get; set; }
-
-        #endregion
     }
 }

@@ -49,7 +49,7 @@ namespace FiscalCore.Modelos.Eventos
         [XmlElement(ElementName = "dhEvento")]
         public string ProxydhEvento
         {
-            get { return dhEvento.ToUtcString(); }
+            get { return dhEvento.ParaDataHoraStringUtc(); }
             set { dhEvento = DateTime.Parse(value); }
         }
 

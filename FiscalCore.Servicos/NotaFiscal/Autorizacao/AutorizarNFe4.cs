@@ -73,7 +73,7 @@ namespace FiscalCore.Servicos
 
         private async Task<IRetornoAutorizacao> Autorizar(string xmlenviNFe4, eModeloDocumento modeloDocumento)
         {
-            var arqEnv = Path.Combine(cfgServico.DiretorioSalvarXml, "Logs", $"{DateTime.Now.Ticks}-env-nfe.xml");
+            var arqEnv = Path.Combine("Logs", $"{DateTime.Now.Ticks}-env-nfe.xml");
             await storage.SaveAsync(arqEnv, xmlenviNFe4);
 
             var urlSefaz = Fabrica.FabricarUrl.ObterUrl(eTipoServico.AutorizarNFe, cfgServico.TipoAmbiente, modeloDocumento, cfgServico.UF);

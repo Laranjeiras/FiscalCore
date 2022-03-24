@@ -6,6 +6,7 @@ using FiscalCore.NotaFiscal.Informacoes.Emitente;
 using FiscalCore.NotaFiscal.Informacoes.Identificacao;
 using FiscalCore.NotaFiscal.Informacoes.Observacoes;
 using FiscalCore.NotaFiscal.Informacoes.Pagamento;
+using FiscalCore.NotaFiscal.Informacoes.RespTec;
 using FiscalCore.NotaFiscal.Informacoes.Total;
 using FiscalCore.NotaFiscal.Transporte;
 using System.Collections.Generic;
@@ -122,7 +123,7 @@ namespace FiscalCore.NotaFiscal.Informacoes
         /// <summary>
         ///     ZD01 - Informações do Responsável Técnico pela Emissão do DF-e
         /// </summary>
-        public respTec RespTec { get; set; }
+        public infRespTec infRespTec { get; set; }
 
     }
 }

@@ -13,6 +13,7 @@
 
 using System;
 using System.Xml.Serialization;
+using FiscalCore.Extensions;
 using FiscalCore.Utils;
 
 #endregion

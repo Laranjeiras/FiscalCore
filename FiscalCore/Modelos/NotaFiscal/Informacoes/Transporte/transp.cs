@@ -1,20 +1,6 @@
-﻿
-
-
-// Autores: 
-
-
-
-
-
-
-
-#region
-
+﻿using FiscalCore.Tipos;
 using System.Collections.Generic;
 using System.Xml.Serialization;
-
-#endregion
 
 namespace FiscalCore.NotaFiscal.Transporte
 {
@@ -27,7 +13,7 @@ namespace FiscalCore.NotaFiscal.Transporte
         ///     Versão 3.10
         ///     Versão 4.00
         /// </summary>
-        public ModalidadeFrete? modFrete { get; set; }
+        public eModalidadeFrete? modFrete { get; set; }
 
         public bool modFreteSpecified
         {

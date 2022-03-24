@@ -1,22 +1,7 @@
-﻿
-
-
-// Autores: 
-
-
-
-
-
-
-
-#region
-
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Xml.Serialization;
-using FiscalCore.Utils;
-
-#endregion
+using FiscalCore.Extensions;
 
 namespace FiscalCore.NotaFiscal.RetornoServicos.DistribuicaoDFe.Schemas
 {

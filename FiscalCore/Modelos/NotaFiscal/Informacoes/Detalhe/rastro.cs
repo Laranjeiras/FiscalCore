@@ -1,21 +1,7 @@
-﻿
-
-
-// Autores: 
-
-
-
-
-
-
-
-#region
-
-using System;
+﻿using System;
 using System.Xml.Serialization;
+using FiscalCore.Extensions;
 using FiscalCore.Utils;
-
-#endregion
 
 namespace FiscalCore.NotaFiscal.Informacoes.Detalhe
 {

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FiscalCore.Extensions;
+using FiscalCore.Tipos;
+using System;
 using System.Text.RegularExpressions;
 
 namespace FiscalCore.NotaFiscal.Informacoes.Emitente
@@ -70,7 +72,11 @@ namespace FiscalCore.NotaFiscal.Informacoes.Emitente
         ///         cadastro de contribuintes do ICMS e estejam emitindo NF-e avulsa;
         ///     </para>
         /// </summary>
-        public string IE { get; set; }
+        public string IE { 
+            get { return _ie; }
+            set { _ie = value == null ? null : value.SomenteNumeros(); }
+        }
+        private string _ie;
 
         /// <summary>
         ///     C18 - IE do Substituto Tributário
@@ -96,7 +102,7 @@ namespace FiscalCore.NotaFiscal.Informacoes.Emitente
         /// <summary>
         ///     C21 - Código de Regime Tributário
         /// </summary>
-        public CRT CRT { get; set; }
+        public eCRT CRT { get; set; }
 
         private const string ErroCpfCnpjPreenchidos = "Somente preencher um dos campos: CNPJ ou CPF, para um objeto do tipo emit!";
 

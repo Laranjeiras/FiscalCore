@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
-using FiscalCore.Utils;
 using FiscalCore.Tipos;
+using FiscalCore.Extensions;
 
 namespace FiscalCore.NotaFiscal.Informacoes.Identificacao
 {
