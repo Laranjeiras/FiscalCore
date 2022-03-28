@@ -1,4 +1,7 @@
-﻿using FiscalCore.Tipos;
+﻿using FiscalCore.Extensions;
+using FiscalCore.Tipos;
+using System;
+using System.Xml.Serialization;
 
 namespace FiscalCore.NotaFiscal.Protocolo
 {
@@ -22,7 +25,15 @@ namespace FiscalCore.NotaFiscal.Protocolo
         /// <summary>
         ///     PR08 - Data e hora de recebimento
         /// </summary>
-        public string dhRecbto { get; set; }
+        [XmlIgnore]
+        public DateTimeOffset dhRecbto { get; set; }
+
+        [XmlElement(ElementName = "dhRecbto")]
+        public string ProxyDhRecbto
+        {
+            get { return dhRecbto.ParaDataHoraStringUtc(); }
+            set { dhRecbto = DateTimeOffset.Parse(value); }
+        }
 
         /// <summary>
         ///     PR09 - Número do Protocolo da NF-e

@@ -1,10 +1,7 @@
-﻿
-#region
-
+﻿using System;
 using System.Xml.Serialization;
+using FiscalCore.Extensions;
 using FiscalCore.Tipos;
-
-#endregion
 
 namespace FiscalCore.NotaFiscal.RetornoServicos.Status
 {
@@ -44,7 +41,15 @@ namespace FiscalCore.NotaFiscal.RetornoServicos.Status
         /// <summary>
         ///     B07 - Data e hora da mensagem de Resposta
         /// </summary>
-        public string dhRecbto { get; set; }
+        [XmlIgnore]
+        public DateTimeOffset dhRecbto { get; set; }
+
+        [XmlElement(ElementName = "dhRecbto")]
+        public string ProxydhRecbto
+        {
+            get { return dhRecbto.ParaDataHoraStringUtc(); }
+            set { dhRecbto = DateTimeOffset.Parse(value); }
+        }
 
         /// <summary>
         ///     FR07 - Código da UF que atendeu a solicitação
