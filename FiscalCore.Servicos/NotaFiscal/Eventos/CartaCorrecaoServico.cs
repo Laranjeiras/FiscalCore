@@ -72,8 +72,9 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
                     detEvento = new detEvento()
                     {
                         versao = _versao,
-                        descEvento = "Carta de Correção",
-                        xCorrecao = correcao
+                        descEvento = "Carta de Correcao",
+                        xCorrecao = correcao,
+                        
                     }
                 };
                 var evento = new evento { versao = _versao, infEvento = infEvento };

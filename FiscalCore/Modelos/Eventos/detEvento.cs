@@ -1,4 +1,6 @@
-﻿using System.Xml.Serialization;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Serialization;
 
 namespace FiscalCore.Modelos.Eventos
 {
@@ -40,12 +42,14 @@ namespace FiscalCore.Modelos.Eventos
             set {  }
             get
             {
-                if (descEvento == "Carta de Correção" || descEvento == "Carta Correcao")
+                if (descricoes.Where(x => x == descEvento).Any())
                     return "A Carta de Correção é disciplinada pelo § 1º-A do art. 7º do Convênio S/N, de 15 de dezembro de 1970 e pode ser utilizada para regularização de erro ocorrido na emissão de documento fiscal, desde que o erro não esteja relacionado com: I - as variáveis que determinam o valor do imposto tais como: base de cálculo, alíquota, diferença de preço, quantidade, valor da operação ou da prestação; II - a correção de dados cadastrais que implique mudança do remetente ou do destinatário; III - a data de emissão ou de saída.";
                 else
                     return null;
             }
         }
+
+        private IList<string> descricoes => new List<string> { "Carta de Correção", "Carta de Correcao" };
         #endregion
     }
 }
