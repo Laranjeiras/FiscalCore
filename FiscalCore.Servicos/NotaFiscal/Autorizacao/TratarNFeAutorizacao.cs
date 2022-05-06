@@ -20,7 +20,6 @@ namespace FiscalCore.Servicos
         {
             foreach (var nfe in nfes)
             {
-                nfe.infNFe.ide.tpAmb = eTipoAmbiente.Homologacao;
                 if (nfe.infNFe.ide.tpAmb == eTipoAmbiente.Homologacao)
                 {
                     nfe.infNFe.dest.xNome = "NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL";

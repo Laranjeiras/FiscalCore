@@ -36,7 +36,7 @@ namespace FiscalCore.WebPrint.Controllers
 
                         using (var danfe = new ZionDanfe.Danfe(modelo))
                         {
-                            danfe.ViewModel.DefinirTextoCreditos("Impresso por AlgoPlus.com.br / (21)99770-6037");
+                            danfe.ViewModel.DefinirTextoCreditos("Impresso por algoplus.com.br / (21)99770-6037");
                             danfe.Gerar();
                             var bytesPdf = danfe.ObterPdfBytes(pdfStream);
                             return File(bytesPdf, "Application/pdf", $"{modelo.ChaveAcesso}.pdf");
