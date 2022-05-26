@@ -19,7 +19,7 @@ namespace FiscalCore.Fabrica
         private static IList<UrlSefaz> UrlsSefaz()
         {
             var urls = new List<UrlSefaz>();
-            urls.Add(new UrlSefaz(eTipoServico.AutorizarNFe, eUF.RJ, eTipoAmbiente.Producao, eModeloDocumento.NFe, "https://nfe.svrs.rs.gov.br/ws/NfeAutorizacao/NFeAutorizacao.asmx", "https://nfe.svrs.rs.gov.br/ws/NfeAutorizacao/NFeAutorizacao.asmx?op=nfeAutorizacaoLote"));
+            urls.Add(new UrlSefaz(eTipoServico.AutorizarNFe, eUF.RJ, eTipoAmbiente.Producao, eModeloDocumento.NFe, "https://nfe.svrs.rs.gov.br/ws/NfeAutorizacao/NFeAutorizacao4.asmx", "https://nfe.svrs.rs.gov.br/ws/NfeAutorizacao/NFeAutorizacao4.asmx?op=nfeAutorizacaoLote"));
             urls.Add(new UrlSefaz(eTipoServico.AutorizarNFe, eUF.RJ, eTipoAmbiente.Homologacao, eModeloDocumento.NFe, "https://nfe-homologacao.svrs.rs.gov.br/ws/NfeAutorizacao/NFeAutorizacao4.asmx", "https://nfe-homologacao.svrs.rs.gov.br/ws/NfeAutorizacao/NFeAutorizacao4.asmx?op=nfeAutorizacaoLote"));
             urls.Add(new UrlSefaz(eTipoServico.AutorizarNFe, eUF.RJ, eTipoAmbiente.Producao, eModeloDocumento.NFCe, "https://nfce.svrs.rs.gov.br/ws/NfeAutorizacao/NFeAutorizacao4.asmx", "https://nfce.svrs.rs.gov.br/ws/NfeAutorizacao/NFeAutorizacao4.asmx?op=nfeAutorizacaoLote"));
             urls.Add(new UrlSefaz(eTipoServico.AutorizarNFe, eUF.RJ, eTipoAmbiente.Homologacao, eModeloDocumento.NFCe, "https://nfce-homologacao.svrs.rs.gov.br/ws/NfeAutorizacao/NFeAutorizacao4.asmx", "https://nfce-homologacao.svrs.rs.gov.br/ws/NfeAutorizacao/NFeAutorizacao4.asmx?op=nfeAutorizacaoLote"));
