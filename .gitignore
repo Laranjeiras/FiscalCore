@@ -359,3 +359,4 @@ FiscalCore.WebPrint/.config/dotnet-tools.json
 /ConsoleApp1/*
 /FiscalCore.Testes/appsettings.json
 /FiscalCore.Testes/NFes/NFe_1.cs
+/FiscalCore.Testes/*
