@@ -1,21 +1,6 @@
-﻿
+﻿using FiscalCore.Utils;
 
-
-// Autores: 
-
-
-
-
-
-
-
-#region
-
-#endregion
-
-using FiscalCore.Utils;
-
-namespace FiscalCore.NotaFiscal.Transporte
+namespace FiscalCore.NotaFiscal.Informacoes.Transporte
 {
     public class retTransp
     {

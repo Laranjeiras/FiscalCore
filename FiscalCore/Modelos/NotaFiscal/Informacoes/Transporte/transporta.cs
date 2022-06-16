@@ -1,21 +1,6 @@
-﻿
+﻿using System;
 
-
-// Autores: 
-
-
-
-
-
-
-
-#region
-
-using System;
-
-#endregion
-
-namespace FiscalCore.NotaFiscal.Transporte
+namespace FiscalCore.NotaFiscal.Informacoes.Transporte
 {
     public class transporta
     {

@@ -1,23 +1,8 @@
-﻿
-
-
-// Autores: 
-
-
-
-
-
-
-
-#region
-
+﻿using FiscalCore.Utils;
 using System.Collections.Generic;
 using System.Xml.Serialization;
-using FiscalCore.Utils;
 
-#endregion
-
-namespace FiscalCore.NotaFiscal.Transporte
+namespace FiscalCore.NotaFiscal.Informacoes.Transporte
 {
     public class vol
     {

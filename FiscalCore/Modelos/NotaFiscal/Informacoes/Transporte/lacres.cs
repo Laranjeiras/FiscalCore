@@ -1,15 +1,5 @@
 ﻿
-
-
-// Autores: 
-
-
-
-
-
-
-
-namespace FiscalCore.NotaFiscal.Transporte
+namespace FiscalCore.NotaFiscal.Informacoes.Transporte
 {
     public class lacres
     {

@@ -8,7 +8,7 @@ using FiscalCore.NotaFiscal.Informacoes.Observacoes;
 using FiscalCore.NotaFiscal.Informacoes.Pagamento;
 using FiscalCore.NotaFiscal.Informacoes.RespTec;
 using FiscalCore.NotaFiscal.Informacoes.Total;
-using FiscalCore.NotaFiscal.Transporte;
+using FiscalCore.NotaFiscal.Informacoes.Transporte;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
