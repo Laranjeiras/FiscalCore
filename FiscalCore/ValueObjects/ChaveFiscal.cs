@@ -7,29 +7,9 @@ namespace FiscalCore.ValueObjects
 {
     public class ChaveFiscal
     {
-        private string chave;
-        public string Chave => chave;
-
-        private byte digitoVerificador;
-        public byte DigitoVerificador => digitoVerificador;
-
-        public string Completa => ModeloToString + Chave;
-
-        private string ModeloToString =>
-            Modelo == eModeloDocumento.NFCe || Modelo == eModeloDocumento.NFe ? "NFe" : throw new ArgumentOutOfRangeException("Modelo documento");
-
-        public eUF UF { get; protected set; }
-        public string AnoMesEmissao { get; protected set; }
-        public string Cnpj { get; protected set; }
-        public eModeloDocumento Modelo { get; protected set; }
-        public int Serie { get; protected set; }
-        public long Numero { get; protected set; }
-        public eTipoEmissao TipoEmissao { get; protected set; }
-        public string CNF { get; protected set; }
-
         protected ChaveFiscal() { }
 
-        public ChaveFiscal(eUF uf, DateTime dataEmissao, string cnpj, eModeloDocumento modelo, int serie, long numero, eTipoEmissao tipoEmissao, string cNF)
+        public ChaveFiscal(eUF uf, DateTime dataEmissao, Cnpj cnpj, eModeloDocumento modelo, int serie, long numero, eTipoEmissao tipoEmissao, Cnf cNF)
         {
             try
             {
@@ -67,7 +47,7 @@ namespace FiscalCore.ValueObjects
                 this.Serie = int.Parse(chave.Substring(22, 3));
                 this.Numero = long.Parse(chave.Substring(25, 9));
                 this.TipoEmissao = (eTipoEmissao)Enum.Parse(typeof(eTipoEmissao), chave.Substring(34, 1));
-                this.CNF = chave.Substring(35, 8);
+                this.CNF = new Cnf(chave.Substring(35, 8));
                 this.digitoVerificador = byte.Parse(chave.Substring(43, 1));
                 this.chave = GerarChave();
             }
@@ -76,6 +56,26 @@ namespace FiscalCore.ValueObjects
                 throw new Exception("Chave inválida");
             }
         }
+
+        private string chave;
+        public string Chave => chave;
+
+        private byte digitoVerificador;
+        public byte DigitoVerificador => digitoVerificador;
+
+        public string Completa => ModeloToString + Chave;
+
+        private string ModeloToString =>
+            Modelo == eModeloDocumento.NFCe || Modelo == eModeloDocumento.NFe ? "NFe" : throw new ArgumentOutOfRangeException("Modelo documento");
+
+        public eUF UF { get; protected set; }
+        public string AnoMesEmissao { get; protected set; }
+        public Cnpj Cnpj { get; protected set; }
+        public eModeloDocumento Modelo { get; protected set; }
+        public int Serie { get; protected set; }
+        public long Numero { get; protected set; }
+        public eTipoEmissao TipoEmissao { get; protected set; }
+        public Cnf CNF { get; protected set; }
 
         private string GerarChave()
         {
@@ -87,7 +87,7 @@ namespace FiscalCore.ValueObjects
             chave.Append(Serie.ToString("D3"));
             chave.Append(Numero.ToString("D9"));
             chave.Append(((int)TipoEmissao).ToString());
-            chave.Append(CNF.PadLeft(8 - CNF.Length, '0'));
+            chave.Append(CNF.ToString());
 
             var digitoVerificador = CalcularDigitoVerificador(chave.ToString());
             this.digitoVerificador = byte.Parse(digitoVerificador);
