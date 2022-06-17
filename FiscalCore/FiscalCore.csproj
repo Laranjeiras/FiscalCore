@@ -5,7 +5,7 @@
     <RepositoryUrl>github.com/Laranjeiras/FiscalCore</RepositoryUrl>
     <Authors>Alexandre Laranjeiras</Authors>
     <PackageTags>NuGet;Classlib;GitHub;Actions</PackageTags>
-    <Version>1.0.28</Version>
+    <Version>1.0.29</Version>
   </PropertyGroup>
 
   <ItemGroup>
