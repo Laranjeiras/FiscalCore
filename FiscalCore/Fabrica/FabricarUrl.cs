@@ -10,7 +10,14 @@ namespace FiscalCore.Fabrica
     {
         public static UrlSefaz ObterUrl(eTipoServico tipoServico, eTipoAmbiente tipoAmbiente, eModeloDocumento modeloDocumento, eUF uf)
         {
-            var urlAction = UrlsSefaz().Where(x => x.Servico == tipoServico && x.UF == uf && x.TipoAmbiente == tipoAmbiente && x.ModeloDocumento == modeloDocumento).FirstOrDefault();
+            var urlAction = UrlsSefaz()
+                .Where(x => 
+                    x.Servico == tipoServico &&
+                    x.UF == uf &&
+                    x.TipoAmbiente == tipoAmbiente &&
+                    x.ModeloDocumento == modeloDocumento)
+                .FirstOrDefault();
+
             if (urlAction == null)
                 throw new ArgumentOutOfRangeException("Nenhuma URL do Webservice encontrada");
             return urlAction;
@@ -55,5 +62,42 @@ namespace FiscalCore.Fabrica
             #endregion
             return urls;
         }
+
+        public static UrlConsultaNfce ObterUrlConsultaNfce(eTipoAmbiente tipoAmbiente, eUF uf, eVersaoQrCode versaoQrCode)
+        {
+            try
+            {
+                var url = UrlQrCodeNfce
+                    .Where(x =>
+                        x.TipoAmbiente == tipoAmbiente &&
+                        x.UF == uf &&
+                        x.VersaoQrCode == versaoQrCode)
+                    .SingleOrDefault();
+                return url;
+            } 
+            catch
+            {
+                throw new Exception($"Não foi possível obter a url da consulta nfce para a UF {uf}");
+            }
+        }
+
+
+        private static List<UrlConsultaNfce> UrlQrCodeNfce = new List<UrlConsultaNfce>
+        {
+            new UrlConsultaNfce(
+                eTipoAmbiente.Homologacao,
+                eUF.RJ,
+                eVersaoQrCode.QrCodeVersao2,
+                "http://www4.fazenda.rj.gov.br/consultaNFCe/QRCode",
+                "www.fazenda.rj.gov.br/nfce/consulta"
+            ),
+            new UrlConsultaNfce(
+                eTipoAmbiente.Producao,
+                eUF.RJ,
+                eVersaoQrCode.QrCodeVersao2,
+                "http://www4.fazenda.rj.gov.br/consultaNFCe/QRCode",
+                "www.fazenda.rj.gov.br/nfce/consulta"
+            ),
+        };
     }
 }

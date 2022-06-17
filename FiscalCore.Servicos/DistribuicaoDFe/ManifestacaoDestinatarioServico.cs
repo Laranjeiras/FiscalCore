@@ -1,5 +1,6 @@
 ﻿using AlgoPlus.Storage.Services;
 using FiscalCore.Configuracoes;
+using FiscalCore.Exceptions;
 using FiscalCore.Extensions;
 using FiscalCore.Fabrica;
 using FiscalCore.Modelos.Eventos;
@@ -45,7 +46,11 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
 
             await storage.SaveAsync($"{DateTime.Now.Ticks}-ped-eve.xml", xmlEvento);
 
-            Schemas.ValidarSchema(eTipoServico.ManifestacaoDestinatario, xmlEvento, config);
+            var validacao = new ValidarXml(eTipoServico.ManifestacaoDestinatario, config);
+            validacao.Validar(xmlEvento);
+            if (!validacao.Valido)
+                throw new FalhaValidacaoException(validacao.ToString());
+
             var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.ManifestacaoDestinatario, xmlEvento);
             var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.ManifestacaoDestinatario, config.TipoAmbiente, eModeloDocumento.NFe, eUF.AN);
             var xmlRetorno = await transmitir.TransmitirAsync(sefazUrl, envelope);

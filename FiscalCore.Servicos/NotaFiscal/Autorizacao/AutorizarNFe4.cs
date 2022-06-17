@@ -12,6 +12,7 @@ using AlgoPlus.Storage.Services;
 using System.IO;
 using FiscalCore.NotaFiscal.RetornoServicos.Autorizacao;
 using FiscalCore.NotaFiscal;
+using FiscalCore.Exceptions;
 
 namespace FiscalCore.Servicos
 {
@@ -36,16 +37,11 @@ namespace FiscalCore.Servicos
 
         public async Task<IRetornoAutorizacao> Autorizar(IList<NFe> nfes, int idLote = 0)
         {
-            new ValidarNFeAutorizacao(nfes, cfgServico).Validar();
-            try
-            {
-                new TratarNFeAutorizacao(ref nfes, cfgServico).Tratar();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                throw new Exception("Ocorreu um erro ao Tratar a NFe");
-            }
+            new TratarNFeAutorizacao(ref nfes, cfgServico)
+                .Tratar();
+
+            new ValidarNFeAutorizacao(nfes, cfgServico)
+                .Validar();
 
             if (idLote <= 0)
                 idLote = new Random().Next(10000000, 99999999);
@@ -57,7 +53,12 @@ namespace FiscalCore.Servicos
                 var nfeAssinada = nfe.Assinar(ObterCertificado.Obter(cfgServico.ConfigCertificado));
                 var xml = XmlUtils.ClasseParaXmlString<NFe>(nfeAssinada);
                 xml = xml.Replace("xmlns=\"http://www.portalfiscal.inf.br/nfe\"", string.Empty);
-                Schemas.ValidarSchema(eTipoServico.AutorizarNFe, xml, cfgServico);
+
+                var validacao = new ValidarXml(eTipoServico.ManifestacaoDestinatario, cfgServico);
+                validacao.Validar(xml);
+                if (!validacao.Valido)
+                    throw new FalhaValidacaoException(validacao.ToString());
+
                 nfesAssinadas.Add(nfeAssinada);
             }
 
@@ -68,7 +69,8 @@ namespace FiscalCore.Servicos
             var versaoServico = cfgServico.VersaoAutorizacaoNFe.Descricao();
             var enviNFe = new enviNFe(versaoServico, idLote, eIndicadorSincronizacao.Sincrono, nfesAssinadas);
             var xmlEnviNFe = XmlUtils.ClasseParaXmlString<enviNFe>(enviNFe);
-            return await Autorizar(xmlEnviNFe, mod);
+            var retorno = await Autorizar(xmlEnviNFe, mod);
+            return retorno;
         }
 
         private async Task<IRetornoAutorizacao> Autorizar(string xmlenviNFe4, eModeloDocumento modeloDocumento)

@@ -1,5 +1,6 @@
 ﻿using AlgoPlus.Storage.Services;
 using FiscalCore.Configuracoes;
+using FiscalCore.Exceptions;
 using FiscalCore.Fabrica;
 using FiscalCore.Modelos.DistribuicaoDFe;
 using FiscalCore.Tipos;
@@ -97,7 +98,12 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             var xml = XmlUtils.ClasseParaXmlString<distDFeInt>(distDFeInt);
 
             if (validarXmlConsulta)
-                Schemas.ValidarSchema(eTipoServico.NFeDistribuicaoDFe, xml, Configuracao);
+            {
+                var validacao = new ValidarXml(eTipoServico.NFeDistribuicaoDFe, Configuracao);
+                validacao.Validar(xml);
+                if (!validacao.Valido)
+                    throw new FalhaValidacaoException(validacao.ToString());
+            }
 
             var nomeArqEnv = $"{Configuracao.Emitente.CNPJ ?? Configuracao.Emitente.CPF}-{DateTime.Now.Ticks}-ped-DistDFeInt.xml";
             var arqEnv = Path.Combine("Logs", nomeArqEnv);
