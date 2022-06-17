@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace FiscalCore.Validacoes
 {
+    [Obsolete]
     public static class NFeCampoValidacao
     {
         public static Notificacao uCom_Validar(string value, string mensagem = "I09 - Unidade Comercial - Unidade Comercial inválida, deve conter entre 1 e 6 caracteres")

@@ -1,9 +1,11 @@
 ﻿using FiscalCore.Modelos.NotaFiscal.Endereco;
 using FiscalCore.Tipos;
 using FiscalCore.Utils;
+using System;
 
 namespace FiscalCore.Validacoes.Sefaz
 {
+    [Obsolete]
     public class DFeEnderecoValidacao
     {
         public Contrato Contrato { get; private set; } = new Contrato();

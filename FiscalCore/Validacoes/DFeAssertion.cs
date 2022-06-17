@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace FiscalCore.Validacoes.Sefaz
 {
+    [Obsolete]
     public class DFeAssertion
     {
         public static void uCom_IsValid(string value, string message = "I09 - Unidade Comercial - Unidade Comercial inválida, deve conter entre 1 e 6 caracteres")
