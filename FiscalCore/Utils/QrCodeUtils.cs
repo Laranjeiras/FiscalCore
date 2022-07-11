@@ -91,13 +91,11 @@ namespace FiscalCore.Utils
 
         public static string ObterUrlQrCode(NFe nfe, eVersaoQrCode versaoQrCode, string cIdToken, string csc)
         {
-            Func<string, string> msgErro = parametro => $"O {parametro} não foi informado!";
-
             if (string.IsNullOrEmpty(cIdToken))
-                throw new ArgumentNullException(nameof(cIdToken), msgErro("token"));
+                throw new ArgumentNullException(nameof(cIdToken));
 
             if (string.IsNullOrEmpty(csc))
-                throw new ArgumentNullException(nameof(cIdToken), msgErro("CSC"));
+                throw new ArgumentNullException(nameof(cIdToken));
 
             return ObterUrlQrCode2(nfe, cIdToken, csc);
         }

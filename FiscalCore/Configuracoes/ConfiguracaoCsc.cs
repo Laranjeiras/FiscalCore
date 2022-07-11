@@ -12,8 +12,8 @@
         {
         }
 
-        public string CIdToken { get; set; }
+        public string CIdToken { get; protected set; }
 
-        public string Csc { get; set; }
+        public string Csc { get; protected set; }
     }
 }
