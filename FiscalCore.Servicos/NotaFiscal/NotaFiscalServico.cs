@@ -15,16 +15,17 @@ namespace FiscalCore.Servicos.NotaFiscal
 {
     public class NotaFiscalServico : BaseSefazServico
     {
-        public NotaFiscalServico(ConfiguracaoServico configuracao, IStorage storage, ITransmitirSefazCommand transmitir) : base(configuracao, transmitir)
+        public NotaFiscalServico(ConfiguracaoServico configuracao, IStorageContext storage, ITransmitirSefazCommand transmitir) : base(configuracao, transmitir)
         {
             if (configuracao.VersaoAutorizacaoNFe == eVersaoServico.Versao400)
                 autorizarNFe = new AutorizarNFe4(configuracao, transmitir, storage);
             else
                 throw new NotImplementedException("Versão de autorização da NFe não suportada");
-            this.storage = storage;
+            this.storageContext = storage;
         }
 
-        private readonly IStorage storage;
+        private readonly IStorageContext storageContext;
+        private IStorage storage => storageContext.GetStorage("FiscalCore");
         private readonly IAutorizarNFeServico autorizarNFe;
         public IAutorizarNFeServico AutorizarNFe => autorizarNFe;
         
@@ -35,7 +36,7 @@ namespace FiscalCore.Servicos.NotaFiscal
             get
             {
                 if (cancelarNFe == null)
-                    cancelarNFe = new CancelarNFeServico(Configuracao, storage, Transmitir);
+                    cancelarNFe = new CancelarNFeServico(Configuracao, storageContext, Transmitir);
                 return cancelarNFe;
             }
         }

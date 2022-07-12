@@ -22,11 +22,11 @@ namespace FiscalCore.Servicos
         private readonly ITransmitirSefazCommand transmitir;
         private readonly IStorage storage;
 
-        public AutorizarNFe4(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir, IStorage storage)
+        public AutorizarNFe4(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir, IStorageContext storage)
         {
             this.cfgServico = cfgServico;
             this.transmitir = transmitir;
-            this.storage = storage;
+            this.storage = storage.GetStorage("FiscalCore");
         }
 
         public async Task<IRetornoAutorizacao> Autorizar(NFe nfe, int idLote = 0)

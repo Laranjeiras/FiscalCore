@@ -22,10 +22,10 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
         private readonly ITransmitirSefazCommand transmitir;
         string versao;
 
-        public CancelarNFeServico(ConfiguracaoServico cfgServico, IStorage storage, ITransmitirSefazCommand transmitir)
+        public CancelarNFeServico(ConfiguracaoServico cfgServico, IStorageContext storage, ITransmitirSefazCommand transmitir)
         {
             this.cfgServico = cfgServico;
-            this.storage = storage;
+            this.storage = storage.GetStorage("FiscalCore");
             this.transmitir = transmitir;
             versao = "1.00";
         }
