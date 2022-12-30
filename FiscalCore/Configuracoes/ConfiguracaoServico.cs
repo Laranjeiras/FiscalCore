@@ -5,7 +5,7 @@ using System.IO;
 
 namespace FiscalCore.Configuracoes
 {
-    public class ConfiguracaoServico
+    public class ConfiguracaoServico : ConfiguracaoBasicaServico
     {
         public ConfiguracaoServico()
         {
@@ -36,26 +36,13 @@ namespace FiscalCore.Configuracoes
             ConfigDanfe = configDanfe;
         }
 
-        public ConfiguracaoCertificado ConfigCertificado { get; set; }
-       
-        public eTipoAmbiente TipoAmbiente { get; set; }
-
         public eTipoEmissao TipoEmissao { get; set; }
-
-        public eUF UF { get; set; } = eUF.RJ;
 
         private string _diretorioSalvarXml;
         public string DiretorioSalvarXml
         {
             get { return _diretorioSalvarXml ?? Directory.GetCurrentDirectory(); }
             set { _diretorioSalvarXml = value; }
-        }
-
-        private string _diretorioSchemas;
-        public string DiretorioSchemas
-        {
-            get { return _diretorioSchemas ?? Directory.GetCurrentDirectory(); }
-            set { _diretorioSchemas = value; }
         }
 
         private string _diretorioSalvarDanfe;
@@ -69,8 +56,6 @@ namespace FiscalCore.Configuracoes
 
         public IConfiguracaoDanfe ConfigDanfe { get; set; }
         public ConfiguracaoCsc Csc { get; set; }
-        public int TimeOut { get; set; } = 5000;
-
 
         /// <summary>
         /// Versão do Processo de emissão da NF-e.

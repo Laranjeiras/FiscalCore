@@ -14,12 +14,12 @@ using System.Threading.Tasks;
 
 namespace FiscalCore.Servicos.DistribuicaoDFe
 {
-    public class DistribuicaoDFeServico : BaseSefazServico
+    public class DistribuicaoDFeServico : BaseSefazServicoBasico
     {
         private readonly IStorage storage;
         private readonly ILogger logger;
 
-        public DistribuicaoDFeServico(ConfiguracaoServico configuracao, ITransmitirSefazCommand transmitir, IStorage storage, ILogger<DistribuicaoDFeServico> logger)
+        public DistribuicaoDFeServico(ConfiguracaoBasicaServico configuracao, ITransmitirSefazCommand transmitir, IStorage storage = null, ILogger logger = null)
             : base(configuracao, transmitir)
         {
             this.storage = storage;
@@ -28,7 +28,8 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
 
         public async Task<retDistDFeInt> ConsultarPorUltimoNSUAsync(string ultimoNsu, bool validarXmlConsulta = true)
         {
-            logger.LogInformation($"Consultar documentos destinados, ultimo NSU {ultimoNsu}");
+            logger?.LogInformation($"Consultar documentos destinados, ultimo NSU {ultimoNsu}");
+            
             if (string.IsNullOrEmpty(ultimoNsu))
                 throw new ArgumentNullException(nameof(ultimoNsu));
             if (ultimoNsu.Length > 15)
@@ -39,7 +40,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             var distDFeInt = new distDFeInt
             {
                 Versao = "1.01",
-                Cnpj = Configuracao.Emitente.CNPJ,
+                Cnpj = Configuracao.CNPJEmitente,
                 DistNSU = new distNSU
                 {
                     UltNSU = ultimoNsu
@@ -54,7 +55,8 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
 
         public async Task<retDistDFeInt> ConsultarPorNSUAsync(string nsu, bool validarXmlConsulta = true)
         {
-            logger.LogInformation($"Consultar documentos destinados por NSU {nsu}");
+            logger?.LogInformation($"Consultar documentos destinados por NSU {nsu}");
+            
             if (string.IsNullOrEmpty(nsu))
                 throw new ArgumentNullException(nameof(nsu));
             if (nsu.Length > 15)
@@ -65,7 +67,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             var distDFeInt = new distDFeInt
             {
                 Versao = "1.01",
-                Cnpj = Configuracao.Emitente.CNPJ,
+                Cnpj = Configuracao.CNPJEmitente,
                 consNSU = new consNSU { NSU = nsu },
                 cUFAutor = ((int)Configuracao.UF).ToString(),
                 TpAmb = Configuracao.TipoAmbiente
@@ -77,10 +79,12 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
 
         public async Task<retDistDFeInt> ConsultarPorChaveAsync(ChaveFiscal chaveNFe, bool validarXmlConsulta = true)
         {
+            logger?.LogInformation($"Consultar documentos destinados por Chave {chaveNFe.Chave}");
+
             var distDFeInt = new distDFeInt
             {
                 Versao = "1.01",
-                Cnpj = Configuracao.Emitente.CNPJ,
+                Cnpj = Configuracao.CNPJEmitente,
                 consChNFe = new consChNFe
                 {
                     ChNFe = chaveNFe.Chave
@@ -105,9 +109,12 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
                     throw new FalhaValidacaoException(validacao.ToString());
             }
 
-            var nomeArqEnv = $"{Configuracao.Emitente.CNPJ ?? Configuracao.Emitente.CPF}-{DateTime.Now.Ticks}-ped-DistDFeInt.xml";
-            var arqEnv = Path.Combine("Logs", nomeArqEnv);
-            var stRet = await storage.SaveAsync(arqEnv, xml);
+            if (storage != null)
+            {
+                var nomeArqEnv = $"{Configuracao.CNPJEmitente}-{DateTime.Now.Ticks}-ped-DistDFeInt.xml";
+                var arqEnv = Path.Combine("Logs", nomeArqEnv);
+                await storage.SaveAsync(arqEnv, xml);
+            }
 
             var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.NFeDistribuicaoDFe, xml);
 
@@ -116,9 +123,12 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
 
             var retornoLimpo = Soap.LimparEnvelope(retorno, "retDistDFeInt").OuterXml;
 
-            var nomeArqRetorno = $"{Configuracao.Emitente.CNPJ ?? Configuracao.Emitente.CPF}-{DateTime.Now.Ticks}-retDistDFeInt.xml";
-            var arqRet = Path.Combine("Logs", nomeArqRetorno);
-            await storage.SaveAsync(arqRet, retornoLimpo);
+            if (storage != null)
+            {
+                var nomeArqRetorno = $"{Configuracao.CNPJEmitente}-{DateTime.Now.Ticks}-retDistDFeInt.xml";
+                var arqRet = Path.Combine("Logs", nomeArqRetorno);
+                await storage.SaveAsync(arqRet, retornoLimpo);
+            }
 
             var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retornoLimpo);
 

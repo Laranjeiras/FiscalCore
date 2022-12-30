@@ -13,4 +13,18 @@ namespace FiscalCore.Servicos
         public ConfiguracaoServico Configuracao { get; }
         public ITransmitirSefazCommand Transmitir { get; }
     }
+
+    public abstract class BaseSefazServicoBasico
+    {
+        public BaseSefazServicoBasico(ConfiguracaoBasicaServico configuracao, ITransmitirSefazCommand transmitir)
+        {
+            configuracao.Validar();
+
+            this.Configuracao = configuracao;
+            this.Transmitir = transmitir;
+        }
+
+        public ConfiguracaoBasicaServico Configuracao;
+        public ITransmitirSefazCommand Transmitir;
+    }
 }

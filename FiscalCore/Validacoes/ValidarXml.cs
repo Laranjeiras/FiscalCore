@@ -14,7 +14,7 @@ namespace FiscalCore.Validacoes
         public IList<string> Erros = new List<string>();
         public bool Valido => Erros.Count == 0;
 
-        public ValidarXml(eTipoServico tipoServico, ConfiguracaoServico cfgServico)
+        public ValidarXml(eTipoServico tipoServico, ConfiguracaoBasicaServico cfgServico)
         {
             var caminhoSchema = cfgServico.DiretorioSchemas;
 

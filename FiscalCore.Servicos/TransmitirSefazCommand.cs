@@ -13,10 +13,10 @@ namespace FiscalCore.Servicos
 {
     public class TransmitirSefazCommand : ITransmitirSefazCommand
     {
-        private readonly ConfiguracaoServico configuracao;
-        private readonly ILogger<TransmitirSefazCommand> logger;
+        private readonly ConfiguracaoBasicaServico configuracao;
+        private readonly ILogger logger;
 
-        public TransmitirSefazCommand(ConfiguracaoServico configuracao, ILogger<TransmitirSefazCommand> logger)
+        public TransmitirSefazCommand(ConfiguracaoBasicaServico configuracao, ILogger<TransmitirSefazCommand> logger = null)
         {
             this.configuracao = configuracao;
             this.logger = logger;
@@ -24,7 +24,8 @@ namespace FiscalCore.Servicos
 
         public virtual async Task<string> TransmitirAsync(UrlSefaz sefazUrl, XmlDocument envelope)
         {
-            logger.LogInformation($"Iniciando transmissão Sefaz [{sefazUrl.Url}]");
+            logger?.LogInformation($"Iniciando transmissão Sefaz [{sefazUrl.Url}]");
+
             HttpWebRequest webRequest = SoapEnvelopeFabrica.CriarWebRequest(sefazUrl.Url, "application/soap+xml;charset=utf-8");
 
             Soap.InserirSoapEnvelopeWebRequest(envelope, webRequest);
@@ -40,7 +41,8 @@ namespace FiscalCore.Servicos
                     soapResult = await rd.ReadToEndAsync();
             }
 
-            logger.LogInformation($"Encerrando transmissão Sefaz");
+            logger?.LogInformation($"Encerrando transmissão Sefaz");
+
             return soapResult;
         }
     }
