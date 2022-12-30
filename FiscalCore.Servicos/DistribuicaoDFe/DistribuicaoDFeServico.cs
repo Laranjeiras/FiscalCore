@@ -49,7 +49,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
                 TpAmb = Configuracao.TipoAmbiente
             };
 
-            var retDistDFeInt = await PrepararTransmissao(distDFeInt, validarXmlConsulta);
+            var retDistDFeInt = await PrepararETransmitir(distDFeInt, validarXmlConsulta);
             return retDistDFeInt;
         }
 
@@ -73,7 +73,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
                 TpAmb = Configuracao.TipoAmbiente
             };
 
-            var retDistDFeInt = await PrepararTransmissao(distDFeInt, validarXmlConsulta);
+            var retDistDFeInt = await PrepararETransmitir(distDFeInt, validarXmlConsulta);
             return retDistDFeInt;
         }
 
@@ -93,11 +93,11 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
                 TpAmb = Configuracao.TipoAmbiente
             };
 
-            var retDistDFeInt = await PrepararTransmissao(distDFeInt, validarXmlConsulta);
+            var retDistDFeInt = await PrepararETransmitir(distDFeInt, validarXmlConsulta);
             return retDistDFeInt;
         }
 
-        private async Task<retDistDFeInt> PrepararTransmissao(distDFeInt distDFeInt, bool validarXmlConsulta = true)
+        private async Task<retDistDFeInt> PrepararETransmitir(distDFeInt distDFeInt, bool validarXmlConsulta = true)
         {
             var xml = XmlUtils.ClasseParaXmlString<distDFeInt>(distDFeInt);
 

@@ -16,7 +16,7 @@ namespace FiscalCore.Servicos
         private readonly ConfiguracaoBasicaServico configuracao;
         private readonly ILogger logger;
 
-        public TransmitirSefazCommand(ConfiguracaoBasicaServico configuracao, ILogger<TransmitirSefazCommand> logger = null)
+        public TransmitirSefazCommand(ConfiguracaoBasicaServico configuracao, ILogger logger = null)
         {
             this.configuracao = configuracao;
             this.logger = logger;
