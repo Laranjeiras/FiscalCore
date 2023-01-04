@@ -96,7 +96,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
                 infEvento = infEvento
             };
 
-            evento.Assinar(ObterCertificado.Obter(config.ConfigCertificado), config.ConfigCertificado.SignatureMethodSignedXml, config.ConfigCertificado.DigestMethodReference);
+            evento.Assinar(config.ConfigCertificado.Certificado, config.ConfigCertificado.SignatureMethodSignedXml, config.ConfigCertificado.DigestMethodReference);
 
             var pedEvento = new envEvento
             {

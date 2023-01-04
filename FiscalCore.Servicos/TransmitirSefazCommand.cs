@@ -30,7 +30,7 @@ namespace FiscalCore.Servicos
 
             Soap.InserirSoapEnvelopeWebRequest(envelope, webRequest);
 
-            webRequest.ClientCertificates.Add(ObterCertificado.Obter(configuracao.ConfigCertificado));
+            webRequest.ClientCertificates.Add(configuracao.ConfigCertificado.Certificado);
 
             IAsyncResult asyncResult = webRequest.BeginGetResponse(null, null);
 

@@ -1,6 +1,8 @@
 ﻿using FiscalCore.Tipos;
+using FiscalCore.Utils;
 using System;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 
 namespace FiscalCore.Configuracoes
 {
@@ -8,6 +10,12 @@ namespace FiscalCore.Configuracoes
     {
         public ConfiguracaoCertificado()
         {
+        }
+
+        public ConfiguracaoCertificado(X509Certificate2 certificado, string senha)
+        {
+            _certificado = certificado;
+            Senha = senha;
         }
 
         public ConfiguracaoCertificado(eTipoCertificado tipoCertificado, string serial)
@@ -35,5 +43,23 @@ namespace FiscalCore.Configuracoes
         public string Senha { get; set; }
         public string SignatureMethodSignedXml { get; set; } = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
         public string DigestMethodReference { get; set; } = "http://www.w3.org/2000/09/xmldsig#sha1";
+
+        private X509Certificate2 _certificado;
+        public X509Certificate2 Certificado => _certificado ?? Obter();
+
+        private X509Certificate2 Obter()
+        {
+            switch (TipoCertificado)
+            {
+                case eTipoCertificado.A1Repositorio:
+                    return Utils.Certificado.ObterDoRepositorio(Serial);
+                case eTipoCertificado.A1Arquivo:
+                    return Utils.Certificado.ObterDeArquivo(ArquivoCertificado, Senha);
+                case eTipoCertificado.A3:
+                    return Utils.Certificado.ObterDoRepositorio(Serial);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
     }
 }

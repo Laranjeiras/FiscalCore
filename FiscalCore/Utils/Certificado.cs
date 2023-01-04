@@ -1,8 +1,5 @@
-﻿using FiscalCore.Configuracoes;
-using FiscalCore.Tipos;
-using FiscalCore.ValueObjects;
+﻿using FiscalCore.ValueObjects;
 using System;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -11,24 +8,9 @@ using System.Text.RegularExpressions;
 
 namespace FiscalCore.Utils
 {
-    public static class ObterCertificado
+    public static class Certificado
     {
-        public static X509Certificate2 Obter(ConfiguracaoCertificado configCertificado)
-        {
-            switch (configCertificado.TipoCertificado)
-            {
-                case eTipoCertificado.A1Repositorio:
-                    return ObterDoRepositorio(configCertificado.Serial);
-                case eTipoCertificado.A1Arquivo:
-                    return ObterDeArquivo(configCertificado.ArquivoCertificado, configCertificado.Senha);
-                case eTipoCertificado.A3:
-                    return ObterDoRepositorio(configCertificado.Serial);
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        private static X509Certificate2 ObterDoRepositorio(string serial)
+        internal static X509Certificate2 ObterDoRepositorio(string serial)
         {
             if (string.IsNullOrEmpty(serial))
                 throw new Exception("Serial do certificado não informado");
@@ -53,7 +35,7 @@ namespace FiscalCore.Utils
             }
         }
 
-        private static X509Certificate2 ObterDeArquivo(string arquivo, string senha)
+        internal static X509Certificate2 ObterDeArquivo(string arquivo, string senha)
         {
             if (!File.Exists(arquivo))
                 throw new FileNotFoundException(string.Format("Certificado digital {0} não encontrado!", arquivo));

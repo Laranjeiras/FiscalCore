@@ -50,7 +50,7 @@ namespace FiscalCore.Servicos
 
             foreach (var nfe in nfes)
             {
-                var nfeAssinada = nfe.Assinar(ObterCertificado.Obter(cfgServico.ConfigCertificado));
+                var nfeAssinada = nfe.Assinar(cfgServico.ConfigCertificado.Certificado);
                 var xml = XmlUtils.ClasseParaXmlString<NFe>(nfeAssinada);
                 xml = xml.Replace("xmlns=\"http://www.portalfiscal.inf.br/nfe\"", string.Empty);
 

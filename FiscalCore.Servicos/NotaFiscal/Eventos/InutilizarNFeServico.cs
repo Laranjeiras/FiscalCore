@@ -82,7 +82,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             );
             pedInutilizacao.infInut.Id = "ID" + numId;
 
-            pedInutilizacao.Assinar(ObterCertificado.Obter(cfgServico.ConfigCertificado));
+            pedInutilizacao.Assinar(cfgServico.ConfigCertificado.Certificado);
 
             return pedInutilizacao;
         }

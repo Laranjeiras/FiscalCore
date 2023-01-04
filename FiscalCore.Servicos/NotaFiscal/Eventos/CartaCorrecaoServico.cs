@@ -86,7 +86,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
                 eventoTmp.infEvento.Id = "ID" + ((int)eventoTmp.infEvento.tpEvento) + eventoTmp.infEvento.chNFe +
                                       eventoTmp.infEvento.nSeqEvento.ToString().PadLeft(2, '0');
 
-                var _certificado = ObterCertificado.Obter(cfgServico.ConfigCertificado);
+                var _certificado = cfgServico.ConfigCertificado.Certificado;
                 eventoTmp.Assinar(_certificado, cfgServico.ConfigCertificado.SignatureMethodSignedXml, cfgServico.ConfigCertificado.DigestMethodReference);
             }
 
