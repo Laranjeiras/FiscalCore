@@ -1,4 +1,5 @@
-﻿using FiscalCore.ValueObjects;
+﻿using FiscalCore.Exceptions;
+using FiscalCore.ValueObjects;
 using System;
 using System.IO;
 using System.Linq;
@@ -37,10 +38,25 @@ namespace FiscalCore.Utils
 
         internal static X509Certificate2 ObterDeArquivo(string arquivo, string senha)
         {
-            if (!File.Exists(arquivo))
-                throw new FileNotFoundException(string.Format("Certificado digital {0} não encontrado!", arquivo));
-            var certificado = new X509Certificate2(arquivo, senha, X509KeyStorageFlags.MachineKeySet);
-            return certificado;
+            try
+            {
+                if (!File.Exists(arquivo))
+                    throw new FileNotFoundException(string.Format("Certificado digital {0} não encontrado!", arquivo));
+                var certificado = new X509Certificate2(arquivo, senha, X509KeyStorageFlags.MachineKeySet);
+                return certificado;
+            } 
+            catch(System.Security.Cryptography.CryptographicException ex)
+            {
+                if (ex.Message.Contains("password is not correct"))
+                {
+                    throw new SenhaInvalidaException("Senha inválida", ex);
+                }
+                throw;
+            }
+            catch(Exception)
+            {
+                throw;
+            }
         }
 
         public static string ExtrairCNPJArquivo(X509Certificate2 certificado)
