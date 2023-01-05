@@ -1,5 +1,4 @@
 ﻿using FiscalCore.Tipos;
-using FiscalCore.Utils;
 using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
@@ -12,7 +11,7 @@ namespace FiscalCore.Configuracoes
         {
         }
 
-        public ConfiguracaoCertificado(X509Certificate2 certificado, string senha)
+        public ConfiguracaoCertificado(X509Certificate2 certificado, string senha = null)
         {
             _certificado = certificado;
             Senha = senha;
@@ -27,7 +26,7 @@ namespace FiscalCore.Configuracoes
             Serial = serial;
         }
 
-        public ConfiguracaoCertificado(string arquivoCertificado, string senha = null)
+        public ConfiguracaoCertificado(string arquivoCertificado, string senha)
         {
             if (!File.Exists(arquivoCertificado))
                 throw new Exception("Arquivo do certificado não encontrado");
