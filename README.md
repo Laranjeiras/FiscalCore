@@ -11,6 +11,7 @@ https://api.nuget.org/v3/index.json
 
 #Exemplo NFe Autorização
 
+```
 var cert = new ConfiguracaoCertificado(eTipoCertificado.A3, "3b6cc164ef2d4cf7ac1488ac895cbedf");
 var emit = new emit
 {
@@ -42,3 +43,4 @@ cfgServico.DiretorioSchemas = @"C:\FISCALCOLRE\NFeSchemas\PL_009_V4_00_NT_2018_0
 
 var servico = new FiscalCore.Servicos.Servicos.NFeAutorizacao4(cfgServico);
 var retorno = servico.Autorizar(xmlString, eModeloDocumento.NFe);
+```
