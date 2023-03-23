@@ -7,6 +7,7 @@ using FiscalCore.Servicos.NotaFiscal.Eventos;
 using FiscalCore.Tipos;
 using FiscalCore.Utils;
 using FiscalCore.ValueObjects;
+using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -15,16 +16,19 @@ namespace FiscalCore.Servicos.NotaFiscal
 {
     public class NotaFiscalServico : BaseSefazServico
     {
-        public NotaFiscalServico(ConfiguracaoServico configuracao, IStorageContext storage, ITransmitirSefazCommand transmitir) : base(configuracao, transmitir)
+        public NotaFiscalServico(ConfiguracaoServico configuracao, IStorageContext storage, ITransmitirSefazCommand transmitir, ILogger<NotaFiscalServico> logger) : base(configuracao, transmitir)
         {
             if (configuracao.VersaoAutorizacaoNFe == eVersaoServico.Versao400)
-                autorizarNFe = new AutorizarNFe4(configuracao, transmitir, storage);
+                autorizarNFe = new AutorizarNFe4(configuracao, transmitir, storage, logger);
             else
                 throw new NotImplementedException("Versão de autorização da NFe não suportada");
             this.storageContext = storage;
+            this.logger = logger;
         }
 
         private readonly IStorageContext storageContext;
+        private readonly ILogger logger;
+
         private IStorage storage => storageContext.GetStorage("FiscalCore");
         private readonly IAutorizarNFeServico autorizarNFe;
         public IAutorizarNFeServico AutorizarNFe => autorizarNFe;
