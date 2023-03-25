@@ -72,9 +72,11 @@ namespace FiscalCore.Utils
             return cnpjValido?.Value;
         }
 
-        public static DateTime Validade(this X509Certificate2 certificado)
-        {
-            return certificado.NotAfter;
-        }
+        public static DateTime Validade(this X509Certificate2 certificado) 
+            => certificado.NotAfter;
+
+        public static bool Expirado(this X509Certificate2 certificado) 
+            => Validade(certificado) > DateTime.Now;
+
     }
 }
