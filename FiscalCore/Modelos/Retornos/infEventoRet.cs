@@ -17,7 +17,9 @@ namespace FiscalCore.Modelos.Retornos
         public eTipoEventoNFe? tpEvento { get; set; }
         public string xEvento { get; set; }
         public int? nSeqEvento { get; set; }
+        [XmlElement("CNPJDest")]
         public string CnpjDest { get; set; }
+        [XmlElement("CPFDest")]
         public string CpfDest { get; set; }
         public DateTime dhRegEvento { get; set; }
         public string nProt { get; set; }
