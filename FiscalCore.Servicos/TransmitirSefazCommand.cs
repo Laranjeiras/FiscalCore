@@ -30,9 +30,20 @@ namespace FiscalCore.Servicos
 
             Soap.InserirSoapEnvelopeWebRequest(envelope, webRequest);
 
+            logger.LogDebug("CARREGANDO INFORMAÇÕES DO CERTIFICADO");
+
+            if(configuracao?.ConfigCertificado?.Certificado == null)
+            {
+                throw new ArgumentNullException("NÁO FOI POSSÍVEL CARREGAR CONFIGURAÇÕES DO CERTIFICADO");
+            }
+
             webRequest.ClientCertificates.Add(configuracao.ConfigCertificado.Certificado);
 
+            logger.LogDebug("INFORMAÇÕES DO CERTIFICADO CARREGADAS");
+
             IAsyncResult asyncResult = webRequest.BeginGetResponse(null, null);
+
+            logger.LogDebug("TRANSMITINDO...");
 
             string soapResult;
             using (WebResponse webResponse = webRequest.EndGetResponse(asyncResult))
