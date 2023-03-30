@@ -17,9 +17,9 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
     public class DistribuicaoDFeServico : BaseSefazServicoBasico
     {
         private readonly IStorage storage;
-        private readonly ILogger logger;
+        private readonly ILogger<DistribuicaoDFeServico> logger;
 
-        public DistribuicaoDFeServico(ConfiguracaoBasicaServico configuracao, ITransmitirSefazCommand transmitir, IStorage storage = null, ILogger logger = null)
+        public DistribuicaoDFeServico(ConfiguracaoBasicaServico configuracao, ITransmitirSefazCommand transmitir, IStorage storage = null, ILogger<DistribuicaoDFeServico> logger = null)
             : base(configuracao, transmitir)
         {
             this.storage = storage;

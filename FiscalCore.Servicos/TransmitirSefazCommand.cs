@@ -14,7 +14,7 @@ namespace FiscalCore.Servicos
     public class TransmitirSefazCommand : ITransmitirSefazCommand
     {
         private readonly ConfiguracaoBasicaServico configuracao;
-        private readonly ILogger logger;
+        private readonly ILogger<TransmitirSefazCommand> logger;
 
         public TransmitirSefazCommand(ConfiguracaoBasicaServico configuracao, ILogger<TransmitirSefazCommand> logger = null)
         {
@@ -30,7 +30,7 @@ namespace FiscalCore.Servicos
 
             Soap.InserirSoapEnvelopeWebRequest(envelope, webRequest);
 
-            logger.LogDebug("CARREGANDO INFORMAÇÕES DO CERTIFICADO");
+            logger?.LogDebug("CARREGANDO INFORMAÇÕES DO CERTIFICADO");
 
             if(configuracao?.ConfigCertificado?.Certificado == null)
             {
@@ -39,11 +39,11 @@ namespace FiscalCore.Servicos
 
             webRequest.ClientCertificates.Add(configuracao.ConfigCertificado.Certificado);
 
-            logger.LogDebug("INFORMAÇÕES DO CERTIFICADO CARREGADAS");
+            logger?.LogDebug("INFORMAÇÕES DO CERTIFICADO CARREGADAS");
 
             IAsyncResult asyncResult = webRequest.BeginGetResponse(null, null);
 
-            logger.LogDebug("TRANSMITINDO...");
+            logger?.LogDebug("TRANSMITINDO...");
 
             string soapResult;
             using (WebResponse webResponse = webRequest.EndGetResponse(asyncResult))
