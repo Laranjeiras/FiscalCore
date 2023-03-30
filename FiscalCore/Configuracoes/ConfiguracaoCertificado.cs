@@ -36,6 +36,12 @@ namespace FiscalCore.Configuracoes
             Senha = senha;
         }
 
+        public ConfiguracaoCertificado(byte[] bytes, string senha)
+        {
+            TipoCertificado = eTipoCertificado.A1Arquivo;
+            _certificado = Utils.Certificado.ObterDeArquivo(bytes, senha);
+        }
+
         public eTipoCertificado TipoCertificado { get; set; }
         public string ArquivoCertificado { get; set; }
         public string Serial { get; set; }

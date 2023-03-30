@@ -59,7 +59,12 @@ namespace FiscalCore.Utils
             }
         }
 
-        public static string ExtrairCNPJArquivo(X509Certificate2 certificado)
+        internal static X509Certificate2 ObterDeArquivo(byte[] bytes, string senha)
+        {
+            return new X509Certificate2(bytes, senha, X509KeyStorageFlags.Exportable);
+        }
+
+        public static string ExtrairCNPJArquivo(this X509Certificate2 certificado)
         {
             const string oIdSubjectAlternativeName = "2.5.29.17";
 
