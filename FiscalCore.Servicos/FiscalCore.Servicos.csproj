@@ -5,7 +5,7 @@
     <RepositoryUrl>github.com/Laranjeiras/FiscalCore</RepositoryUrl>
     <Authors>Carlos Alexandre Laranjeiras</Authors>
     <PackageTags>NuGet;Classlib;GitHub;Actions</PackageTags>
-    <Version>1.0.40</Version>      
+    <Version>1.0.41</Version>    
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,8 +14,9 @@
     <None Remove="Servicos\**" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="AlgoPlus.Storage" Version="0.3.15" />
+<ItemGroup>
+	<PackageReference Include="AlgoPlus.Storage" Version="0.3.15" />
+	<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.3" />
   </ItemGroup>
 
   <ItemGroup>
