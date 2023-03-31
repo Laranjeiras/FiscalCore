@@ -1,10 +1,8 @@
 # FiscalCore
 
-Dotnet Standard 2.1
+Dotnet Core 3.1
 
 [![Pack Dominio + Push no NuGet](https://github.com/Laranjeiras/FiscalCore/actions/workflows/publish_domain.yml/badge.svg)](https://github.com/Laranjeiras/FiscalCore/actions/workflows/publish_domain.yml)
-
-https://api.nuget.org/v3/index.json
 
 
 #Exemplo NFe Autorização
