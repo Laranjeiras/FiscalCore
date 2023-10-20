@@ -40,3 +40,9 @@ cfgServico.DiretorioSchemas = @"C:\FISCALCOLRE\NFeSchemas\PL_009_V4_00_NT_2018_0
 var servico = new FiscalCore.Servicos.Servicos.NFeAutorizacao4(cfgServico);
 var retorno = servico.Autorizar(xmlString, eModeloDocumento.NFe);
 ```
+
+# Composição Chave de Acesso
+
+<img src="./others/Doc_ChaveAcesso.png"/>
+
+<img src="./others/Doc_ComposicaoChaveAcesso.png"/>
