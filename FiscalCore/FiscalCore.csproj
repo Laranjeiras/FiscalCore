@@ -7,6 +7,8 @@
     <PackageTags>NuGet;Classlib;GitHub;Actions</PackageTags>
     <Version>1.1.0</Version>
     <Title>FiscalCore</Title>
+    <PackageProjectUrl>github.com/Laranjeiras/FiscalCore</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
