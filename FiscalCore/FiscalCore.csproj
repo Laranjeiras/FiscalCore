@@ -3,9 +3,10 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RepositoryUrl>github.com/Laranjeiras/FiscalCore</RepositoryUrl>
-    <Authors>Calor Alexandre Laranjeiras</Authors>
+    <Authors>Carlos Alexandre Laranjeiras</Authors>
     <PackageTags>NuGet;Classlib;GitHub;Actions</PackageTags>
     <Version>1.1.0</Version>
+    <Title>FiscalCore</Title>
   </PropertyGroup>
 
   <ItemGroup>
