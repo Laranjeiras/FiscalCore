@@ -43,6 +43,6 @@ var retorno = servico.Autorizar(xmlString, eModeloDocumento.NFe);
 
 # Composição Chave de Acesso
 
-<img src="./others/Doc_ChaveAcesso.png"/>
+<img src="https://github.com/Laranjeiras/FiscalCore/blob/main/Others/Doc_ChaveAcesso.png">
 
-<img src="./others/Doc_ComposicaoChaveAcesso.png"/>
+<img src="https://github.com/Laranjeiras/FiscalCore/blob/main/Others/Doc_ComposicaoChaveAcesso.png"/>
