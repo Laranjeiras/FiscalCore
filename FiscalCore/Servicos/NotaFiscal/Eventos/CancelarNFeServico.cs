@@ -20,14 +20,14 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
         private readonly ConfiguracaoServico cfgServico;
         private readonly IStorage storage;
         private readonly ITransmitirSefazCommand transmitir;
-        string versao;
+        private const string VERSAO = "1.00";
+        private const string LOG_PATH = "1.00";
 
         public CancelarNFeServico(ConfiguracaoServico cfgServico, IStorageContext storage, ITransmitirSefazCommand transmitir)
         {
             this.cfgServico = cfgServico;
             this.storage = storage.GetStorage("FiscalCore");
             this.transmitir = transmitir;
-            versao = "1.00";
         }
 
         public async Task<retEnvEvento> Cancelar(InfoNFeCancelar infoNFe)
@@ -43,59 +43,41 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             if (infos.Count > 20)
                 throw new Exception("No máximo 20 NFes podem ser canceladas");
 
-            var modelos = infos.Select(x => x.ChaveAcesso.Modelo).Distinct().ToList();
-            if (modelos.Count != 1)
-                throw new FalhaValidacaoException("Lista de cancelamento deve conter somente 1 modelo");
-
-            eModeloDocumento modeloDocumento = modelos.FirstOrDefault();
+            var modelo = ExtrairModelo(infos);
 
             List<evento> eventos = new List<evento>();
 
             foreach (var item in infos)
             {
-                var protocolo = item.ProtocoloAutorizacao;
-                var chave = item.ChaveAcesso;
-                var just = item.Justificativa;
+                var evento = FiscalCore.Modelos.Eventos.evento.CriarEventoCancelamento(
+                    cfgServico.UF,
+                    cfgServico.TipoAmbiente,
+                    cfgServico.Emitente,
+                    item.ChaveAcesso,
+                    item.ProtocoloAutorizacao.Protocolo,
+                    item.Justificativa, VERSAO
+                );
 
-                if(string.IsNullOrEmpty(just) || just.Length < 15 || just.Length > 255)
-                    throw new Exception("Justificativa de conter entre 15 e 255 caracteres");
-
-                var detEvento = new detEvento
-                {
-                    nProt = protocolo.Protocolo,
-                    versao = versao,
-                    xJust = just,
-                    descEvento = "Cancelamento",
-                };
-
-                var infEvento = new infEventoEnv
-                {
-                    cOrgao = cfgServico.UF,
-                    tpAmb = cfgServico.TipoAmbiente,
-                    chNFe = chave.Chave,
-                    dhEvento = DateTime.Now,
-                    tpEvento = eTipoEventoNFe.NFeCancelamento,
-                    nSeqEvento = 1,
-                    verEvento = versao,
-                    detEvento = detEvento
-                };
-
-                if (!string.IsNullOrEmpty(cfgServico.Emitente.CNPJ))
-                    infEvento.CNPJ = cfgServico.Emitente.CNPJ;
-                else
-                    infEvento.CPF = cfgServico.Emitente.CPF;
-
-                var evento = new evento { versao = versao, infEvento = infEvento };
                 eventos.Add(evento);
-            }            
-            return await Cancelar(eventos, modeloDocumento);
+            }
+
+            return await Cancelar(eventos, modelo);
+        }
+
+        private eModeloDocumento ExtrairModelo(IList<InfoNFeCancelar> infos)
+        {
+            var modelos = infos.Select(x => x.ChaveAcesso.Modelo).Distinct().ToList();
+            if (modelos.Count != 1)
+                throw new FalhaValidacaoException("Lista de cancelamento deve conter somente 1 modelo");
+
+            return modelos.FirstOrDefault();
         }
 
         private async Task<retEnvEvento> Cancelar(List<evento> eventos, eModeloDocumento modeloDoc) 
         {
             var pedEvento = new envEvento
             {
-                versao = versao,
+                versao = VERSAO,
                 idLote = 1,
                 evento = eventos
             };
@@ -111,7 +93,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
 
             var xmlEvento = XmlUtils.ClasseParaXmlString<envEvento>(pedEvento);
 
-            var arqEnv = Path.Combine("Logs", $"{DateTime.Now.Ticks}-ped-eve.xml");
+            var arqEnv = Path.Combine(LOG_PATH, $"{DateTime.Now.Ticks}-ped-eve.xml");
             await storage.SaveAsync(arqEnv, xmlEvento);
 
             var sefazUrl = Fabrica.FabricarUrl.ObterUrl(eTipoServico.CancelarNFe, cfgServico.TipoAmbiente, modeloDoc, cfgServico.UF);
@@ -121,7 +103,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
 
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retEnvEvento").OuterXml;
 
-            var arqRet = Path.Combine("Logs", $"{DateTime.Now.Ticks}-ret-eve.xml");
+            var arqRet = Path.Combine(LOG_PATH, $"{DateTime.Now.Ticks}-ret-eve.xml");
             await storage.SaveAsync(arqRet, retornoXmlStringLimpa);
 
             var retEnvEvento = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
@@ -132,14 +114,19 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
 
     public class InfoNFeCancelar
     {
+        private const string JUSTIFICATIVA = "Nota Fiscal Emitida Indevidamente";
         public ChaveFiscal ChaveAcesso { get; private set; }
         public ProtocoloAutorizacao ProtocoloAutorizacao { get; private set; }
         public string Justificativa { get; private set; }
 
-        public InfoNFeCancelar(ChaveFiscal chaveAcesso, ProtocoloAutorizacao protocoloAutorizacao, string justificativa = "Nota Fiscal Emitida Indevidamente")
+        public InfoNFeCancelar(ChaveFiscal chaveAcesso, ProtocoloAutorizacao protocoloAutorizacao, string justificativa = JUSTIFICATIVA)
         {
             ChaveAcesso = chaveAcesso ?? throw new ArgumentNullException(nameof(chaveAcesso));
             ProtocoloAutorizacao = protocoloAutorizacao ?? throw new ArgumentNullException(nameof(protocoloAutorizacao));
+
+            if (string.IsNullOrEmpty(justificativa) || justificativa.Length < 15 || justificativa.Length > 255)
+                throw new Exception("Justificativa de conter entre 15 e 255 caracteres");
+
             Justificativa = justificativa;
         }
     }
