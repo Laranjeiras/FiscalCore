@@ -8,6 +8,7 @@ using FiscalCore.Tipos;
 using FiscalCore.Fabrica;
 using AlgoPlus.Storage.Services;
 using System.IO;
+using FiscalCore.ValueObjects;
 
 namespace FiscalCore.Servicos
 {
@@ -26,12 +27,11 @@ namespace FiscalCore.Servicos
             this.versao = "4.00";
         }
 
-        public async Task<retConsSitNFe> ConsultarPelaChave(string chaveAcesso) 
+        public async Task<retConsSitNFe> ConsultarPelaChave(ChaveFiscal chave) 
         {
-            chaveAcesso = chaveAcesso.Replace("NFe", "");
             var consSit = new consSitNFe
             {
-                chNFe = chaveAcesso,
+                chNFe = chave.Chave,
                 tpAmb = cfgServico.TipoAmbiente,
                 versao = versao
             };
@@ -41,9 +41,7 @@ namespace FiscalCore.Servicos
             var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("pedConsSitNFe.xml", cfgServico));
             await storage.SaveAsync(arqEnv, xmlEvento);
 
-            var modeloDoc = chaveAcesso.Substring(20, 2).ModeloDocumento();
-
-            var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.ConsultaSituacaoNFe, cfgServico.TipoAmbiente, modeloDoc, cfgServico.UF);
+            var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.ConsultaSituacaoNFe, cfgServico.TipoAmbiente, chave.Modelo, cfgServico.UF);
             var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.ConsultaSituacaoNFe, xmlEvento);
 
             var retornoXmlString = await sefaz.TransmitirAsync(sefazUrl, envelope);
