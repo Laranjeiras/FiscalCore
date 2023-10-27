@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -26,21 +27,19 @@ namespace FiscalCore.Servicos
         {
             logger?.LogInformation($"INICIANDO TRANSMISSÃO SEFAZ [{sefazUrl.Url}]");
 
-            HttpWebRequest webRequest = SoapEnvelopeFabrica.CriarWebRequest(sefazUrl.Url, "application/soap+xml;charset=utf-8");
+            var certificado = CarregarCertificado();
+
+            var webRequest = SoapEnvelopeFabrica.CriarWebRequest(sefazUrl.Url, certificado);
 
             Soap.InserirSoapEnvelopeWebRequest(envelope, webRequest);
 
-            logger?.LogDebug("CARREGANDO INFORMAÇÕES DO CERTIFICADO");
+            var soapResult = await Transmitir(webRequest);
 
-            if(configuracao?.ConfigCertificado?.Certificado == null)
-            {
-                throw new ArgumentNullException("NÁO FOI POSSÍVEL CARREGAR CONFIGURAÇÕES DO CERTIFICADO");
-            }
+            return soapResult;
+        }
 
-            webRequest.ClientCertificates.Add(configuracao.ConfigCertificado.Certificado);
-
-            logger?.LogDebug("INFORMAÇÕES DO CERTIFICADO CARREGADAS");
-
+        private async Task<string> Transmitir(HttpWebRequest webRequest)
+        {
             IAsyncResult asyncResult = webRequest.BeginGetResponse(null, null);
 
             logger?.LogDebug("TRANSMITINDO...");
@@ -49,12 +48,24 @@ namespace FiscalCore.Servicos
             using (WebResponse webResponse = webRequest.EndGetResponse(asyncResult))
             {
                 using StreamReader rd = new StreamReader(webResponse.GetResponseStream());
-                    soapResult = await rd.ReadToEndAsync();
+                soapResult = await rd.ReadToEndAsync();
             }
 
             logger?.LogInformation($"ENCERRANDO TRANSMISSÃO SEFAZ");
 
             return soapResult;
+        }
+
+        private X509Certificate2 CarregarCertificado()
+        {
+            logger?.LogDebug("CARREGANDO INFORMAÇÕES DO CERTIFICADO");
+
+            var certificado = configuracao?.ConfigCertificado?.Certificado
+                ?? throw new ArgumentNullException("NÁO FOI POSSÍVEL CARREGAR CONFIGURAÇÕES DO CERTIFICADO");
+
+            logger?.LogDebug("INFORMAÇÕES DO CERTIFICADO CARREGADAS");
+
+            return certificado;
         }
     }
 }
