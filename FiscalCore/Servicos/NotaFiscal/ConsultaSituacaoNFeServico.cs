@@ -9,6 +9,7 @@ using FiscalCore.Fabrica;
 using AlgoPlus.Storage.Services;
 using System.IO;
 using FiscalCore.ValueObjects;
+using System.Threading;
 
 namespace FiscalCore.Servicos
 {
@@ -18,6 +19,7 @@ namespace FiscalCore.Servicos
         private readonly IStorage storage;
         private readonly ITransmitirSefazCommand sefaz;
         private readonly string versao;
+        private readonly CancellationToken cancellation;
 
         public ConsultaSituacaoNFeServico(ConfiguracaoServico cfgServico, IStorage storage, ITransmitirSefazCommand transmitir)
         {
@@ -25,6 +27,7 @@ namespace FiscalCore.Servicos
             this.storage = storage;
             this.sefaz = transmitir;
             this.versao = "4.00";
+            this.cancellation = new CancellationToken();
         }
 
         public async Task<retConsSitNFe> ConsultarPelaChave(ChaveFiscal chave) 
@@ -39,7 +42,7 @@ namespace FiscalCore.Servicos
             var xmlEvento = XmlUtils.ClasseParaXmlString<consSitNFe>(consSit);
 
             var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("pedConsSitNFe.xml", cfgServico));
-            await storage.SaveAsync(arqEnv, xmlEvento);
+            await storage.SaveAsync(arqEnv, xmlEvento, cancellation);
 
             var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.ConsultaSituacaoNFe, cfgServico.TipoAmbiente, chave.Modelo, cfgServico.UF);
             var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.ConsultaSituacaoNFe, xmlEvento);
@@ -49,7 +52,7 @@ namespace FiscalCore.Servicos
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retConsSitNFe").OuterXml;
 
             var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("retConsSitNFe.xml", cfgServico));
-            await storage.SaveAsync(arqRet, retornoXmlStringLimpa);
+            await storage.SaveAsync(arqRet, retornoXmlStringLimpa, cancellation);
 
             var retEnvEvento = new retConsSitNFe().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 

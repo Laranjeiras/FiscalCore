@@ -10,6 +10,7 @@ using FiscalCore.ValueObjects;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FiscalCore.Servicos.DistribuicaoDFe
@@ -18,12 +19,14 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
     {
         private readonly IStorage storage;
         private readonly ILogger<DistribuicaoDFeServico> logger;
+        private readonly CancellationToken cancellation;
 
         public DistribuicaoDFeServico(ConfiguracaoBasicaServico configuracao, ITransmitirSefazCommand transmitir, IStorage storage = null, ILogger<DistribuicaoDFeServico> logger = null)
             : base(configuracao, transmitir)
         {
             this.storage = storage;
             this.logger = logger;
+            this.cancellation = new CancellationToken();
         }
 
         public async Task<retDistDFeInt> ConsultarPorUltimoNSUAsync(string ultimoNsu, bool validarXmlConsulta = true)
@@ -147,7 +150,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             logger.LogDebug($"ENVELOPE LIMPO");
 
             var arqRet = Path.Combine("Logs", $"{Configuracao.CNPJEmitente}-{DateTime.Now.Ticks}-retDistDFeInt.xml");
-            await storage.SaveAsync(arqRet, retornoLimpo);
+            await storage.SaveAsync(arqRet, retornoLimpo, cancellation);
 
             logger.LogDebug($"DESERIALIZANDO XML");
             var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retornoLimpo);
@@ -164,7 +167,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             }
 
             logger.LogInformation($"SALVAR LOG XML {filename}");
-            var fileInfo = await storage.SaveAsync(filename, conteudo);
+            var fileInfo = await storage.SaveAsync(filename, conteudo, cancellation);
             logger.LogInformation($"LOG SALVO {fileInfo.AbsolutePath}");
         }
     }

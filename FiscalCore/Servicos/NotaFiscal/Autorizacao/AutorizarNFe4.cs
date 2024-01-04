@@ -15,6 +15,7 @@ using FiscalCore.NotaFiscal;
 using FiscalCore.Exceptions;
 using Microsoft.Extensions.Logging;
 using FiscalCore.Servicos.NotaFiscal;
+using System.Threading;
 
 namespace FiscalCore.Servicos
 {
@@ -24,6 +25,7 @@ namespace FiscalCore.Servicos
         private readonly ITransmitirSefazCommand transmitir;
         private readonly IStorage storage;
         private readonly ILogger<NotaFiscalServico> logger;
+        private readonly CancellationToken cancellation;
 
         public AutorizarNFe4(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir, IStorageContext storage, ILogger<NotaFiscalServico> logger)
         {
@@ -31,6 +33,7 @@ namespace FiscalCore.Servicos
             this.transmitir = transmitir;
             this.storage = storage.GetStorage("FiscalCore");
             this.logger = logger;
+            this.cancellation = new CancellationToken(); // PARA FUNCIONAR O STORAGE
         }
 
         public async Task<IRetornoAutorizacao> Autorizar(NFe nfe, int idLote = 0)
@@ -125,7 +128,7 @@ namespace FiscalCore.Servicos
         private async Task SalvarLog(string filename, string conteudo)
         {
             logger.LogInformation($"SALVAR LOG XML {filename}");
-            var fileInfo = await storage.SaveAsync(filename, conteudo);
+            var fileInfo = await storage.SaveAsync(filename, conteudo, cancellation);
             logger.LogInformation($"LOG SALVO {fileInfo.AbsolutePath}");
         }
     }

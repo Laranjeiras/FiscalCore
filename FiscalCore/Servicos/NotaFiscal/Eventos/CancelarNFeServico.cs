@@ -12,6 +12,7 @@ using System.Linq;
 using AlgoPlus.Storage.Services;
 using System.IO;
 using FiscalCore.Exceptions;
+using System.Threading;
 
 namespace FiscalCore.Servicos.NotaFiscal.Eventos
 {
@@ -20,6 +21,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
         private readonly ConfiguracaoServico cfgServico;
         private readonly IStorage storage;
         private readonly ITransmitirSefazCommand transmitir;
+        private readonly CancellationToken cancellation;
         private const string VERSAO = "1.00";
         private const string LOG_PATH = "1.00";
 
@@ -28,6 +30,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             this.cfgServico = cfgServico;
             this.storage = storage.GetStorage("FiscalCore");
             this.transmitir = transmitir;
+            this.cancellation = new CancellationToken();
         }
 
         public async Task<retEnvEvento> Cancelar(InfoNFeCancelar infoNFe)
@@ -94,7 +97,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             var xmlEvento = XmlUtils.ClasseParaXmlString<envEvento>(pedEvento);
 
             var arqEnv = Path.Combine(LOG_PATH, $"{DateTime.Now.Ticks}-ped-eve.xml");
-            await storage.SaveAsync(arqEnv, xmlEvento);
+            await storage.SaveAsync(arqEnv, xmlEvento, cancellation);
 
             var sefazUrl = Fabrica.FabricarUrl.ObterUrl(eTipoServico.CancelarNFe, cfgServico.TipoAmbiente, modeloDoc, cfgServico.UF);
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.CancelarNFe, xmlEvento);
@@ -104,7 +107,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retEnvEvento").OuterXml;
 
             var arqRet = Path.Combine(LOG_PATH, $"{DateTime.Now.Ticks}-ret-eve.xml");
-            await storage.SaveAsync(arqRet, retornoXmlStringLimpa);
+            await storage.SaveAsync(arqRet, retornoXmlStringLimpa, cancellation);
 
             var retEnvEvento = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 

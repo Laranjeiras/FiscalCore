@@ -9,6 +9,7 @@ using FiscalCore.Tipos;
 using FiscalCore.Fabrica;
 using System.IO;
 using AlgoPlus.Storage.Services;
+using System.Threading;
 
 namespace FiscalCore.Servicos.NotaFiscal.Eventos
 {
@@ -17,12 +18,14 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
         private ConfiguracaoServico cfgServico;
         private readonly IStorage storage;
         private readonly ITransmitirSefazCommand transmitir;
+        private readonly CancellationToken cancellation;
 
         public InutilizarNFeServico(ConfiguracaoServico cfgServico, IStorage storage, ITransmitirSefazCommand transmitir)
         {
             this.cfgServico = cfgServico;
             this.storage = storage;
             this.transmitir = transmitir;
+            this.cancellation = new CancellationToken();
         }
 
         public async Task<retInutNFe> Inutilizar(int ano, eModeloDocumento modeloDocumento, int serie, int numeroInicial, int numeroFinal, string justificativa) 
@@ -35,7 +38,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             var xmlInutilizacao = XmlUtils.ClasseParaXmlString<inutNFe>(pedInutilizacao);
 
             var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ped-inut.xml", cfgServico));
-            await storage.SaveAsync(arqEnv, xmlInutilizacao);
+            await storage.SaveAsync(arqEnv, xmlInutilizacao, cancellation);
 
             var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.InutilizacaoNFe, xmlInutilizacao);
             var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.InutilizacaoNFe, cfgServico.TipoAmbiente, modeloDocumento, cfgServico.UF);
@@ -43,7 +46,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             var retornoLimpo = Soap.LimparEnvelope(retornoXmlString, "retInutNFe").OuterXml;
 
             var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ret-inut.xml", cfgServico));
-            await storage.SaveAsync(arqRet, retornoLimpo);
+            await storage.SaveAsync(arqRet, retornoLimpo, cancellation);
 
             return XmlUtils.XmlStringParaClasse<retInutNFe>(retornoLimpo);
         }

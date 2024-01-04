@@ -10,6 +10,7 @@ using FiscalCore.Tipos;
 using System.IO;
 using AlgoPlus.Storage.Services;
 using FiscalCore.Exceptions;
+using System.Threading;
 
 namespace FiscalCore.Servicos.NotaFiscal.Eventos
 {
@@ -18,6 +19,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
         private readonly ConfiguracaoServico cfgServico;
         private readonly IStorage storage;
         private readonly ITransmitirSefazCommand transmitir;
+        private readonly CancellationToken cancellation;
         private const string VERSAO = "1.00";
 
         public CartaCorrecaoServico(ConfiguracaoServico cfgServico, IStorage storage, ITransmitirSefazCommand transmitir)
@@ -25,6 +27,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             this.cfgServico = cfgServico;
             this.storage = storage;
             this.transmitir = transmitir;
+            this.cancellation = new CancellationToken();
         }
 
         public async Task<retEnvEvento> TransmitirCorrecao(InfoCartaCorrecao info)
@@ -99,7 +102,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             var xmlEvento = XmlUtils.ClasseParaXmlString<envEvento>(pedEvento);
 
             var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ped-eve.xml", cfgServico));
-            await storage.SaveAsync(arqEnv, xmlEvento);
+            await storage.SaveAsync(arqEnv, xmlEvento, cancellation);
 
             var sefazUrl = Fabrica.FabricarUrl.ObterUrl(eTipoServico.CartaCorrecao, cfgServico.TipoAmbiente, eModeloDocumento.NFe, cfgServico.UF);
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.CartaCorrecao, xmlEvento);
@@ -109,7 +112,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retEnvEvento").OuterXml;
 
             var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ret-eve.xml", cfgServico));
-            await storage.SaveAsync(arqRet, retornoXmlStringLimpa);
+            await storage.SaveAsync(arqRet, retornoXmlStringLimpa, cancellation);
 
              var retorno = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 
