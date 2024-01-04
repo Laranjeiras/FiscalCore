@@ -18,14 +18,13 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
         private readonly ConfiguracaoServico cfgServico;
         private readonly IStorage storage;
         private readonly ITransmitirSefazCommand transmitir;
-        private readonly string _versao;
+        private const string VERSAO = "1.00";
 
         public CartaCorrecaoServico(ConfiguracaoServico cfgServico, IStorage storage, ITransmitirSefazCommand transmitir)
         {
             this.cfgServico = cfgServico;
             this.storage = storage;
             this.transmitir = transmitir;
-            _versao = "1.00";
         }
 
         public async Task<retEnvEvento> TransmitirCorrecao(InfoCartaCorrecao info)
@@ -68,16 +67,16 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
                     nSeqEvento = nSeqEvento,
                     tpAmb = cfgServico.TipoAmbiente,
                     tpEvento = eTipoEventoNFe.NFeCartaCorrecao,
-                    verEvento = _versao,
+                    verEvento = VERSAO,
                     detEvento = new detEvento()
                     {
-                        versao = _versao,
+                        versao = VERSAO,
                         descEvento = "Carta de Correcao",
                         xCorrecao = correcao,
                         
                     }
                 };
-                var evento = new evento { versao = _versao, infEvento = infEvento };
+                var evento = new evento { versao = VERSAO, infEvento = infEvento };
                 eventos.Add(evento);
             }
 
@@ -92,7 +91,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
 
             var pedEvento = new envEvento 
             {
-                versao = _versao,
+                versao = VERSAO,
                 idLote = 1,
                 evento = eventos
             };
