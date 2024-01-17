@@ -10,6 +10,7 @@ using FiscalCore.ValueObjects;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FiscalCore.Servicos.NotaFiscal
@@ -56,7 +57,7 @@ namespace FiscalCore.Servicos.NotaFiscal
             }
         }
 
-        public async Task<retConsSitNFe> ConsultarPelaChave(string chaveAcesso, string versao)
+        public async Task<retConsSitNFe> ConsultarPelaChave(string chaveAcesso, string versao, CancellationToken cancellation)
         {
             var chave = new ChaveFiscal(chaveAcesso);
             var consSit = new consSitNFe
@@ -69,7 +70,7 @@ namespace FiscalCore.Servicos.NotaFiscal
             var xmlEvento = XmlUtils.ClasseParaXmlString<consSitNFe>(consSit);
 
             var arqEnv = Path.Combine("Logs", $"{DateTime.Now.Ticks}-pedConsSitNFe.xml");
-            await storage.SaveAsync(arqEnv, xmlEvento);
+            await storage.SaveAsync(arqEnv, xmlEvento, cancellation);
 
             var modeloDoc = chave.Modelo;
 
@@ -82,7 +83,7 @@ namespace FiscalCore.Servicos.NotaFiscal
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retConsSitNFe").OuterXml;
 
             var arqRet = Path.Combine("Logs", $"{DateTime.Now.Ticks}-retConsSitNFe.xml");
-            await storage.SaveAsync(arqRet, retornoXmlStringLimpa);
+            await storage.SaveAsync(arqRet, retornoXmlStringLimpa, cancellation);
 
             var retEnvEvento = new retConsSitNFe().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 

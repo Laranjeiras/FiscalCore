@@ -8,6 +8,7 @@ using FiscalCore.Tipos;
 using FiscalCore.Fabrica;
 using AlgoPlus.Storage.Services;
 using System.IO;
+using System.Threading;
 
 namespace FiscalCore.Servicos
 {
@@ -26,7 +27,7 @@ namespace FiscalCore.Servicos
             this.versao = "4.00";
         }
 
-        public async Task<retConsSitNFe> ConsultarPelaChave(string chaveAcesso) 
+        public async Task<retConsSitNFe> ConsultarPelaChave(string chaveAcesso, CancellationToken cancellation) 
         {
             chaveAcesso = chaveAcesso.Replace("NFe", "");
             var consSit = new consSitNFe
@@ -39,7 +40,7 @@ namespace FiscalCore.Servicos
             var xmlEvento = XmlUtils.ClasseParaXmlString<consSitNFe>(consSit);
 
             var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("pedConsSitNFe.xml", cfgServico));
-            await storage.SaveAsync(arqEnv, xmlEvento);
+            await storage.SaveAsync(arqEnv, xmlEvento, cancellation);
 
             var modeloDoc = chaveAcesso.Substring(20, 2).ModeloDocumento();
 
@@ -51,7 +52,7 @@ namespace FiscalCore.Servicos
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retConsSitNFe").OuterXml;
 
             var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("retConsSitNFe.xml", cfgServico));
-            await storage.SaveAsync(arqRet, retornoXmlStringLimpa);
+            await storage.SaveAsync(arqRet, retornoXmlStringLimpa, cancellation);
 
             var retEnvEvento = new retConsSitNFe().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 

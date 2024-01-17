@@ -12,6 +12,7 @@ using FiscalCore.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FiscalCore.Servicos.DistribuicaoDFe
@@ -31,7 +32,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             this.nSeqEvento = 1;
         }
 
-        public async Task<retEnvEvento> ManifestarAsync(ChaveFiscal chaveNFe, eTipoEventoNFe tipoEvento, string justificativa = null)
+        public async Task<retEnvEvento> ManifestarAsync(ChaveFiscal chaveNFe, eTipoEventoNFe tipoEvento, string justificativa, CancellationToken cancellation)
         {
             if(tipoEvento != eTipoEventoNFe.CienciaOperacao 
                 && tipoEvento != eTipoEventoNFe.ConfirmacaoOperacao
@@ -42,9 +43,9 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             var xmlEvento = GerarXmlEvento(chaveNFe.Chave, tipoEvento, justificativa);
 
             var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ped-eve.xml", config));
-            await storage.SaveAsync(arqEnv, xmlEvento);
+            await storage.SaveAsync(arqEnv, xmlEvento, cancellation);
 
-            await storage.SaveAsync($"{DateTime.Now.Ticks}-ped-eve.xml", xmlEvento);
+            await storage.SaveAsync($"{DateTime.Now.Ticks}-ped-eve.xml", xmlEvento, cancellation);
 
             var validacao = new ValidarXml(eTipoServico.ManifestacaoDestinatario, config);
             validacao.Validar(xmlEvento);
@@ -57,7 +58,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             var xmlRetLimpo = Soap.LimparEnvelope(xmlRetorno, "retEnvEvento").OuterXml;
 
             var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ret-eve.xml", config));
-            await storage.SaveAsync(arqRet, xmlRetLimpo);
+            await storage.SaveAsync(arqRet, xmlRetLimpo, cancellation);
 
             var retEnvEvento = XmlUtils.XmlStringParaClasse<retEnvEvento>(xmlRetLimpo);
             return retEnvEvento;

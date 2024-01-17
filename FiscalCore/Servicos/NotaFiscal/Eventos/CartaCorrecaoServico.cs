@@ -10,6 +10,7 @@ using FiscalCore.Tipos;
 using System.IO;
 using AlgoPlus.Storage.Services;
 using FiscalCore.Exceptions;
+using System.Threading;
 
 namespace FiscalCore.Servicos.NotaFiscal.Eventos
 {
@@ -28,19 +29,20 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             _versao = "1.00";
         }
 
-        public async Task<retEnvEvento> TransmitirCorrecao(InfoCartaCorrecao info)
+        public async Task<retEnvEvento> TransmitirCorrecao(InfoCartaCorrecao info, CancellationToken cancellation)
         {
-            return await TransmitirCorrecao(new List<InfoCartaCorrecao> { info });
+            var infos = new List<InfoCartaCorrecao> { info };
+            var retorno = await TransmitirCorrecao(infos, cancellation);
+            return retorno;
         }
 
-        public async Task<retEnvEvento> TransmitirCorrecao(IList<InfoCartaCorrecao> infos) 
+        public async Task<retEnvEvento> TransmitirCorrecao(IList<InfoCartaCorrecao> infos, CancellationToken cancellation) 
         {
             if (infos == null || infos.Count <= 0)
                 throw new Exception("Informações da NFe não encontrada");
 
             if (infos.Count > 20)
                 throw new Exception("No máximo 20 NFes podem ser Corrigidas");
-
 
             List<evento> eventos = new List<evento>();
 
@@ -100,7 +102,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             var xmlEvento = XmlUtils.ClasseParaXmlString<envEvento>(pedEvento);
 
             var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ped-eve.xml", cfgServico));
-            await storage.SaveAsync(arqEnv, xmlEvento);
+            await storage.SaveAsync(arqEnv, xmlEvento, cancellation);
 
             var sefazUrl = Fabrica.FabricarUrl.ObterUrl(eTipoServico.CartaCorrecao, cfgServico.TipoAmbiente, eModeloDocumento.NFe, cfgServico.UF);
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.CartaCorrecao, xmlEvento);
@@ -110,7 +112,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retEnvEvento").OuterXml;
 
             var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ret-eve.xml", cfgServico));
-            await storage.SaveAsync(arqRet, retornoXmlStringLimpa);
+            await storage.SaveAsync(arqRet, retornoXmlStringLimpa, cancellation);
 
              var retorno = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 

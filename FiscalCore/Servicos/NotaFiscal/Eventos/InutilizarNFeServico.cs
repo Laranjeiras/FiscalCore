@@ -9,6 +9,7 @@ using FiscalCore.Tipos;
 using FiscalCore.Fabrica;
 using System.IO;
 using AlgoPlus.Storage.Services;
+using System.Threading;
 
 namespace FiscalCore.Servicos.NotaFiscal.Eventos
 {
@@ -25,7 +26,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             this.transmitir = transmitir;
         }
 
-        public async Task<retInutNFe> Inutilizar(int ano, eModeloDocumento modeloDocumento, int serie, int numeroInicial, int numeroFinal, string justificativa) 
+        public async Task<retInutNFe> Inutilizar(int ano, eModeloDocumento modeloDocumento, int serie, int numeroInicial, int numeroFinal, string justificativa, CancellationToken cancellation) 
         {
             var cnpj = cfgServico.Emitente.CNPJ ?? cfgServico.Emitente.CPF;
             var tpAmb = cfgServico.TipoAmbiente;
@@ -35,7 +36,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             var xmlInutilizacao = XmlUtils.ClasseParaXmlString<inutNFe>(pedInutilizacao);
 
             var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ped-inut.xml", cfgServico));
-            await storage.SaveAsync(arqEnv, xmlInutilizacao);
+            await storage.SaveAsync(arqEnv, xmlInutilizacao, cancellation);
 
             var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.InutilizacaoNFe, xmlInutilizacao);
             var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.InutilizacaoNFe, cfgServico.TipoAmbiente, modeloDocumento, cfgServico.UF);
@@ -43,7 +44,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             var retornoLimpo = Soap.LimparEnvelope(retornoXmlString, "retInutNFe").OuterXml;
 
             var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ret-inut.xml", cfgServico));
-            await storage.SaveAsync(arqRet, retornoLimpo);
+            await storage.SaveAsync(arqRet, retornoLimpo, cancellation);
 
             return XmlUtils.XmlStringParaClasse<retInutNFe>(retornoLimpo);
         }

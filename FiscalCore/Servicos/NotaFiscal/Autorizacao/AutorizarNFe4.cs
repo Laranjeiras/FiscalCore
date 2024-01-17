@@ -15,6 +15,7 @@ using FiscalCore.NotaFiscal;
 using FiscalCore.Exceptions;
 using Microsoft.Extensions.Logging;
 using FiscalCore.Servicos.NotaFiscal;
+using System.Threading;
 
 namespace FiscalCore.Servicos
 {
@@ -33,14 +34,14 @@ namespace FiscalCore.Servicos
             this.logger = logger;
         }
 
-        public async Task<IRetornoAutorizacao> Autorizar(NFe nfe, int idLote = 0)
+        public async Task<IRetornoAutorizacao> Autorizar(NFe nfe, CancellationToken cancellation, int idLote = 0)
         {
             logger.LogDebug("RECEBENDO NFe", nfe);
             var lista = new List<NFe> { nfe };
-            return  await Autorizar(lista, idLote);
+            return  await Autorizar(lista, cancellation, idLote);
         }
 
-        public async Task<IRetornoAutorizacao> Autorizar(IList<NFe> nfes, int idLote = 0)
+        public async Task<IRetornoAutorizacao> Autorizar(IList<NFe> nfes, CancellationToken cancellation, int idLote = 0)
         {
             logger.LogDebug($"RECEBENDO LISTA DE NFes TOTAL: {nfes.Count}");
 
@@ -94,14 +95,14 @@ namespace FiscalCore.Servicos
             var enviNFe = new enviNFe(versaoServico, idLote, eIndicadorSincronizacao.Sincrono, nfesAssinadas);
 
             var xmlEnviNFe = XmlUtils.ClasseParaXmlString<enviNFe>(enviNFe);
-            var retorno = await Autorizar(xmlEnviNFe, mod);
+            var retorno = await Autorizar(xmlEnviNFe, mod, cancellation);
             return retorno;
         }
 
-        private async Task<IRetornoAutorizacao> Autorizar(string xmlenviNFe4, eModeloDocumento modeloDocumento)
+        private async Task<IRetornoAutorizacao> Autorizar(string xmlenviNFe4, eModeloDocumento modeloDocumento, CancellationToken cancellation)
         {
             var arqEnv = Path.Combine("Logs", $"{DateTime.Now.Ticks}-env-nfe.xml");
-            await SalvarLog(arqEnv, xmlenviNFe4);
+            await SalvarLog(arqEnv, xmlenviNFe4, cancellation);
             
             var urlSefaz = Fabrica.FabricarUrl.ObterUrl(eTipoServico.AutorizarNFe, cfgServico.TipoAmbiente, modeloDocumento, cfgServico.UF);
             logger.LogDebug($"URL SEFAZ OBTIDA {urlSefaz.Url}");
@@ -115,17 +116,17 @@ namespace FiscalCore.Servicos
             var retornoLimpo = Soap.LimparEnvelope(retornoXmlString, "retEnviNFe").OuterXml;
                         
             var arqRet = Path.Combine("Logs", $"{DateTime.Now.Ticks}-ret-env-nfe.xml");
-            await SalvarLog(arqRet, retornoLimpo);           
+            await SalvarLog(arqRet, retornoLimpo, cancellation);           
 
             var retEnviNFe = new RetNFeAutorizacao4(retornoLimpo);
             retEnviNFe.XmlEnviado = xmlenviNFe4;
             return retEnviNFe;
         }
 
-        private async Task SalvarLog(string filename, string conteudo)
+        private async Task SalvarLog(string filename, string conteudo, CancellationToken cancellation)
         {
             logger.LogInformation($"SALVAR LOG XML {filename}");
-            var fileInfo = await storage.SaveAsync(filename, conteudo);
+            var fileInfo = await storage.SaveAsync(filename, conteudo, cancellation);
             logger.LogInformation($"LOG SALVO {fileInfo.AbsolutePath}");
         }
     }

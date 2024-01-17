@@ -10,6 +10,7 @@ using FiscalCore.ValueObjects;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FiscalCore.Servicos.DistribuicaoDFe
@@ -26,7 +27,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             this.logger = logger;
         }
 
-        public async Task<retDistDFeInt> ConsultarPorUltimoNSUAsync(string ultimoNsu, bool validarXmlConsulta = true)
+        public async Task<retDistDFeInt> ConsultarPorUltimoNSUAsync(string ultimoNsu, CancellationToken cancellation, bool validarXmlConsulta = true)
         {
             logger?.LogInformation($"CONSULTAR DOCUMENTOS DESTINADOS POR ÚLTIMO NSU [{ultimoNsu}]");
             
@@ -54,14 +55,14 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
                 TpAmb = Configuracao.TipoAmbiente
             };
 
-            var retDistDFeInt = await PrepararETransmitir(distDFeInt, validarXmlConsulta);
+            var retDistDFeInt = await PrepararETransmitir(distDFeInt, cancellation, validarXmlConsulta);
 
             logger?.LogInformation($"DOCUMENTOS CONSULTADO COM SUCESSO | ÚLTIMO NSU [{ultimoNsu}]");
 
             return retDistDFeInt;
         }
 
-        public async Task<retDistDFeInt> ConsultarPorNSUAsync(string nsu, bool validarXmlConsulta = true)
+        public async Task<retDistDFeInt> ConsultarPorNSUAsync(string nsu, CancellationToken cancellation, bool validarXmlConsulta = true)
         {
             logger?.LogInformation($"CONSULTAR DOCUMENTOS DESTINADOS POR NSU [{nsu}]");
             
@@ -81,14 +82,14 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
                 TpAmb = Configuracao.TipoAmbiente
             };
 
-            var retDistDFeInt = await PrepararETransmitir(distDFeInt, validarXmlConsulta);
+            var retDistDFeInt = await PrepararETransmitir(distDFeInt, cancellation, validarXmlConsulta);
 
             logger?.LogInformation($"DOCUMENTOS CONSULTADO COM SUCESSO | NSU [{nsu}]");
 
             return retDistDFeInt;
         }
 
-        public async Task<retDistDFeInt> ConsultarPorChaveAsync(ChaveFiscal chaveNFe, bool validarXmlConsulta = true)
+        public async Task<retDistDFeInt> ConsultarPorChaveAsync(ChaveFiscal chaveNFe, CancellationToken cancellation, bool validarXmlConsulta = true)
         {
             logger?.LogInformation($"CONSULTAR DOCUMENTOS DESTINADOS POR CHAVE [{chaveNFe.Chave}]");
 
@@ -104,33 +105,33 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
                 TpAmb = Configuracao.TipoAmbiente
             };
 
-            var retDistDFeInt = await PrepararETransmitir(distDFeInt, validarXmlConsulta);
+            var retDistDFeInt = await PrepararETransmitir(distDFeInt, cancellation, validarXmlConsulta);
 
             logger?.LogInformation($"DOCUMENTOS CONSULTADO COM SUCESSO | CHAVE [{chaveNFe}]");
 
             return retDistDFeInt;
         }
 
-        private async Task<retDistDFeInt> PrepararETransmitir(distDFeInt distDFeInt, bool validarXmlConsulta = true)
+        private async Task<retDistDFeInt> PrepararETransmitir(distDFeInt distDFeInt, CancellationToken cancellation, bool validarXmlConsulta = true)
         {
 
             var xml = XmlUtils.ClasseParaXmlString<distDFeInt>(distDFeInt);
-
-            logger.LogDebug($"VALIDANDO XML");
+            
 
             if (validarXmlConsulta)
             {
+                logger.LogDebug($"VALIDANDO XML");
                 var validacao = new ValidarXml(eTipoServico.NFeDistribuicaoDFe, Configuracao);
                 validacao.Validar(xml);
                 if (!validacao.Valido)
                 {
                     throw new FalhaValidacaoException(validacao.ToString());
                 }
+                logger.LogDebug($"XML VALIDADO COM SUCESSO");
             }
-            logger.LogDebug($"XML VALIDADO");
 
             var arqEnv = Path.Combine("Logs", $"{Configuracao.CNPJEmitente}-{DateTime.Now.Ticks}-ped-DistDFeInt.xml");
-            await SalvarLog(arqEnv, xml);
+            await SalvarLog(arqEnv, xml, cancellation);
 
             logger.LogDebug($"FABRICAR ENVELOPE");
             var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.NFeDistribuicaoDFe, xml);
@@ -147,7 +148,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             logger.LogDebug($"ENVELOPE LIMPO");
 
             var arqRet = Path.Combine("Logs", $"{Configuracao.CNPJEmitente}-{DateTime.Now.Ticks}-retDistDFeInt.xml");
-            await storage.SaveAsync(arqRet, retornoLimpo);
+            await storage.SaveAsync(arqRet, retornoLimpo,cancellation);
 
             logger.LogDebug($"DESERIALIZANDO XML");
             var retDistDFeInt = XmlUtils.XmlStringParaClasse<retDistDFeInt>(retornoLimpo);
@@ -156,7 +157,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             return retDistDFeInt;
         }
 
-        private async Task SalvarLog(string filename, string conteudo)
+        private async Task SalvarLog(string filename, string conteudo, CancellationToken cancellation)
         {
             if (storage == null)
             {
@@ -164,7 +165,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             }
 
             logger.LogInformation($"SALVAR LOG XML {filename}");
-            var fileInfo = await storage.SaveAsync(filename, conteudo);
+            var fileInfo = await storage.SaveAsync(filename, conteudo, cancellation);
             logger.LogInformation($"LOG SALVO {fileInfo.AbsolutePath}");
         }
     }
