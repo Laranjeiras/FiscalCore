@@ -3,7 +3,6 @@ using FiscalCore.Configuracoes;
 using FiscalCore.Extensions;
 using FiscalCore.Modelos.Consulta;
 using FiscalCore.Modelos.Retornos;
-using FiscalCore.Servicos.NotaFiscal.Eventos;
 using FiscalCore.Tipos;
 using FiscalCore.Utils;
 using FiscalCore.ValueObjects;
@@ -15,47 +14,15 @@ using System.Threading.Tasks;
 
 namespace FiscalCore.Servicos.NotaFiscal
 {
-    public class NotaFiscalServico : BaseSefazServico
+    public class NotaFiscalServico : BaseSefazServico<NotaFiscalServico>
     {
-        public NotaFiscalServico(ConfiguracaoServico configuracao, IStorageContext storage, ITransmitirSefazCommand transmitir, ILogger<NotaFiscalServico> logger) : base(configuracao, transmitir)
+        public NotaFiscalServico(ConfiguracaoServico configuracao, IAutorizarNFeServico nfeServico, IStorageContext storageContext, ITransmitirSefazCommand transmitir, ILogger<NotaFiscalServico> logger) 
+            : base(configuracao, transmitir, logger, storageContext)
         {
-            if (configuracao.VersaoAutorizacaoNFe == eVersaoServico.Versao400)
-                autorizarNFe = new AutorizarNFe4(configuracao, transmitir, storage, logger);
-            else
-                throw new NotImplementedException("Versão de autorização da NFe não suportada");
-            this.storageContext = storage;
-            this.logger = logger;
+            this.AutorizarNFe = nfeServico;
         }
 
-        private readonly IStorageContext storageContext;
-        private readonly ILogger logger;
-
-        private IStorage storage => storageContext.GetStorage("FiscalCore");
-        private readonly IAutorizarNFeServico autorizarNFe;
-        public IAutorizarNFeServico AutorizarNFe => autorizarNFe;
-        
-
-        private CancelarNFeServico cancelarNFe;
-        public CancelarNFeServico CancelarNFe
-        {
-            get
-            {
-                if (cancelarNFe == null)
-                    cancelarNFe = new CancelarNFeServico(Configuracao, storageContext, Transmitir);
-                return cancelarNFe;
-            }
-        }
-
-        private ComprovanteEntregaNFeServico eventoComprovanteEntregaNFe;
-        public ComprovanteEntregaNFeServico EventoComprovateEntregaNFe
-        {
-            get
-            {
-                if (eventoComprovanteEntregaNFe == null)
-                    eventoComprovanteEntregaNFe = new ComprovanteEntregaNFeServico(Configuracao, Transmitir);
-                return eventoComprovanteEntregaNFe;
-            }
-        }
+        public IAutorizarNFeServico AutorizarNFe { get; private set; }
 
         public async Task<retConsSitNFe> ConsultarPelaChave(string chaveAcesso, string versao, CancellationToken cancellation)
         {
@@ -63,54 +30,31 @@ namespace FiscalCore.Servicos.NotaFiscal
             var consSit = new consSitNFe
             {
                 chNFe = chaveAcesso,
-                tpAmb = Configuracao.TipoAmbiente,
+                tpAmb = configuracao.TipoAmbiente,
                 versao = versao
             };
 
             var xmlEvento = XmlUtils.ClasseParaXmlString<consSitNFe>(consSit);
 
             var arqEnv = Path.Combine("Logs", $"{DateTime.Now.Ticks}-pedConsSitNFe.xml");
-            await storage.SaveAsync(arqEnv, xmlEvento, cancellation);
+            await SalvarLog(arqEnv, xmlEvento, cancellation);
 
             var modeloDoc = chave.Modelo;
 
-            var sefazUrl = Fabrica.FabricarUrl.ObterUrl(eTipoServico.ConsultaSituacaoNFe, Configuracao.TipoAmbiente, modeloDoc, Configuracao.UF);
+            var sefazUrl = Fabrica.FabricarUrl.ObterUrl(eTipoServico.ConsultaSituacaoNFe, configuracao.TipoAmbiente, modeloDoc, configuracao.UF);
 
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.ConsultaSituacaoNFe, xmlEvento);
 
-            var retornoXmlString = await Transmitir.TransmitirAsync(sefazUrl, envelope);
+            var retornoXmlString = await transmitir.TransmitirAsync(sefazUrl, envelope);
 
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retConsSitNFe").OuterXml;
 
             var arqRet = Path.Combine("Logs", $"{DateTime.Now.Ticks}-retConsSitNFe.xml");
-            await storage.SaveAsync(arqRet, retornoXmlStringLimpa, cancellation);
+            await SalvarLog(arqRet, retornoXmlStringLimpa, cancellation);
 
             var retEnvEvento = new retConsSitNFe().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 
             return retEnvEvento;
-        }
-
-        private CartaCorrecaoServico cartaCorrecaoServico;
-        public CartaCorrecaoServico CartaCorrecaoServico
-        {
-            get
-            {
-                if (cartaCorrecaoServico == null)
-                    cartaCorrecaoServico = new CartaCorrecaoServico(Configuracao, storage, Transmitir);
-                return cartaCorrecaoServico;
-            }
-        }
-
-        private InutilizarNFeServico inutilizarNFeServico;
-        
-        public InutilizarNFeServico InutilizarNFeServico
-        {
-            get
-            {
-                if (inutilizarNFeServico == null)
-                    inutilizarNFeServico = new InutilizarNFeServico(Configuracao, storage, Transmitir);
-                return inutilizarNFeServico;
-            }
         }
     }
 }

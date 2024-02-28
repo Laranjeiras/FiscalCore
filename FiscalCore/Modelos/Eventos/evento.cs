@@ -22,5 +22,8 @@ namespace FiscalCore.Modelos.Eventos
         /// </summary>
         [XmlElement(Namespace = "http://www.w3.org/2000/09/xmldsig#")]
         public Signature Signature { get; set; }
+
+        public static evento CriarEvento(string versao, infEventoEnv infEvento) => 
+            new evento { versao = versao, infEvento = infEvento };
     }
 }

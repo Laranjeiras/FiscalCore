@@ -24,5 +24,13 @@ namespace FiscalCore.Modelos.Eventos
         /// </summary>
         [XmlElement("evento")]
         public List<evento> evento { get; set; }
+
+        public static envEvento Criar(string versao, int idLote, evento evento) =>
+            new envEvento
+            {
+                versao = versao,
+                idLote = idLote,
+                evento = new List<evento> { evento }
+            };
     }
 }
