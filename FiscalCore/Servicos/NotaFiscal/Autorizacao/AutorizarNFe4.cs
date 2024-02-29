@@ -5,33 +5,22 @@ using System;
 using FiscalCore.Extensions;
 using System.Collections.Generic;
 using System.Linq;
-using FiscalCore.Validacoes;
 using System.Threading.Tasks;
 using FiscalCore.Tipos;
 using AlgoPlus.Storage.Services;
 using System.IO;
 using FiscalCore.NotaFiscal.RetornoServicos.Autorizacao;
 using FiscalCore.NotaFiscal;
-using FiscalCore.Exceptions;
 using Microsoft.Extensions.Logging;
-using FiscalCore.Servicos.NotaFiscal;
 using System.Threading;
 
 namespace FiscalCore.Servicos
 {
-    public class AutorizarNFe4 : IAutorizarNFeServico
+    public class AutorizarNFe4 : BaseSefazServico<AutorizarNFe4>, IAutorizarNFeServico
     {
-        private readonly ConfiguracaoServico cfgServico;
-        private readonly ITransmitirSefazCommand transmitir;
-        private readonly IStorage storage;
-        private readonly ILogger<NotaFiscalServico> logger;
-
-        public AutorizarNFe4(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir, IStorageContext storage, ILogger<NotaFiscalServico> logger)
+        public AutorizarNFe4(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir, IStorageContext storageContext, ILogger<AutorizarNFe4> logger)
+            : base(cfgServico, transmitir, logger, storageContext)
         {
-            this.cfgServico = cfgServico;
-            this.transmitir = transmitir;
-            this.storage = storage.GetStorage("FiscalCore");
-            this.logger = logger;
         }
 
         public async Task<IRetornoAutorizacao> Autorizar(NFe nfe, CancellationToken cancellation, int idLote = 0)
@@ -47,13 +36,13 @@ namespace FiscalCore.Servicos
 
             logger.LogDebug($"TRATAR NFes");
 
-            new TratarNFeAutorizacao(ref nfes, cfgServico)
+            new TratarNFeAutorizacao(ref nfes, configuracao)
                 .Tratar();
 
             logger.LogDebug($"NFes TRATADAS");
             logger.LogDebug($"VALIDAR NFes");
 
-            new ValidarNFeAutorizacao(nfes, cfgServico)
+            new ValidarNFeAutorizacao(nfes, configuracao)
                 .Validar();
 
             logger.LogDebug($"NFes VALIDADAS");
@@ -69,17 +58,15 @@ namespace FiscalCore.Servicos
 
             foreach (var nfe in nfes)
             {
-                var nfeAssinada = nfe.Assinar(cfgServico.ConfigCertificado.Certificado);
+                var nfeAssinada = nfe.Assinar(configuracao.ConfigCertificado.Certificado);
                 var xml = XmlUtils.ClasseParaXmlString<NFe>(nfeAssinada);
                 xml = xml.Replace("xmlns=\"http://www.portalfiscal.inf.br/nfe\"", string.Empty);
 
                 logger.LogInformation($"NFe [{nfeAssinada.infNFe.Id}] ASSINADA");
 
-                var validacao = new ValidarXml(eTipoServico.AutorizarNFe, cfgServico);
-                validacao.Validar(xml);
-                if (!validacao.Valido)
-                {   
-                    throw new FalhaValidacaoException(validacao.ToString());
+                if (configuracao.ValidarXmlSchema)
+                {
+                    ValidarXml(eTipoServico.AutorizarNFe, configuracao, xml);
                 }
 
                 logger.LogInformation($"NFe [{nfeAssinada.infNFe.Id}] VALIDADA");
@@ -91,7 +78,7 @@ namespace FiscalCore.Servicos
                 .Distinct()
                 .SingleOrDefault();
                 
-            var versaoServico = cfgServico.VersaoAutorizacaoNFe.Descricao();
+            var versaoServico = configuracao.VersaoAutorizacaoNFe.Descricao();
             var enviNFe = new enviNFe(versaoServico, idLote, eIndicadorSincronizacao.Sincrono, nfesAssinadas);
 
             var xmlEnviNFe = XmlUtils.ClasseParaXmlString<enviNFe>(enviNFe);
@@ -104,7 +91,7 @@ namespace FiscalCore.Servicos
             var arqEnv = Path.Combine("Logs", $"{DateTime.Now.Ticks}-env-nfe.xml");
             await SalvarLog(arqEnv, xmlenviNFe4, cancellation);
             
-            var urlSefaz = Fabrica.FabricarUrl.ObterUrl(eTipoServico.AutorizarNFe, cfgServico.TipoAmbiente, modeloDocumento, cfgServico.UF);
+            var urlSefaz = Fabrica.FabricarUrl.ObterUrl(eTipoServico.AutorizarNFe, configuracao.TipoAmbiente, modeloDocumento, configuracao.UF);
             logger.LogDebug($"URL SEFAZ OBTIDA {urlSefaz.Url}");
 
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.AutorizarNFe, xmlenviNFe4);
@@ -121,13 +108,6 @@ namespace FiscalCore.Servicos
             var retEnviNFe = new RetNFeAutorizacao4(retornoLimpo);
             retEnviNFe.XmlEnviado = xmlenviNFe4;
             return retEnviNFe;
-        }
-
-        private async Task SalvarLog(string filename, string conteudo, CancellationToken cancellation)
-        {
-            logger.LogInformation($"SALVAR LOG XML {filename}");
-            var fileInfo = await storage.SaveAsync(filename, conteudo, cancellation);
-            logger.LogInformation($"LOG SALVO {fileInfo.AbsolutePath}");
         }
     }
 }

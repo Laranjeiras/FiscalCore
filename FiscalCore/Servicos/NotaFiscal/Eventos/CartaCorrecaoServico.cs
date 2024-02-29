@@ -11,22 +11,21 @@ using System.IO;
 using AlgoPlus.Storage.Services;
 using FiscalCore.Exceptions;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace FiscalCore.Servicos.NotaFiscal.Eventos
 {
-    public class CartaCorrecaoServico : IEventoServico
+    public class CartaCorrecaoServico : BaseSefazServico<CartaCorrecaoServico>, IEventoServico
     {
         private readonly ConfiguracaoServico cfgServico;
-        private readonly IStorage storage;
         private readonly ITransmitirSefazCommand transmitir;
-        private readonly string _versao;
+        private readonly string _versao = "1.00";
 
-        public CartaCorrecaoServico(ConfiguracaoServico cfgServico, IStorage storage, ITransmitirSefazCommand transmitir)
+        public CartaCorrecaoServico(ConfiguracaoServico cfgServico, IStorageContext storageContext, ITransmitirSefazCommand transmitir, ILogger<CartaCorrecaoServico> logger)
+            : base(cfgServico, transmitir, logger, storageContext)
         {
             this.cfgServico = cfgServico;
-            this.storage = storage;
             this.transmitir = transmitir;
-            _versao = "1.00";
         }
 
         public async Task<retEnvEvento> TransmitirCorrecao(InfoCartaCorrecao info, CancellationToken cancellation)
@@ -102,7 +101,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             var xmlEvento = XmlUtils.ClasseParaXmlString<envEvento>(pedEvento);
 
             var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ped-eve.xml", cfgServico));
-            await storage.SaveAsync(arqEnv, xmlEvento, cancellation);
+            await SalvarLog(arqEnv, xmlEvento, cancellation);
 
             var sefazUrl = Fabrica.FabricarUrl.ObterUrl(eTipoServico.CartaCorrecao, cfgServico.TipoAmbiente, eModeloDocumento.NFe, cfgServico.UF);
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.CartaCorrecao, xmlEvento);
@@ -112,7 +111,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retEnvEvento").OuterXml;
 
             var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ret-eve.xml", cfgServico));
-            await storage.SaveAsync(arqRet, retornoXmlStringLimpa, cancellation);
+            await SalvarLog(arqRet, retornoXmlStringLimpa, cancellation);
 
              var retorno = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 

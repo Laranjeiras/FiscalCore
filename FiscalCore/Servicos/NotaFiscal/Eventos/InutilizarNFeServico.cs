@@ -3,58 +3,49 @@ using FiscalCore.Extensions;
 using FiscalCore.Modelos.Inutilizacao;
 using FiscalCore.Modelos.Retornos;
 using FiscalCore.Utils;
-using System;
 using System.Threading.Tasks;
 using FiscalCore.Tipos;
 using FiscalCore.Fabrica;
 using System.IO;
 using AlgoPlus.Storage.Services;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace FiscalCore.Servicos.NotaFiscal.Eventos
 {
-    public class InutilizarNFeServico : IEventoServico
+    public class InutilizarNFeServico : BaseSefazServico<InutilizarNFeServico>, IEventoServico
     {
-        private ConfiguracaoServico cfgServico;
-        private readonly IStorage storage;
-        private readonly ITransmitirSefazCommand transmitir;
-
-        public InutilizarNFeServico(ConfiguracaoServico cfgServico, IStorage storage, ITransmitirSefazCommand transmitir)
+        public InutilizarNFeServico(ConfiguracaoServico cfgServico, IStorageContext storageContext, ITransmitirSefazCommand transmitir, ILogger<InutilizarNFeServico> logger) 
+            : base(cfgServico, transmitir, logger, storageContext) 
         {
-            this.cfgServico = cfgServico;
-            this.storage = storage;
-            this.transmitir = transmitir;
         }
 
         public async Task<retInutNFe> Inutilizar(int ano, eModeloDocumento modeloDocumento, int serie, int numeroInicial, int numeroFinal, string justificativa, CancellationToken cancellation) 
         {
-            var cnpj = cfgServico.Emitente.CNPJ ?? cfgServico.Emitente.CPF;
-            var tpAmb = cfgServico.TipoAmbiente;
-            var uf = cfgServico.UF;
+            var cnpj = configuracao.Emitente.CNPJ ?? configuracao.Emitente.CPF;
+            var tpAmb = configuracao.TipoAmbiente;
+            var uf = configuracao.UF;
             var pedInutilizacao = FabricarInutNFe(tpAmb, uf, ano, cnpj, modeloDocumento, serie, numeroInicial, numeroFinal, justificativa);
                         
             var xmlInutilizacao = XmlUtils.ClasseParaXmlString<inutNFe>(pedInutilizacao);
 
-            var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ped-inut.xml", cfgServico));
-            await storage.SaveAsync(arqEnv, xmlInutilizacao, cancellation);
+            var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ped-inut.xml", configuracao));
+            await SalvarLog(arqEnv, xmlInutilizacao, cancellation);
 
             var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.InutilizacaoNFe, xmlInutilizacao);
-            var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.InutilizacaoNFe, cfgServico.TipoAmbiente, modeloDocumento, cfgServico.UF);
+            var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.InutilizacaoNFe, configuracao.TipoAmbiente, modeloDocumento, configuracao.UF);
             var retornoXmlString = await transmitir.TransmitirAsync(sefazUrl, envelope);
             var retornoLimpo = Soap.LimparEnvelope(retornoXmlString, "retInutNFe").OuterXml;
 
-            var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ret-inut.xml", cfgServico));
-            await storage.SaveAsync(arqRet, retornoLimpo, cancellation);
+            var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ret-inut.xml", configuracao));
+            await SalvarLog(arqRet, retornoLimpo, cancellation);
 
             return XmlUtils.XmlStringParaClasse<retInutNFe>(retornoLimpo);
         }
 
         private inutNFe FabricarInutNFe(eTipoAmbiente tpAmb, eUF uf, int ano, string cnpj, eModeloDocumento modelo, int serie, int numeroInicial, int numeroFinal, string justificativa)
         {
-            //Zion.Common.Assertions.ZionAssertion.StringHasMinLen(justificativa, 15, "Justificativa deve conter entre 15 e 255 caracteres");
-            //Zion.Common.Assertions.ZionAssertion.StringHasMaxLen(justificativa, 255, "Justificativa deve conter entre 15 e 255 caracteres");
-
-            string versaoServico = cfgServico.VersaoInutilizacaoNFe.Descricao();
+            string versaoServico = configuracao.VersaoInutilizacaoNFe.Descricao();
 
             var pedInutilizacao = new inutNFe
             {
@@ -83,7 +74,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             );
             pedInutilizacao.infInut.Id = "ID" + numId;
 
-            pedInutilizacao.Assinar(cfgServico.ConfigCertificado.Certificado);
+            pedInutilizacao.Assinar(configuracao.ConfigCertificado.Certificado);
 
             return pedInutilizacao;
         }

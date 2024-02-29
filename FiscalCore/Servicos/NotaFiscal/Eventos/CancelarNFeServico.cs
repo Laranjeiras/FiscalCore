@@ -7,28 +7,22 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FiscalCore.Tipos;
-using FiscalCore.ValueObjects;
 using System.Linq;
 using AlgoPlus.Storage.Services;
 using System.IO;
 using FiscalCore.Exceptions;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace FiscalCore.Servicos.NotaFiscal.Eventos
 {
-    public class CancelarNFeServico : IEventoServico
+    public class CancelarNFeServico : BaseSefazServico<CancelarNFeServico>, IEventoServico
     {
-        private readonly ConfiguracaoServico cfgServico;
-        private readonly IStorage storage;
-        private readonly ITransmitirSefazCommand transmitir;
-        string versao;
+        private const string versao = "1.00";
 
-        public CancelarNFeServico(ConfiguracaoServico cfgServico, IStorageContext storage, ITransmitirSefazCommand transmitir)
+        public CancelarNFeServico(ConfiguracaoServico cfgServico, IStorageContext storage, ITransmitirSefazCommand transmitir, ILogger<CancelarNFeServico> logger)
+            :base(cfgServico, transmitir, logger, storage)
         {
-            this.cfgServico = cfgServico;
-            this.storage = storage.GetStorage("FiscalCore");
-            this.transmitir = transmitir;
-            versao = "1.00";
         }
 
         public async Task<retEnvEvento> Cancelar(InfoNFeCancelar infoNFe, CancellationToken cancellation) =>
@@ -69,8 +63,8 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
 
                 var infEvento = new infEventoEnv
                 {
-                    cOrgao = cfgServico.UF,
-                    tpAmb = cfgServico.TipoAmbiente,
+                    cOrgao = configuracao.UF,
+                    tpAmb = configuracao.TipoAmbiente,
                     chNFe = chave.Chave,
                     dhEvento = DateTime.Now,
                     tpEvento = eTipoEventoNFe.NFeCancelamento,
@@ -79,10 +73,10 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
                     detEvento = detEvento
                 };
 
-                if (!string.IsNullOrEmpty(cfgServico.Emitente.CNPJ))
-                    infEvento.CNPJ = cfgServico.Emitente.CNPJ;
+                if (!string.IsNullOrEmpty(configuracao.Emitente.CNPJ))
+                    infEvento.CNPJ = configuracao.Emitente.CNPJ;
                 else
-                    infEvento.CPF = cfgServico.Emitente.CPF;
+                    infEvento.CPF = configuracao.Emitente.CPF;
 
                 var evento = new evento { versao = versao, infEvento = infEvento };
                 eventos.Add(evento);
@@ -104,16 +98,16 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
                 eventoTmp.infEvento.Id = "ID" + ((int)eventoTmp.infEvento.tpEvento) + eventoTmp.infEvento.chNFe +
                                       eventoTmp.infEvento.nSeqEvento.ToString().PadLeft(2, '0');
 
-                var _certificado = cfgServico.ConfigCertificado.Certificado;
-                eventoTmp.Assinar(_certificado, cfgServico.ConfigCertificado.SignatureMethodSignedXml, cfgServico.ConfigCertificado.DigestMethodReference);
+                var _certificado = configuracao.ConfigCertificado.Certificado;
+                eventoTmp.Assinar(_certificado, configuracao.ConfigCertificado.SignatureMethodSignedXml, configuracao.ConfigCertificado.DigestMethodReference);
             }
 
             var xmlEvento = XmlUtils.ClasseParaXmlString<envEvento>(pedEvento);
 
             var arqEnv = Path.Combine("Logs", $"{DateTime.Now.Ticks}-ped-eve.xml");
-            await storage.SaveAsync(arqEnv, xmlEvento, cancellation);
+            await SalvarLog(arqEnv, xmlEvento, cancellation);
 
-            var sefazUrl = Fabrica.FabricarUrl.ObterUrl(eTipoServico.CancelarNFe, cfgServico.TipoAmbiente, modeloDoc, cfgServico.UF);
+            var sefazUrl = Fabrica.FabricarUrl.ObterUrl(eTipoServico.CancelarNFe, configuracao.TipoAmbiente, modeloDoc, configuracao.UF);
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.CancelarNFe, xmlEvento);
 
             var retornoXmlString = await transmitir.TransmitirAsync(sefazUrl, envelope);
@@ -121,25 +115,11 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retEnvEvento").OuterXml;
 
             var arqRet = Path.Combine("Logs", $"{DateTime.Now.Ticks}-ret-eve.xml");
-            await storage.SaveAsync(arqRet, retornoXmlStringLimpa, cancellation);
+            await SalvarLog(arqRet, retornoXmlStringLimpa, cancellation);
 
             var retEnvEvento = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 
             return retEnvEvento;
-        }
-    }
-
-    public class InfoNFeCancelar
-    {
-        public ChaveFiscal ChaveAcesso { get; private set; }
-        public ProtocoloAutorizacao ProtocoloAutorizacao { get; private set; }
-        public string Justificativa { get; private set; }
-
-        public InfoNFeCancelar(ChaveFiscal chaveAcesso, ProtocoloAutorizacao protocoloAutorizacao, string justificativa = "Nota Fiscal Emitida Indevidamente")
-        {
-            ChaveAcesso = chaveAcesso ?? throw new ArgumentNullException(nameof(chaveAcesso));
-            ProtocoloAutorizacao = protocoloAutorizacao ?? throw new ArgumentNullException(nameof(protocoloAutorizacao));
-            Justificativa = justificativa;
         }
     }
 }

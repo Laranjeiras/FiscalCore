@@ -31,29 +31,35 @@ namespace FiscalCore.Servicos
             Soap.InserirSoapEnvelopeWebRequest(envelope, webRequest);
 
             logger?.LogDebug("CARREGANDO INFORMAÇÕES DO CERTIFICADO");
+            TemCertificado(configuracao);
+            webRequest.ClientCertificates.Add(configuracao.ConfigCertificado.Certificado);
+            logger?.LogDebug("INFORMAÇÕES DO CERTIFICADO CARREGADAS");
 
-            if(configuracao?.ConfigCertificado?.Certificado == null)
+            logger?.LogDebug("TRANSMITINDO...");
+            var soapResult = await GetResponse(webRequest);
+            logger?.LogInformation($"ENCERRANDO TRANSMISSÃO SEFAZ");
+
+            return soapResult;
+        }
+
+        private static void TemCertificado(ConfiguracaoBasicaServico configuracao)
+        {
+            if (configuracao?.ConfigCertificado?.Certificado == null)
             {
                 throw new ArgumentNullException("NÁO FOI POSSÍVEL CARREGAR CONFIGURAÇÕES DO CERTIFICADO");
             }
+        }
 
-            webRequest.ClientCertificates.Add(configuracao.ConfigCertificado.Certificado);
-
-            logger?.LogDebug("INFORMAÇÕES DO CERTIFICADO CARREGADAS");
-
+        private static async Task<string> GetResponse(HttpWebRequest webRequest)
+        {
             IAsyncResult asyncResult = webRequest.BeginGetResponse(null, null);
-
-            logger?.LogDebug("TRANSMITINDO...");
 
             string soapResult;
             using (WebResponse webResponse = webRequest.EndGetResponse(asyncResult))
             {
                 using StreamReader rd = new StreamReader(webResponse.GetResponseStream());
-                    soapResult = await rd.ReadToEndAsync();
+                soapResult = await rd.ReadToEndAsync();
             }
-
-            logger?.LogInformation($"ENCERRANDO TRANSMISSÃO SEFAZ");
-
             return soapResult;
         }
     }

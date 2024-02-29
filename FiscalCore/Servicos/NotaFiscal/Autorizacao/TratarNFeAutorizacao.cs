@@ -21,7 +21,7 @@ namespace FiscalCore.Servicos
         {
             foreach (var nfe in nfes)
             {
-                // Não contribuinte o indFInal tem que ser o COnsumidor Final
+                // Não contribuinte o indFInal tem que ser o Consumidor Final
                 if (nfe.infNFe.dest?.indIEDest == indIEDest.NaoContribuinte)
                     nfe.infNFe.ide.indFinal = eConsumidorFinal.Sim;
 
@@ -32,7 +32,6 @@ namespace FiscalCore.Servicos
                         det.imposto.IPI = null;
                     }
                 }
-
 
                 if (nfe.infNFe.ide.tpAmb == eTipoAmbiente.Homologacao)
                 {
