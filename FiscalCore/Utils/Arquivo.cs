@@ -30,6 +30,11 @@ namespace FiscalCore.Utils
             return $"{config.Emitente.CNPJ ?? config.Emitente.CPF}-{DateTime.Now.Ticks}-{sufixo}";
         }
 
+        public static string MontarNomeArquivo(string sufixo, ConfiguracaoBasicaServico config)
+        {
+            return $"{config.CNPJEmitente}-{DateTime.Now.Ticks}-{sufixo}";
+        }
+
         public static string CriarDiretorioSeNaoExistir(string diretorio)
         {
             if (diretorio == null)

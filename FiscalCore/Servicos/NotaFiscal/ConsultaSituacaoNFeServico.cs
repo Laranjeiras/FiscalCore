@@ -10,25 +10,26 @@ using AlgoPlus.Storage.Services;
 using System.IO;
 using System.Threading;
 using Microsoft.Extensions.Logging;
+using FiscalCore.ValueObjects;
 
 namespace FiscalCore.Servicos
 {
-    public class ConsultaSituacaoNFeServico : BaseSefazServico<ConsultaSituacaoNFeServico>
+    public class ConsultaSituacaoNFeServico : BaseSefazServicoBasico<ConsultaSituacaoNFeServico>
     {
         private const string versao= "4.00";
 
-        public ConsultaSituacaoNFeServico(ConfiguracaoServico cfgServico, IStorageContext storage, ITransmitirSefazCommand transmitir, ILogger<ConsultaSituacaoNFeServico> logger)
+        public ConsultaSituacaoNFeServico(ConfiguracaoBasicaServico cfgServico, IStorageContext storage, ITransmitirSefazCommand transmitir, ILogger<ConsultaSituacaoNFeServico> logger)
             :base(cfgServico, transmitir, logger, storage)
         {
         }
 
-        public async Task<retConsSitNFe> ConsultarPelaChave(string chaveAcesso, CancellationToken cancellation) 
+        public async Task<retConsSitNFe> ConsultarPelaChave(ChaveFiscal chaveAcesso, CancellationToken cancellation) 
         {
-            chaveAcesso = chaveAcesso.Replace("NFe", "");
+            //chaveAcesso = chaveAcesso.Replace("NFe", "");
 
             var consSit = new consSitNFe
             {
-                chNFe = chaveAcesso,
+                chNFe = chaveAcesso.Chave,
                 tpAmb = configuracao.TipoAmbiente,
                 versao = versao
             };
@@ -38,7 +39,7 @@ namespace FiscalCore.Servicos
             var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("pedConsSitNFe.xml", configuracao));
             await SalvarLog(arqEnv, xmlEvento, cancellation);
 
-            var modeloDoc = chaveAcesso.Substring(20, 2).ModeloDocumento();
+            var modeloDoc = chaveAcesso.Modelo;
 
             var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.ConsultaSituacaoNFe, configuracao.TipoAmbiente, modeloDoc, configuracao.UF);
             var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.ConsultaSituacaoNFe, xmlEvento);
