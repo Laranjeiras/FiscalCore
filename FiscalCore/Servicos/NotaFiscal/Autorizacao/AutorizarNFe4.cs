@@ -50,7 +50,7 @@ namespace FiscalCore.Servicos
             if (idLote <= 0)
                 idLote = new Random().Next(10000000, 99999999);
 
-            logger?.LogInformation($"NUMERO LOTE: {idLote}");
+            logger?.LogDebug($"NUMERO LOTE: {idLote}");
 
             var nfesAssinadas = nfes
                 .Select(ValidarEAssinar)
@@ -74,18 +74,18 @@ namespace FiscalCore.Servicos
 
         public NFe ValidarEAssinar(NFe nfe)
         {
-            logger?.LogInformation("ASSINAR NFe");
+            logger?.LogDebug("ASSINAR NFe");
 
             var nfeAssinada = nfe.Assinar(configuracao.ConfigCertificado.Certificado);
             var xml = XmlUtils.ClasseParaXmlString<NFe>(nfeAssinada);
             xml = xml.Replace("xmlns=\"http://www.portalfiscal.inf.br/nfe\"", string.Empty);
 
-            logger.LogInformation($"NFe [{nfe.infNFe.Id}] ASSINADA");
+            logger.LogDebug($"NFe [{nfe.infNFe.Id}] ASSINADA");
 
             if (configuracao.ValidarXmlSchema)
             {
                 ValidarXml(eTipoServico.AutorizarNFe, configuracao, xml);
-                logger?.LogInformation($"NFe [{nfeAssinada.infNFe.Id}] VALIDADA");
+                logger?.LogDebug($"NFe [{nfeAssinada.infNFe.Id}] VALIDADA");
             }
 
             return nfeAssinada;

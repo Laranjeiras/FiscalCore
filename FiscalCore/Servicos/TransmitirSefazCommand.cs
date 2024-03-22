@@ -24,7 +24,7 @@ namespace FiscalCore.Servicos
 
         public virtual async Task<string> TransmitirAsync(UrlSefaz sefazUrl, XmlDocument envelope)
         {
-            logger?.LogInformation($"INICIANDO TRANSMISSÃO SEFAZ [{sefazUrl.Url}]");
+            logger?.LogDebug($"INICIANDO TRANSMISSÃO SEFAZ [{sefazUrl.Url}]");
 
             HttpWebRequest webRequest = SoapEnvelopeFabrica.CriarWebRequest(sefazUrl.Url, "application/soap+xml;charset=utf-8");
 
@@ -37,7 +37,7 @@ namespace FiscalCore.Servicos
 
             logger?.LogDebug("TRANSMITINDO...");
             var soapResult = await GetResponse(webRequest);
-            logger?.LogInformation($"ENCERRANDO TRANSMISSÃO SEFAZ");
+            logger?.LogDebug($"ENCERRANDO TRANSMISSÃO SEFAZ");
 
             return soapResult;
         }

@@ -51,10 +51,10 @@ namespace FiscalCore.Servicos
         {
             try
             {
-                logger?.LogInformation($"SALVAR LOG XML {filename}");
+                logger?.LogDebug($"SALVAR LOG XML {filename}");
                 var storage = storageContext.GetStorage(STORAGE_NAME);
                 var fileInfo = await storage.SaveAsync(filename, conteudo, cancellation);
-                logger?.LogInformation($"LOG SALVO {fileInfo.AbsolutePath}");
+                logger?.LogDebug($"LOG SALVO {fileInfo.AbsolutePath}");
             }
             catch (Exception ex)
             {
