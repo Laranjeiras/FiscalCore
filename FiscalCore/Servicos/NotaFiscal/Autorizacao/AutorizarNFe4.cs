@@ -39,6 +39,8 @@ namespace FiscalCore.Servicos
 
             var modelo = ModeloDocumentoDaLista(nfes);
 
+            configuracao.ConfigCertificado.Certificado.Validar();
+
             logger?.LogDebug($"TRATAR NFes");
             TratarNFeAutorizacao.AplicarPoliticas(nfes);
             logger?.LogDebug($"NFes TRATADAS");

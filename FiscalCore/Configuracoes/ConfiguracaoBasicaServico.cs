@@ -28,7 +28,7 @@ namespace FiscalCore.Configuracoes
         {
             if (string.IsNullOrEmpty(CNPJEmitente) || CNPJEmitente.Length < 11 && CNPJEmitente.Length > 18)
             {
-                throw new ConfiguracaoExcepetion($"{nameof(CNPJEmitente)} inválido");
+                throw new ConfiguracaoException($"{nameof(CNPJEmitente)} inválido");
             }
         }
     }
