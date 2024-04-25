@@ -81,7 +81,14 @@ namespace FiscalCore.Utils
             => certificado.NotAfter;
 
         public static bool Expirado(this X509Certificate2 certificado) 
-            => Validade(certificado) > DateTime.Now;
+            => Validade(certificado) <= DateTime.Now;
 
+        public static void Validar(this X509Certificate2 certificado)
+        {
+            if (certificado.Expirado())
+            {
+                throw new ConfiguracaoException($"CERTIFICADO EXPIRADO EM {certificado.Validade()}");
+            }
+        }
     }
 }
