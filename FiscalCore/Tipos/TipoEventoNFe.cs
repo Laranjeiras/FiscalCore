@@ -35,6 +35,7 @@ namespace FiscalCore.Tipos
         [XmlEnum("110140")]
         NFceEpec = 110140,
 
+        #region Manifestação do Detinatário
         [Description("Confirmação da Operação")]
         [XmlEnum("210200")]
         ConfirmacaoOperacao = 210200,
@@ -50,6 +51,7 @@ namespace FiscalCore.Tipos
         [Description("Operação não Realizada")]
         [XmlEnum("210240")]
         OperacaoNaoRealizada = 210240,
+        #endregion
 
         [Description("Registro de Passagem Automatico MDFe")]
         [XmlEnum("610552")]
