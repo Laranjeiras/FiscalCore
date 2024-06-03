@@ -63,8 +63,8 @@ namespace FiscalCore.Danfe.NFCe.Nativo
         }
 
         private static SolidBrush CriarSolidBrushParaQuebrarLinhas()
-        {
-            SolidBrush br = new SolidBrush(SystemColors.ControlText) { Color = Color.Black };
+        {            
+            SolidBrush br = new SolidBrush(Color.Black);
             return br;
         }
     }

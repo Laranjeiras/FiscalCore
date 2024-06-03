@@ -1,4 +1,4 @@
-﻿using FiscalCore.Tipos;
+using FiscalCore.Tipos;
 using System;
 using System.Net;
 using System.Net.Security;
@@ -86,14 +86,16 @@ namespace FiscalCore.Fabrica
             return soapEnvelopeDocument;
         }
 
-        public static HttpWebRequest CriarWebRequest(string url, string contentType)
+        public static HttpWebRequest CriarWebRequest(string url, X509Certificate2 certificado)
         {
             HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(url);
             webRequest.Headers.Add(@"SOAP:Action");
-            webRequest.ContentType = contentType;
+            webRequest.ContentType = "application/soap+xml;charset=utf-8";
             webRequest.ServerCertificateValidationCallback = CertificateValidationCallbackl;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             webRequest.Method = "POST";
+            webRequest.ClientCertificates.Add(certificado);
+
             return webRequest;
         }
 

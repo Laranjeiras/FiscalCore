@@ -19,11 +19,13 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
     public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDestinatarioServico>
     {
         private readonly int nSeqEvento;
+        private readonly CancellationToken cancellation;
 
         public ManifestacaoDestinatarioServico(ConfiguracaoServico config, IStorageContext storageContext, ITransmitirSefazCommand transmitir, ILogger<ManifestacaoDestinatarioServico> logger)
             :base(config, transmitir, logger, storageContext)
         {
             this.nSeqEvento = 1;
+            this.cancellation = new CancellationToken();
         }
 
         public async Task<retEnvEvento> ManifestarAsync(ChaveFiscal chaveNFe, eTipoEventoNFe tipoEvento, string justificativa, CancellationToken cancellation)

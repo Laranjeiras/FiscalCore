@@ -19,13 +19,15 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
     {
         private readonly ConfiguracaoServico cfgServico;
         private readonly ITransmitirSefazCommand transmitir;
-        private readonly string _versao = "1.00";
+        private readonly CancellationToken cancellation;
+        private const string VERSAO = "1.00";
 
         public CartaCorrecaoServico(ConfiguracaoServico cfgServico, IStorageContext storageContext, ITransmitirSefazCommand transmitir, ILogger<CartaCorrecaoServico> logger)
             : base(cfgServico, transmitir, logger, storageContext)
         {
             this.cfgServico = cfgServico;
             this.transmitir = transmitir;
+            this.cancellation = new CancellationToken();
         }
 
         public async Task<retEnvEvento> TransmitirCorrecao(InfoCartaCorrecao info, CancellationToken cancellation)
@@ -69,16 +71,16 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
                     nSeqEvento = nSeqEvento,
                     tpAmb = cfgServico.TipoAmbiente,
                     tpEvento = eTipoEventoNFe.NFeCartaCorrecao,
-                    verEvento = _versao,
+                    verEvento = VERSAO,
                     detEvento = new detEvento()
                     {
-                        versao = _versao,
+                        versao = VERSAO,
                         descEvento = "Carta de Correcao",
                         xCorrecao = correcao,
                         
                     }
                 };
-                var evento = new evento { versao = _versao, infEvento = infEvento };
+                var evento = new evento { versao = VERSAO, infEvento = infEvento };
                 eventos.Add(evento);
             }
 
@@ -93,7 +95,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
 
             var pedEvento = new envEvento 
             {
-                versao = _versao,
+                versao = VERSAO,
                 idLote = 1,
                 evento = eventos
             };
@@ -111,9 +113,9 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retEnvEvento").OuterXml;
 
             var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ret-eve.xml", cfgServico));
+            
             await SalvarLog(arqRet, retornoXmlStringLimpa, cancellation);
-
-             var retorno = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
+            var retorno = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 
             return retorno;
         }

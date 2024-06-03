@@ -18,7 +18,8 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
 {
     public class CancelarNFeServico : BaseSefazServico<CancelarNFeServico>, IEventoServico
     {
-        private const string versao = "1.00";
+        private const string VERSAO = "1.00";
+        private const string LOG_PATH = "1.00";
 
         public CancelarNFeServico(ConfiguracaoServico cfgServico, IStorageContext storage, ITransmitirSefazCommand transmitir, ILogger<CancelarNFeServico> logger)
             :base(cfgServico, transmitir, logger, storage)
@@ -36,59 +37,41 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             if (infos.Count > 20)
                 throw new Exception("No máximo 20 NFes podem ser canceladas");
 
-            var modelos = infos.Select(x => x.ChaveAcesso.Modelo).Distinct().ToList();
-            if (modelos.Count != 1)
-                throw new FalhaValidacaoException("Lista de cancelamento deve conter somente 1 modelo");
-
-            eModeloDocumento modeloDocumento = modelos.FirstOrDefault();
+            var modelo = ExtrairModelo(infos);
 
             List<evento> eventos = new List<evento>();
 
             foreach (var item in infos)
             {
-                var protocolo = item.ProtocoloAutorizacao;
-                var chave = item.ChaveAcesso;
-                var just = item.Justificativa;
+                var evento = FiscalCore.Modelos.Eventos.evento.CriarEventoCancelamento(
+                    cfgServico.UF,
+                    cfgServico.TipoAmbiente,
+                    cfgServico.Emitente,
+                    item.ChaveAcesso,
+                    item.ProtocoloAutorizacao.Protocolo,
+                    item.Justificativa, VERSAO
+                );
 
-                if(string.IsNullOrEmpty(just) || just.Length < 15 || just.Length > 255)
-                    throw new Exception("Justificativa de conter entre 15 e 255 caracteres");
-
-                var detEvento = new detEvento
-                {
-                    nProt = protocolo.Protocolo,
-                    versao = versao,
-                    xJust = just,
-                    descEvento = "Cancelamento",
-                };
-
-                var infEvento = new infEventoEnv
-                {
-                    cOrgao = configuracao.UF,
-                    tpAmb = configuracao.TipoAmbiente,
-                    chNFe = chave.Chave,
-                    dhEvento = DateTime.Now,
-                    tpEvento = eTipoEventoNFe.NFeCancelamento,
-                    nSeqEvento = 1,
-                    verEvento = versao,
-                    detEvento = detEvento
-                };
-
-                if (!string.IsNullOrEmpty(configuracao.Emitente.CNPJ))
-                    infEvento.CNPJ = configuracao.Emitente.CNPJ;
-                else
-                    infEvento.CPF = configuracao.Emitente.CPF;
-
-                var evento = new evento { versao = versao, infEvento = infEvento };
                 eventos.Add(evento);
-            }            
-            return await Cancelar(eventos, modeloDocumento, cancellation);
+            }
+
+            return await Cancelar(eventos, modelo);
+        }
+
+        private eModeloDocumento ExtrairModelo(IList<InfoNFeCancelar> infos)
+        {
+            var modelos = infos.Select(x => x.ChaveAcesso.Modelo).Distinct().ToList();
+            if (modelos.Count != 1)
+                throw new FalhaValidacaoException("Lista de cancelamento deve conter somente 1 modelo");
+
+            return modelos.FirstOrDefault();
         }
 
         private async Task<retEnvEvento> Cancelar(List<evento> eventos, eModeloDocumento modeloDoc, CancellationToken cancellation) 
         {
             var pedEvento = new envEvento
             {
-                versao = versao,
+                versao = VERSAO,
                 idLote = 1,
                 evento = eventos
             };
@@ -120,6 +103,25 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             var retEnvEvento = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 
             return retEnvEvento;
+        }
+    }
+
+    public class InfoNFeCancelar
+    {
+        private const string JUSTIFICATIVA = "Nota Fiscal Emitida Indevidamente";
+        public ChaveFiscal ChaveAcesso { get; private set; }
+        public ProtocoloAutorizacao ProtocoloAutorizacao { get; private set; }
+        public string Justificativa { get; private set; }
+
+        public InfoNFeCancelar(ChaveFiscal chaveAcesso, ProtocoloAutorizacao protocoloAutorizacao, string justificativa = JUSTIFICATIVA)
+        {
+            ChaveAcesso = chaveAcesso ?? throw new ArgumentNullException(nameof(chaveAcesso));
+            ProtocoloAutorizacao = protocoloAutorizacao ?? throw new ArgumentNullException(nameof(protocoloAutorizacao));
+
+            if (string.IsNullOrEmpty(justificativa) || justificativa.Length < 15 || justificativa.Length > 255)
+                throw new Exception("Justificativa de conter entre 15 e 255 caracteres");
+
+            Justificativa = justificativa;
         }
     }
 }

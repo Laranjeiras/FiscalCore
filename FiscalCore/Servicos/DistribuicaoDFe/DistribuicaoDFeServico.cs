@@ -146,5 +146,17 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
 
             return retDistDFeInt;
         }
+
+        private async Task SalvarLog(string filename, string conteudo)
+        {
+            if (storage == null)
+            {
+                return;
+            }
+
+            logger.LogInformation($"SALVAR LOG XML {filename}");
+            var fileInfo = await storage.SaveAsync(filename, conteudo, cancellation);
+            logger.LogInformation($"LOG SALVO {fileInfo.AbsolutePath}");
+        }
     }
 }

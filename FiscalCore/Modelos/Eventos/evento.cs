@@ -1,5 +1,9 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Xml.Serialization;
+using FiscalCore.Configuracoes.Emitente;
 using FiscalCore.Modelos.Signatures;
+using FiscalCore.Tipos;
+using FiscalCore.ValueObjects;
 
 namespace FiscalCore.Modelos.Eventos
 {
@@ -23,7 +27,38 @@ namespace FiscalCore.Modelos.Eventos
         [XmlElement(Namespace = "http://www.w3.org/2000/09/xmldsig#")]
         public Signature Signature { get; set; }
 
+        public static evento CriarEventoCancelamento(eUF uf, eTipoAmbiente tipoAmbiente, emit emitente, ChaveFiscal chave, string protocolo, string just, string versao)
+        {
+            var infEvento = new infEventoEnv
+            {
+                cOrgao = uf,
+                tpAmb = tipoAmbiente,
+                chNFe = chave.Chave,
+                dhEvento = DateTime.Now,
+                tpEvento = eTipoEventoNFe.NFeCancelamento,
+                nSeqEvento = 1,
+                verEvento = versao,
+                detEvento = new detEvento
+                {
+                    nProt = protocolo,
+                    versao = versao,
+                    xJust = just,
+                    descEvento = "Cancelamento"
+                }
+            };
+
+            if (!string.IsNullOrEmpty(emitente.CNPJ))
+                infEvento.CNPJ = emitente.CNPJ;
+            else
+                infEvento.CPF = emitente.CPF;
+
+            var evento = new evento { versao = versao, infEvento = infEvento };
+
+            return evento;
+        }
+
         public static evento CriarEvento(string versao, infEventoEnv infEvento) => 
             new evento { versao = versao, infEvento = infEvento };
+
     }
 }

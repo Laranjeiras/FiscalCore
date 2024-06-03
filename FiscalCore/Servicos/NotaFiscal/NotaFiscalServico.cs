@@ -37,6 +37,7 @@ namespace FiscalCore.Servicos.NotaFiscal
             var xmlEvento = XmlUtils.ClasseParaXmlString<consSitNFe>(consSit);
 
             var arqEnv = Path.Combine("Logs", $"{DateTime.Now.Ticks}-pedConsSitNFe.xml");
+            
             await SalvarLog(arqEnv, xmlEvento, cancellation);
 
             var modeloDoc = chave.Modelo;
@@ -50,6 +51,7 @@ namespace FiscalCore.Servicos.NotaFiscal
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retConsSitNFe").OuterXml;
 
             var arqRet = Path.Combine("Logs", $"{DateTime.Now.Ticks}-retConsSitNFe.xml");
+
             await SalvarLog(arqRet, retornoXmlStringLimpa, cancellation);
 
             var retEnvEvento = new retConsSitNFe().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);

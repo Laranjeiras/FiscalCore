@@ -1,4 +1,4 @@
-﻿using FiscalCore.Configuracoes;
+using FiscalCore.Configuracoes;
 using FiscalCore.Fabrica;
 using FiscalCore.Utils;
 using FiscalCore.ValueObjects;
@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -26,7 +27,7 @@ namespace FiscalCore.Servicos
         {
             logger?.LogDebug($"INICIANDO TRANSMISSÃO SEFAZ [{sefazUrl.Url}]");
 
-            HttpWebRequest webRequest = SoapEnvelopeFabrica.CriarWebRequest(sefazUrl.Url, "application/soap+xml;charset=utf-8");
+            var certificado = CarregarCertificado();
 
             Soap.InserirSoapEnvelopeWebRequest(envelope, webRequest);
 
@@ -51,6 +52,7 @@ namespace FiscalCore.Servicos
         }
 
         private static async Task<string> GetResponse(HttpWebRequest webRequest)
+
         {
             IAsyncResult asyncResult = webRequest.BeginGetResponse(null, null);
 
@@ -61,6 +63,18 @@ namespace FiscalCore.Servicos
                 soapResult = await rd.ReadToEndAsync();
             }
             return soapResult;
+        }
+
+        private X509Certificate2 CarregarCertificado()
+        {
+            logger?.LogDebug("CARREGANDO INFORMAÇÕES DO CERTIFICADO");
+
+            var certificado = configuracao?.ConfigCertificado?.Certificado
+                ?? throw new ArgumentNullException("NÁO FOI POSSÍVEL CARREGAR CONFIGURAÇÕES DO CERTIFICADO");
+
+            logger?.LogDebug("INFORMAÇÕES DO CERTIFICADO CARREGADAS");
+
+            return certificado;
         }
     }
 }
