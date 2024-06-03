@@ -19,21 +19,11 @@ namespace FiscalCore.Servicos
 {
     public class AutorizarNFe4 : AutorizarNFe, IAutorizarNFeServico
     {
-        private readonly ConfiguracaoServico cfgServico;
-        private readonly ITransmitirSefazCommand transmitir;
-        private readonly IStorage storage;
-        private readonly ILogger<NotaFiscalServico> logger;
-        private readonly CancellationToken cancellation;
         private readonly string versaoServico;
 
         public AutorizarNFe4(ConfiguracaoServico configuracao, ITransmitirSefazCommand transmitir, IStorageContext storageContext, ILogger<AutorizarNFe4> logger)
             : base(configuracao, transmitir, logger, storageContext)
         {
-
-            this.cfgServico = cfgServico;
-            this.transmitir = transmitir;
-            this.storage = storage.GetStorage("FiscalCore");
-            this.logger = logger;
             this.cancellation = new CancellationToken(); // PARA FUNCIONAR O STORAGE
             this.versaoServico = configuracao.VersaoAutorizacaoNFe.Descricao();
         }
@@ -103,13 +93,6 @@ namespace FiscalCore.Servicos
             }
             
             return nfeAssinada;
-        }
-
-        private async Task SalvarLog(string filename, string conteudo)
-        {
-            logger.LogInformation($"SALVAR LOG XML {filename}");
-            var fileInfo = await storage.SaveAsync(filename, conteudo, cancellation);
-            logger.LogInformation($"LOG SALVO {fileInfo.AbsolutePath}");
         }
     }
 }

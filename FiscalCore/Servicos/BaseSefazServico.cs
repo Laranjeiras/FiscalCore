@@ -61,6 +61,7 @@ namespace FiscalCore.Servicos
                 logger.LogWarning("OCORREU UM ERRO AO SALVAR O LOG (STORAGE: FiscalCore) | {}", ex.Message);
             }
         }
+        
         protected void ValidarXml(eTipoServico tipoServico, ConfiguracaoServico config, string xmlValidar)
         {
             var validacao = new ValidarXml(tipoServico, config);
