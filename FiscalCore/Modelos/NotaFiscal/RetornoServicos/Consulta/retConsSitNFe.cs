@@ -1,4 +1,6 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Collections.Generic;
+using System.Xml.Serialization;
 using FiscalCore.NotaFiscal.Protocolo;
 using FiscalCore.Tipos;
 
@@ -8,9 +10,6 @@ namespace FiscalCore.NotaFiscal.RetornoServicos.Consulta
     public class retConsSitNFe 
     {
         #region Propriedades
-
-        
-
         /// <summary>
         ///     ER02 - Versão do leiaute
         /// </summary>
@@ -44,7 +43,13 @@ namespace FiscalCore.NotaFiscal.RetornoServicos.Consulta
         public eUF cUF { get; set; }
 
         /// <summary>
-        ///     EP07a - Chave de Acesso da NF-e consultada
+        ///     EP07a - Preenchido com a data e hora do processamento.
+        ///     Formato: “AAAA-MM-DDThh:mm:ssTZD” (UTC - Universal Coordinated Time)
+        /// </summary>
+        public DateTimeOffset dhRecbto { get; set; }
+
+        /// <summary>
+        ///     EP07b - Chave de Acesso da NF-e consultada
         /// </summary>
         public string chNFe { get; set; }
 
@@ -57,12 +62,8 @@ namespace FiscalCore.NotaFiscal.RetornoServicos.Consulta
         ///// <summary>
         /////     ER10 - Informação do evento e respectivo Protocolo de registro de Evento
         ///// </summary>
-        //[XmlElement("procEventoNFe")]
-        //public List<procEventoNFe> procEventoNFe { get; set; }
-
+        [XmlElement("procEventoNFe")]
+        public List<procEventoNFe> procEventoNFe { get; set; }
         #endregion
-
-
-
     }
 }

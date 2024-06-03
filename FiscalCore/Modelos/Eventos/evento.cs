@@ -56,5 +56,9 @@ namespace FiscalCore.Modelos.Eventos
 
             return evento;
         }
+
+        public static evento CriarEvento(string versao, infEventoEnv infEvento) => 
+            new evento { versao = versao, infEvento = infEvento };
+
     }
 }

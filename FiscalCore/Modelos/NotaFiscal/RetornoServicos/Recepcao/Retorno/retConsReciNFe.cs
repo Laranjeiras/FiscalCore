@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 using FiscalCore.NotaFiscal.Protocolo;
 using FiscalCore.Tipos;
@@ -48,6 +49,12 @@ namespace FiscalCore.NotaFiscal.RetornoServicos.Recepcao.Retorno
         ///     BR06a - Código da UF que atendeu a solicitação.
         /// </summary>
         public eUF cUF { get; set; }
+
+        /// <summary>
+        ///     BR06a1 - Preenchido com a data e hora do processamento (informado também no caso de rejeição). 
+        ///     Formato: “AAAA-MM-DDThh:mm:ssTZD” (UTC - Universal Coordinated Time)
+        /// </summary>
+        public DateTimeOffset dhRecbto { get; set; }
 
         /// <summary>
         ///     BR06b - Código da Mensagem (v2.0) Campo de uso da SEFAZ para enviar mensagem de interesse da SEFAZ para o emissor.

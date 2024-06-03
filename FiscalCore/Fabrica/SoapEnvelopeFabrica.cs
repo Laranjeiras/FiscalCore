@@ -1,5 +1,7 @@
-﻿using FiscalCore.Tipos;
+using FiscalCore.Tipos;
+using System;
 using System.Net;
+using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Xml;
 
@@ -89,10 +91,15 @@ namespace FiscalCore.Fabrica
             HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(url);
             webRequest.Headers.Add(@"SOAP:Action");
             webRequest.ContentType = "application/soap+xml;charset=utf-8";
+            webRequest.ServerCertificateValidationCallback = CertificateValidationCallbackl;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             webRequest.Method = "POST";
             webRequest.ClientCertificates.Add(certificado);
 
             return webRequest;
         }
+
+        private static bool CertificateValidationCallbackl(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+            => true;
     }
 }

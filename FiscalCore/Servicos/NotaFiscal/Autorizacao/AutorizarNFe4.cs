@@ -5,124 +5,104 @@ using System;
 using FiscalCore.Extensions;
 using System.Collections.Generic;
 using System.Linq;
-using FiscalCore.Validacoes;
 using System.Threading.Tasks;
 using FiscalCore.Tipos;
 using AlgoPlus.Storage.Services;
-using System.IO;
 using FiscalCore.NotaFiscal.RetornoServicos.Autorizacao;
 using FiscalCore.NotaFiscal;
-using FiscalCore.Exceptions;
 using Microsoft.Extensions.Logging;
 using FiscalCore.Servicos.NotaFiscal;
 using System.Threading;
+using FiscalCore.Servicos.NotaFiscal.Autorizacao;
 
 namespace FiscalCore.Servicos
 {
-    public class AutorizarNFe4 : IAutorizarNFeServico
+    public class AutorizarNFe4 : AutorizarNFe, IAutorizarNFeServico
     {
         private readonly ConfiguracaoServico cfgServico;
         private readonly ITransmitirSefazCommand transmitir;
         private readonly IStorage storage;
         private readonly ILogger<NotaFiscalServico> logger;
         private readonly CancellationToken cancellation;
+        private readonly string versaoServico;
 
-        public AutorizarNFe4(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir, IStorageContext storage, ILogger<NotaFiscalServico> logger)
+        public AutorizarNFe4(ConfiguracaoServico configuracao, ITransmitirSefazCommand transmitir, IStorageContext storageContext, ILogger<AutorizarNFe4> logger)
+            : base(configuracao, transmitir, logger, storageContext)
         {
+
             this.cfgServico = cfgServico;
             this.transmitir = transmitir;
             this.storage = storage.GetStorage("FiscalCore");
             this.logger = logger;
             this.cancellation = new CancellationToken(); // PARA FUNCIONAR O STORAGE
+            this.versaoServico = configuracao.VersaoAutorizacaoNFe.Descricao();
         }
 
-        public async Task<IRetornoAutorizacao> Autorizar(NFe nfe, int idLote = 0)
+        public async Task<IRetornoAutorizacao> Autorizar(NFe nfe, CancellationToken cancellation, int idLote = 0)
         {
-            logger.LogDebug("RECEBENDO NFe", nfe);
+            logger?.LogDebug("RECEBENDO NFe", nfe);
             var lista = new List<NFe> { nfe };
-            return  await Autorizar(lista, idLote);
+            return  await Autorizar(lista, cancellation, idLote);
         }
 
-        public async Task<IRetornoAutorizacao> Autorizar(IList<NFe> nfes, int idLote = 0)
+        public async Task<IRetornoAutorizacao> Autorizar(IList<NFe> nfes, CancellationToken cancellation, int idLote = 0)
         {
-            logger.LogDebug($"RECEBENDO LISTA DE NFes TOTAL: {nfes.Count}");
+            logger?.LogDebug($"RECEBENDO LISTA DE NFes TOTAL: {nfes.Count}");
 
-            logger.LogDebug($"TRATAR NFes");
+            var modelo = ModeloDocumentoDaLista(nfes);
 
-            new TratarNFeAutorizacao(ref nfes, cfgServico)
-                .Tratar();
+            configuracao.ConfigCertificado.Certificado.Validar();
 
-            logger.LogDebug($"NFes TRATADAS");
-            logger.LogDebug($"VALIDAR NFes");
-
-            new ValidarNFeAutorizacao(nfes, cfgServico)
-                .Validar();
-
-            logger.LogDebug($"NFes VALIDADAS");
+            logger?.LogDebug($"TRATAR NFes");
+            TratarNFeAutorizacao.AplicarPoliticas(nfes);
+            logger?.LogDebug($"NFes TRATADAS");
+            
+            logger?.LogDebug($"VALIDAR NFes");
+            ValidarNFeAutorizacao.ValidarPoliticas(nfes, configuracao);
+            logger?.LogDebug($"NFes VALIDADAS");
 
             if (idLote <= 0)
                 idLote = new Random().Next(10000000, 99999999);
 
-            logger.LogInformation($"NUMERO LOTE: {idLote}");
+            logger?.LogDebug($"NUMERO LOTE: {idLote}");
 
-            var nfesAssinadas = new List<NFe>();
-
-            logger.LogInformation("ASSINAR NFes");
-
-            foreach (var nfe in nfes)
-            {
-                var nfeAssinada = nfe.Assinar(cfgServico.ConfigCertificado.Certificado);
-                var xml = XmlUtils.ClasseParaXmlString<NFe>(nfeAssinada);
-                xml = xml.Replace("xmlns=\"http://www.portalfiscal.inf.br/nfe\"", string.Empty);
-
-                logger.LogInformation($"NFe [{nfeAssinada.infNFe.Id}] ASSINADA");
-
-                var validacao = new ValidarXml(eTipoServico.AutorizarNFe, cfgServico);
-                validacao.Validar(xml);
-                if (!validacao.Valido)
-                {   
-                    throw new FalhaValidacaoException(validacao.ToString());
-                }
-
-                logger.LogInformation($"NFe [{nfeAssinada.infNFe.Id}] VALIDADA");
-
-                nfesAssinadas.Add(nfeAssinada);
-            }
-
-            var mod = nfes.Select(x => x.infNFe.ide.mod)
-                .Distinct()
-                .SingleOrDefault();
+            var nfesAssinadas = nfes
+                .Select(ValidarEAssinar)
+                .ToList();
                 
-            var versaoServico = cfgServico.VersaoAutorizacaoNFe.Descricao();
-            var enviNFe = new enviNFe(versaoServico, idLote, eIndicadorSincronizacao.Sincrono, nfesAssinadas);
+            var enviNFe = new enviNFe(
+                versaoServico, 
+                idLote, 
+                eIndicadorSincronizacao.Sincrono, 
+                nfesAssinadas);
 
             var xmlEnviNFe = XmlUtils.ClasseParaXmlString<enviNFe>(enviNFe);
-            var retorno = await Autorizar(xmlEnviNFe, mod);
+            var retorno = await Autorizar(xmlEnviNFe, modelo, cancellation);
             return retorno;
         }
 
-        private async Task<IRetornoAutorizacao> Autorizar(string xmlenviNFe4, eModeloDocumento modeloDocumento)
+        public eModeloDocumento ModeloDocumentoDaLista(IList<NFe> nfes) 
+            => nfes.Select(x => x.infNFe.ide.mod)
+                .Distinct()
+                .SingleOrDefault();
+
+        public NFe ValidarEAssinar(NFe nfe)
         {
-            var arqEnv = Path.Combine("Logs", $"{DateTime.Now.Ticks}-env-nfe.xml");
-            await SalvarLog(arqEnv, xmlenviNFe4);
+            logger?.LogDebug("ASSINAR NFe");
+
+            var nfeAssinada = nfe.Assinar(configuracao.ConfigCertificado.Certificado);
+            var xml = XmlUtils.ClasseParaXmlString<NFe>(nfeAssinada);
+            xml = xml.Replace("xmlns=\"http://www.portalfiscal.inf.br/nfe\"", string.Empty);
+
+            logger.LogDebug($"NFe [{nfe.infNFe.Id}] ASSINADA");
+
+            if (configuracao.ValidarXmlSchema)
+            {
+                ValidarXml(eTipoServico.AutorizarNFe, configuracao, xml);
+                logger?.LogDebug($"NFe [{nfeAssinada.infNFe.Id}] VALIDADA");
+            }
             
-            var urlSefaz = Fabrica.FabricarUrl.ObterUrl(eTipoServico.AutorizarNFe, cfgServico.TipoAmbiente, modeloDocumento, cfgServico.UF);
-            logger.LogDebug($"URL SEFAZ OBTIDA {urlSefaz.Url}");
-
-            var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.AutorizarNFe, xmlenviNFe4);
-
-            logger.LogDebug($"TRANSMITIR SEFAZ");
-
-            var retornoXmlString = await transmitir.TransmitirAsync(urlSefaz, envelope);
-            logger.LogDebug($"RETORNO SEFAZ", retornoXmlString);
-            var retornoLimpo = Soap.LimparEnvelope(retornoXmlString, "retEnviNFe").OuterXml;
-                        
-            var arqRet = Path.Combine("Logs", $"{DateTime.Now.Ticks}-ret-env-nfe.xml");
-            await SalvarLog(arqRet, retornoLimpo);           
-
-            var retEnviNFe = new RetNFeAutorizacao4(retornoLimpo);
-            retEnviNFe.XmlEnviado = xmlenviNFe4;
-            return retEnviNFe;
+            return nfeAssinada;
         }
 
         private async Task SalvarLog(string filename, string conteudo)

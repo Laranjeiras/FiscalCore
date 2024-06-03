@@ -9,7 +9,6 @@ namespace FiscalCore.Configuracoes
     {
         public ConfiguracaoServico()
         {
-
         }
 
         public ConfiguracaoServico(
@@ -26,6 +25,7 @@ namespace FiscalCore.Configuracoes
             this.UF = uf;
             this.Emitente = emitente;
             this.Csc = csc;
+            this.CNPJEmitente = emitente.CpfCnpj;
 
             TipoEmissao = eTipoEmissao.Normal;
 
@@ -87,6 +87,7 @@ namespace FiscalCore.Configuracoes
 
         public void Validar()
         {
+            base.Validar();
             if (Emitente == null)
                 throw new FalhaValidacaoException("Emitente não informado");
             if (Emitente.enderEmit == null)

@@ -10,49 +10,63 @@ using AlgoPlus.Storage.Services;
 using System.IO;
 using FiscalCore.ValueObjects;
 using System.Threading;
+using System.Threading;
+using Microsoft.Extensions.Logging;
+using FiscalCore.ValueObjects;
 
 namespace FiscalCore.Servicos
 {
-    public class ConsultaSituacaoNFeServico
+    public class ConsultaSituacaoNFeServico : BaseSefazServicoBasico<ConsultaSituacaoNFeServico>
     {
         private readonly ConfiguracaoServico cfgServico;
         private readonly IStorage storage;
         private readonly ITransmitirSefazCommand sefaz;
-        private readonly string versao;
         private readonly CancellationToken cancellation;
+        private const string versao= "4.00";
 
-        public ConsultaSituacaoNFeServico(ConfiguracaoServico cfgServico, IStorage storage, ITransmitirSefazCommand transmitir)
+        public ConsultaSituacaoNFeServico(ConfiguracaoBasicaServico cfgServico, IStorageContext storage, ITransmitirSefazCommand transmitir, ILogger<ConsultaSituacaoNFeServico> logger)
+            :base(cfgServico, transmitir, logger, storage)
         {
             this.cfgServico = cfgServico;
             this.storage = storage;
             this.sefaz = transmitir;
-            this.versao = "4.00";
             this.cancellation = new CancellationToken();
         }
 
-        public async Task<retConsSitNFe> ConsultarPelaChave(ChaveFiscal chave) 
+        public async Task<retConsSitNFe> ConsultarPelaChave(ChaveFiscal chaveAcesso, CancellationToken cancellation) 
         {
+            //chaveAcesso = chaveAcesso.Replace("NFe", "");
+
             var consSit = new consSitNFe
             {
-                chNFe = chave.Chave,
-                tpAmb = cfgServico.TipoAmbiente,
+                chNFe = chaveAcesso.Chave,
+                tpAmb = configuracao.TipoAmbiente,
                 versao = versao
             };
 
             var xmlEvento = XmlUtils.ClasseParaXmlString<consSitNFe>(consSit);
 
+
             var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("pedConsSitNFe.xml", cfgServico));
             await storage.SaveAsync(arqEnv, xmlEvento, cancellation);
 
             var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.ConsultaSituacaoNFe, cfgServico.TipoAmbiente, chave.Modelo, cfgServico.UF);
+
+            var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("pedConsSitNFe.xml", configuracao));
+            await SalvarLog(arqEnv, xmlEvento, cancellation);
+
+            var modeloDoc = chaveAcesso.Modelo;
+
+            var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.ConsultaSituacaoNFe, configuracao.TipoAmbiente, modeloDoc, configuracao.UF);
+
             var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.ConsultaSituacaoNFe, xmlEvento);
 
-            var retornoXmlString = await sefaz.TransmitirAsync(sefazUrl, envelope);
+            var retornoXmlString = await transmitir.TransmitirAsync(sefazUrl, envelope);
 
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retConsSitNFe").OuterXml;
 
-            var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("retConsSitNFe.xml", cfgServico));
-            await storage.SaveAsync(arqRet, retornoXmlStringLimpa, cancellation);
+            var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("retConsSitNFe.xml", configuracao));
+            await SalvarLog(arqRet, retornoXmlStringLimpa, cancellation);
 
             var retEnvEvento = new retConsSitNFe().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 

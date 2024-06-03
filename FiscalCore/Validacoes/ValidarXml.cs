@@ -17,12 +17,30 @@ namespace FiscalCore.Validacoes
         public ValidarXml(eTipoServico tipoServico, ConfiguracaoBasicaServico cfgServico)
         {
             var caminhoSchema = cfgServico.DiretorioSchemas;
+            arquivoSchema = PathArquivoSchema(caminhoSchema, tipoServico);
+            ConferirSchemas(arquivoSchema);
+        }
 
-            if (!Directory.Exists(caminhoSchema))
-                throw new FileNotFoundException("Diretório de Schemas não encontrado: " + caminhoSchema);
+        public ValidarXml(eTipoServico tipoServico, ConfiguracaoServico cfgServico)
+        {
+            var caminhoSchema = cfgServico.DiretorioSchemas;
 
-            arquivoSchema = Path.Combine(caminhoSchema, Schemas.ObterSchema(tipoServico));
+            arquivoSchema = PathArquivoSchema(caminhoSchema, tipoServico);
 
+            ConferirSchemas(arquivoSchema);
+        }
+
+        private string PathArquivoSchema(string diretorioSchemas, eTipoServico tipoServico)
+        {
+            if (!Directory.Exists(diretorioSchemas))
+                throw new FileNotFoundException("Diretório de Schemas não encontrado: " + diretorioSchemas);
+
+            var arquivoSchema = Schemas.ObterSchema(tipoServico);
+            return Path.Combine(diretorioSchemas, arquivoSchema);
+        }
+
+        private void ConferirSchemas(string arquivoSchema)
+        {
             if (!File.Exists(arquivoSchema))
                 throw new FileNotFoundException($"Arquivo não encontrado: {arquivoSchema}");
         }

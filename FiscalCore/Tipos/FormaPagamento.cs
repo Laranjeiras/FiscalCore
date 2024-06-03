@@ -42,7 +42,7 @@ namespace FiscalCore.Tipos
         ValeCombustivel = 13,
 
         [Description("Duplicata Mercantil")]
-        [XmlEnum("13")]
+        [XmlEnum("14")]
         DuplicataMercantil = 14,
 
         [Description("Boleto Bancário")]

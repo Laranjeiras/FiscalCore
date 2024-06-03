@@ -1,4 +1,4 @@
-﻿using FiscalCore.Configuracoes;
+using FiscalCore.Configuracoes;
 using FiscalCore.Fabrica;
 using FiscalCore.Utils;
 using FiscalCore.ValueObjects;
@@ -25,24 +25,36 @@ namespace FiscalCore.Servicos
 
         public virtual async Task<string> TransmitirAsync(UrlSefaz sefazUrl, XmlDocument envelope)
         {
-            logger?.LogInformation($"INICIANDO TRANSMISSÃO SEFAZ [{sefazUrl.Url}]");
+            logger?.LogDebug($"INICIANDO TRANSMISSÃO SEFAZ [{sefazUrl.Url}]");
 
             var certificado = CarregarCertificado();
 
-            var webRequest = SoapEnvelopeFabrica.CriarWebRequest(sefazUrl.Url, certificado);
-
             Soap.InserirSoapEnvelopeWebRequest(envelope, webRequest);
 
-            var soapResult = await Transmitir(webRequest);
+            logger?.LogDebug("CARREGANDO INFORMAÇÕES DO CERTIFICADO");
+            TemCertificado(configuracao);
+            webRequest.ClientCertificates.Add(configuracao.ConfigCertificado.Certificado);
+            logger?.LogDebug("INFORMAÇÕES DO CERTIFICADO CARREGADAS");
+
+            logger?.LogDebug("TRANSMITINDO...");
+            var soapResult = await GetResponse(webRequest);
+            logger?.LogDebug($"ENCERRANDO TRANSMISSÃO SEFAZ");
 
             return soapResult;
         }
 
-        private async Task<string> Transmitir(HttpWebRequest webRequest)
+        private static void TemCertificado(ConfiguracaoBasicaServico configuracao)
+        {
+            if (configuracao?.ConfigCertificado?.Certificado == null)
+            {
+                throw new ArgumentNullException("NÁO FOI POSSÍVEL CARREGAR CONFIGURAÇÕES DO CERTIFICADO");
+            }
+        }
+
+        private static async Task<string> GetResponse(HttpWebRequest webRequest)
+
         {
             IAsyncResult asyncResult = webRequest.BeginGetResponse(null, null);
-
-            logger?.LogDebug("TRANSMITINDO...");
 
             string soapResult;
             using (WebResponse webResponse = webRequest.EndGetResponse(asyncResult))
@@ -50,9 +62,6 @@ namespace FiscalCore.Servicos
                 using StreamReader rd = new StreamReader(webResponse.GetResponseStream());
                 soapResult = await rd.ReadToEndAsync();
             }
-
-            logger?.LogInformation($"ENCERRANDO TRANSMISSÃO SEFAZ");
-
             return soapResult;
         }
 

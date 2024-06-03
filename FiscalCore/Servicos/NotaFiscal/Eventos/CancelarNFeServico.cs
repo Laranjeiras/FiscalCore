@@ -7,38 +7,29 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FiscalCore.Tipos;
-using FiscalCore.ValueObjects;
 using System.Linq;
 using AlgoPlus.Storage.Services;
 using System.IO;
 using FiscalCore.Exceptions;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace FiscalCore.Servicos.NotaFiscal.Eventos
 {
-    public class CancelarNFeServico : IEventoServico
+    public class CancelarNFeServico : BaseSefazServico<CancelarNFeServico>, IEventoServico
     {
-        private readonly ConfiguracaoServico cfgServico;
-        private readonly IStorage storage;
-        private readonly ITransmitirSefazCommand transmitir;
-        private readonly CancellationToken cancellation;
         private const string VERSAO = "1.00";
         private const string LOG_PATH = "1.00";
 
-        public CancelarNFeServico(ConfiguracaoServico cfgServico, IStorageContext storage, ITransmitirSefazCommand transmitir)
+        public CancelarNFeServico(ConfiguracaoServico cfgServico, IStorageContext storage, ITransmitirSefazCommand transmitir, ILogger<CancelarNFeServico> logger)
+            :base(cfgServico, transmitir, logger, storage)
         {
-            this.cfgServico = cfgServico;
-            this.storage = storage.GetStorage("FiscalCore");
-            this.transmitir = transmitir;
-            this.cancellation = new CancellationToken();
         }
 
-        public async Task<retEnvEvento> Cancelar(InfoNFeCancelar infoNFe)
-        {
-            return await Cancelar(new List<InfoNFeCancelar> { infoNFe });
-        }
+        public async Task<retEnvEvento> Cancelar(InfoNFeCancelar infoNFe, CancellationToken cancellation) =>
+            await Cancelar(new List<InfoNFeCancelar> { infoNFe }, cancellation);
 
-        public async Task<retEnvEvento> Cancelar(IList<InfoNFeCancelar> infos) 
+        public async Task<retEnvEvento> Cancelar(IList<InfoNFeCancelar> infos, CancellationToken cancellation) 
         {
             if (infos == null || infos.Count <= 0)
                 throw new Exception("Informações da NFe não encontrada");
@@ -76,7 +67,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             return modelos.FirstOrDefault();
         }
 
-        private async Task<retEnvEvento> Cancelar(List<evento> eventos, eModeloDocumento modeloDoc) 
+        private async Task<retEnvEvento> Cancelar(List<evento> eventos, eModeloDocumento modeloDoc, CancellationToken cancellation) 
         {
             var pedEvento = new envEvento
             {
@@ -90,24 +81,24 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
                 eventoTmp.infEvento.Id = "ID" + ((int)eventoTmp.infEvento.tpEvento) + eventoTmp.infEvento.chNFe +
                                       eventoTmp.infEvento.nSeqEvento.ToString().PadLeft(2, '0');
 
-                var _certificado = cfgServico.ConfigCertificado.Certificado;
-                eventoTmp.Assinar(_certificado, cfgServico.ConfigCertificado.SignatureMethodSignedXml, cfgServico.ConfigCertificado.DigestMethodReference);
+                var _certificado = configuracao.ConfigCertificado.Certificado;
+                eventoTmp.Assinar(_certificado, configuracao.ConfigCertificado.SignatureMethodSignedXml, configuracao.ConfigCertificado.DigestMethodReference);
             }
 
             var xmlEvento = XmlUtils.ClasseParaXmlString<envEvento>(pedEvento);
 
-            var arqEnv = Path.Combine(LOG_PATH, $"{DateTime.Now.Ticks}-ped-eve.xml");
-            await storage.SaveAsync(arqEnv, xmlEvento, cancellation);
+            var arqEnv = Path.Combine("Logs", $"{DateTime.Now.Ticks}-ped-eve.xml");
+            await SalvarLog(arqEnv, xmlEvento, cancellation);
 
-            var sefazUrl = Fabrica.FabricarUrl.ObterUrl(eTipoServico.CancelarNFe, cfgServico.TipoAmbiente, modeloDoc, cfgServico.UF);
+            var sefazUrl = Fabrica.FabricarUrl.ObterUrl(eTipoServico.CancelarNFe, configuracao.TipoAmbiente, modeloDoc, configuracao.UF);
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.CancelarNFe, xmlEvento);
 
             var retornoXmlString = await transmitir.TransmitirAsync(sefazUrl, envelope);
 
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retEnvEvento").OuterXml;
 
-            var arqRet = Path.Combine(LOG_PATH, $"{DateTime.Now.Ticks}-ret-eve.xml");
-            await storage.SaveAsync(arqRet, retornoXmlStringLimpa, cancellation);
+            var arqRet = Path.Combine("Logs", $"{DateTime.Now.Ticks}-ret-eve.xml");
+            await SalvarLog(arqRet, retornoXmlStringLimpa, cancellation);
 
             var retEnvEvento = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 
