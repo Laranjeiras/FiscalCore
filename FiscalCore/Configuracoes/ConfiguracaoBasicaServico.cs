@@ -12,6 +12,11 @@ namespace FiscalCore.Configuracoes
         public eUF UF { get; set; } = eUF.RJ;
         public int TimeOut { get; set; } = 5000;
 
+        /// <summary>
+        /// Ignora erro caso de erro ao salvar arquivos xml no storage
+        /// </summary>
+        public bool IgnorarErroDeStorage { get; set; }
+
         private string _diretorioSchemas;
         public string DiretorioSchemas
         {
