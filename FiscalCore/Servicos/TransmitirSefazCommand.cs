@@ -29,6 +29,8 @@ namespace FiscalCore.Servicos
 
             var certificado = CarregarCertificado();
 
+            HttpWebRequest webRequest = SoapEnvelopeFabrica.CriarWebRequest(sefazUrl.Url, certificado);
+
             Soap.InserirSoapEnvelopeWebRequest(envelope, webRequest);
 
             logger?.LogDebug("CARREGANDO INFORMAÇÕES DO CERTIFICADO");

@@ -44,9 +44,9 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             foreach (var item in infos)
             {
                 var evento = FiscalCore.Modelos.Eventos.evento.CriarEventoCancelamento(
-                    cfgServico.UF,
-                    cfgServico.TipoAmbiente,
-                    cfgServico.Emitente,
+                    configuracao.UF,
+                    configuracao.TipoAmbiente,
+                    configuracao.Emitente,
                     item.ChaveAcesso,
                     item.ProtocoloAutorizacao.Protocolo,
                     item.Justificativa, VERSAO
@@ -55,7 +55,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
                 eventos.Add(evento);
             }
 
-            return await Cancelar(eventos, modelo);
+            return await Cancelar(eventos, modelo, cancellation);
         }
 
         private eModeloDocumento ExtrairModelo(IList<InfoNFeCancelar> infos)
@@ -103,25 +103,6 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             var retEnvEvento = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
 
             return retEnvEvento;
-        }
-    }
-
-    public class InfoNFeCancelar
-    {
-        private const string JUSTIFICATIVA = "Nota Fiscal Emitida Indevidamente";
-        public ChaveFiscal ChaveAcesso { get; private set; }
-        public ProtocoloAutorizacao ProtocoloAutorizacao { get; private set; }
-        public string Justificativa { get; private set; }
-
-        public InfoNFeCancelar(ChaveFiscal chaveAcesso, ProtocoloAutorizacao protocoloAutorizacao, string justificativa = JUSTIFICATIVA)
-        {
-            ChaveAcesso = chaveAcesso ?? throw new ArgumentNullException(nameof(chaveAcesso));
-            ProtocoloAutorizacao = protocoloAutorizacao ?? throw new ArgumentNullException(nameof(protocoloAutorizacao));
-
-            if (string.IsNullOrEmpty(justificativa) || justificativa.Length < 15 || justificativa.Length > 255)
-                throw new Exception("Justificativa de conter entre 15 e 255 caracteres");
-
-            Justificativa = justificativa;
         }
     }
 }

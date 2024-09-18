@@ -13,8 +13,13 @@ namespace FiscalCore.Servicos.NotaFiscal.Autorizacao
 {
     public class AutorizarNFe : BaseSefazServicoBasico<AutorizarNFe>
     {
+        private const string STORAGE_NAME = "FiscalCore";
+        private IStorage storage;
+        protected CancellationToken cancellation;
+
         public AutorizarNFe(ConfiguracaoBasicaServico configuracao, ITransmitirSefazCommand transmitir, ILogger<AutorizarNFe4> logger, IStorageContext storageContext) : base(configuracao, transmitir, logger, storageContext)
         {
+            this.storage = storageContext.GetStorage(STORAGE_NAME);
         }
 
         public async Task<IRetornoAutorizacao> Autorizar(string xmlenviNFe4, eModeloDocumento modeloDocumento, CancellationToken cancellation)
@@ -39,6 +44,14 @@ namespace FiscalCore.Servicos.NotaFiscal.Autorizacao
             var retEnviNFe = new RetNFeAutorizacao4(retornoLimpo);
             retEnviNFe.XmlEnviado = xmlenviNFe4;
             return retEnviNFe;
+        }
+
+
+        private async Task SalvarLog(string filename, string conteudo, CancellationToken cancellation)
+        {
+            logger.LogInformation($"SALVAR LOG XML {filename}");
+            var fileInfo = await storage.SaveAsync(filename, conteudo, cancellation);
+            logger.LogInformation($"LOG SALVO {fileInfo.AbsolutePath}");
         }
     }
 }
