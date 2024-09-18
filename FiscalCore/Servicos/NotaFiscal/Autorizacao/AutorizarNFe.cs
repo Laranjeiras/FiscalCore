@@ -46,12 +46,23 @@ namespace FiscalCore.Servicos.NotaFiscal.Autorizacao
             return retEnviNFe;
         }
 
-
-        private async Task SalvarLog(string filename, string conteudo, CancellationToken cancellation)
+        private new async Task SalvarLog(string filename, string conteudo, CancellationToken cancellation)
         {
-            logger.LogInformation($"SALVAR LOG XML {filename}");
-            var fileInfo = await storage.SaveAsync(filename, conteudo, cancellation);
-            logger.LogInformation($"LOG SALVO {fileInfo.AbsolutePath}");
+            try
+            {
+                logger.LogInformation($"SALVAR LOG XML {filename}");
+                var fileInfo = await storage.SaveAsync(filename, conteudo, cancellation);
+                logger.LogInformation($"LOG SALVO {fileInfo.AbsolutePath}");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "OCORREU UM ERRO AO SALVAR ARQUIVO NO STORAGE. {}");
+
+                if (!configuracao.IgnorarErroDeStorage)
+                {
+                    throw;
+                }
+            }
         }
     }
 }

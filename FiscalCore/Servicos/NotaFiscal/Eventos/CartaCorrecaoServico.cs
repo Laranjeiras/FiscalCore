@@ -53,10 +53,16 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
                 var correcao = item.Correcao;
                 var nSeqEvento = item.nSeqEvento;
                 chave = chave.Replace("NFe", "");
-                eModeloDocumento _modeloDocumento = chave.Substring(20, 2).ModeloDocumento();
 
                 if (item.Correcao.Length < 15 || item.Correcao.Length > 1000)
                     throw new FalhaValidacaoException("A descrição da correção deve conter entre 15 e 1000 caracteres");
+
+                eModeloDocumento _modeloDocumento = 
+                    chave
+                        .AsSpan(20, 2)
+                        .ToString()
+                        .ModeloDocumento();
+
 
                 if (_modeloDocumento != eModeloDocumento.NFe)
                     throw new FalhaValidacaoException("Somente NFe pode ter Carta Correção");
@@ -76,8 +82,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
                     {
                         versao = VERSAO,
                         descEvento = "Carta de Correcao",
-                        xCorrecao = correcao,
-                        
+                        xCorrecao = correcao
                     }
                 };
                 var evento = new evento { versao = VERSAO, infEvento = infEvento };
