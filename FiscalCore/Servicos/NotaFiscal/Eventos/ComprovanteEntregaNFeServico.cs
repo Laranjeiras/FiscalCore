@@ -1,5 +1,4 @@
-﻿using AlgoPlus.Storage.Services;
-using FiscalCore.Configuracoes;
+﻿using FiscalCore.Configuracoes;
 using Microsoft.Extensions.Logging;
 
 namespace FiscalCore.Servicos.NotaFiscal.Eventos
@@ -9,9 +8,8 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
         public ComprovanteEntregaNFeServico(
             ConfiguracaoServico config,
             ITransmitirSefazCommand transmitir,
-            ILogger<ComprovanteEntregaNFeServico> logger,
-            IStorageContext storageContext) 
-            : base(config, transmitir, logger, storageContext)
+            ILogger<ComprovanteEntregaNFeServico> logger)
+            : base(config, transmitir, logger)
         {
         }
     }

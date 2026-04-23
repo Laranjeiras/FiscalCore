@@ -1,19 +1,18 @@
 ﻿using FiscalCore.Configuracoes;
-using FiscalCore.Modelos.Retornos;
-using FiscalCore.Utils;
-using System;
 using FiscalCore.Extensions;
+using FiscalCore.Modelos.Retornos;
+using FiscalCore.NotaFiscal;
+using FiscalCore.NotaFiscal.RetornoServicos.Autorizacao;
+using FiscalCore.Servicos.NotaFiscal;
+using FiscalCore.Servicos.NotaFiscal.Autorizacao;
+using FiscalCore.Tipos;
+using FiscalCore.Utils;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using FiscalCore.Tipos;
-using AlgoPlus.Storage.Services;
-using FiscalCore.NotaFiscal.RetornoServicos.Autorizacao;
-using FiscalCore.NotaFiscal;
-using Microsoft.Extensions.Logging;
-using FiscalCore.Servicos.NotaFiscal;
 using System.Threading;
-using FiscalCore.Servicos.NotaFiscal.Autorizacao;
+using System.Threading.Tasks;
 
 namespace FiscalCore.Servicos
 {
@@ -21,10 +20,10 @@ namespace FiscalCore.Servicos
     {
         private readonly string versaoServico;
 
-        public AutorizarNFe4(ConfiguracaoServico configuracao, ITransmitirSefazCommand transmitir, IStorageContext storageContext, ILogger<AutorizarNFe4> logger)
-            : base(configuracao, transmitir, logger, storageContext)
+        public AutorizarNFe4(ConfiguracaoServico configuracao, ITransmitirSefazCommand transmitir, ILogger<AutorizarNFe4> logger)
+            : base(configuracao, transmitir, logger)
         {
-            this.cancellation = new CancellationToken(); // PARA FUNCIONAR O STORAGE
+            this.cancellation = new CancellationToken();
             this.versaoServico = configuracao.VersaoAutorizacaoNFe.Descricao();
         }
 

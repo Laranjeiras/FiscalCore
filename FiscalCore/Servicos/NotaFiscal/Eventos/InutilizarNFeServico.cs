@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using FiscalCore.Tipos;
 using FiscalCore.Fabrica;
 using System.IO;
-using AlgoPlus.Storage.Services;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 
@@ -15,8 +14,8 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
 {
     public class InutilizarNFeServico : BaseSefazServico<InutilizarNFeServico>, IEventoServico
     {
-        public InutilizarNFeServico(ConfiguracaoServico cfgServico, IStorageContext storageContext, ITransmitirSefazCommand transmitir, ILogger<InutilizarNFeServico> logger) 
-            : base(cfgServico, transmitir, logger, storageContext) 
+        public InutilizarNFeServico(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir, ILogger<InutilizarNFeServico> logger)
+            : base(cfgServico, transmitir, logger) 
         {
         }
 

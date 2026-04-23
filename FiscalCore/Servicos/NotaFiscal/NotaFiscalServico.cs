@@ -1,5 +1,4 @@
-﻿using AlgoPlus.Storage.Services;
-using FiscalCore.Configuracoes;
+﻿using FiscalCore.Configuracoes;
 using FiscalCore.Extensions;
 using FiscalCore.Modelos.Consulta;
 using FiscalCore.Modelos.Retornos;
@@ -16,8 +15,8 @@ namespace FiscalCore.Servicos.NotaFiscal
 {
     public class NotaFiscalServico : BaseSefazServico<NotaFiscalServico>
     {
-        public NotaFiscalServico(ConfiguracaoServico configuracao, IAutorizarNFeServico nfeServico, IStorageContext storageContext, ITransmitirSefazCommand transmitir, ILogger<NotaFiscalServico> logger) 
-            : base(configuracao, transmitir, logger, storageContext)
+        public NotaFiscalServico(ConfiguracaoServico configuracao, IAutorizarNFeServico nfeServico, ITransmitirSefazCommand transmitir, ILogger<NotaFiscalServico> logger)
+            : base(configuracao, transmitir, logger)
         {
             this.AutorizarNFe = nfeServico;
         }

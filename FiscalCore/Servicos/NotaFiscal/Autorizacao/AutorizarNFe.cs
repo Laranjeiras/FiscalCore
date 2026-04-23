@@ -1,25 +1,22 @@
-﻿using AlgoPlus.Storage.Services;
-using FiscalCore.Configuracoes;
+﻿using FiscalCore.Configuracoes;
 using FiscalCore.Modelos.Retornos;
 using FiscalCore.Tipos;
 using FiscalCore.Utils;
 using Microsoft.Extensions.Logging;
-using System.IO;
-using System.Threading.Tasks;
-using System.Threading;
 using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FiscalCore.Servicos.NotaFiscal.Autorizacao
 {
     public class AutorizarNFe : BaseSefazServicoBasico<AutorizarNFe>
     {
-        private const string STORAGE_NAME = "FiscalCore";
-        private IStorage storage;
         protected CancellationToken cancellation;
 
-        public AutorizarNFe(ConfiguracaoBasicaServico configuracao, ITransmitirSefazCommand transmitir, ILogger<AutorizarNFe4> logger, IStorageContext storageContext) : base(configuracao, transmitir, logger, storageContext)
+        public AutorizarNFe(ConfiguracaoBasicaServico configuracao, ITransmitirSefazCommand transmitir, ILogger<AutorizarNFe4> logger)
+            : base(configuracao, transmitir, logger)
         {
-            this.storage = storageContext.GetStorage(STORAGE_NAME);
         }
 
         public async Task<IRetornoAutorizacao> Autorizar(string xmlenviNFe4, eModeloDocumento modeloDocumento, CancellationToken cancellation)
@@ -50,18 +47,18 @@ namespace FiscalCore.Servicos.NotaFiscal.Autorizacao
         {
             try
             {
-                logger.LogInformation($"SALVAR LOG XML {filename}");
+                logger?.LogInformation($"SALVAR LOG XML {filename}");
+                var diretorio = GetDiretorioSalvarXml();
+                var storage = new FileStorage(diretorio);
                 var fileInfo = await storage.SaveAsync(filename, conteudo, cancellation);
-                logger.LogInformation($"LOG SALVO {fileInfo.AbsolutePath}");
+                logger?.LogInformation($"LOG SALVO {fileInfo.FullName}");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "OCORREU UM ERRO AO SALVAR ARQUIVO NO STORAGE. {}");
+                logger?.LogError(ex, "OCORREU UM ERRO AO SALVAR ARQUIVO NO STORAGE.");
 
                 if (!configuracao.IgnorarErroDeStorage)
-                {
                     throw;
-                }
             }
         }
     }

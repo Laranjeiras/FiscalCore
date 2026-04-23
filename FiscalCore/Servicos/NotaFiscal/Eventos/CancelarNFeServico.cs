@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FiscalCore.Tipos;
 using System.Linq;
-using AlgoPlus.Storage.Services;
 using System.IO;
 using FiscalCore.Exceptions;
 using System.Threading;
@@ -21,8 +20,8 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
         private const string VERSAO = "1.00";
         private const string LOG_PATH = "1.00";
 
-        public CancelarNFeServico(ConfiguracaoServico cfgServico, IStorageContext storage, ITransmitirSefazCommand transmitir, ILogger<CancelarNFeServico> logger)
-            :base(cfgServico, transmitir, logger, storage)
+        public CancelarNFeServico(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir, ILogger<CancelarNFeServico> logger)
+            : base(cfgServico, transmitir, logger)
         {
         }
 

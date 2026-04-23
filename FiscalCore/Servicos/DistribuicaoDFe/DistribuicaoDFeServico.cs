@@ -1,5 +1,4 @@
-﻿using AlgoPlus.Storage.Services;
-using FiscalCore.Configuracoes;
+﻿using FiscalCore.Configuracoes;
 using FiscalCore.Fabrica;
 using FiscalCore.Modelos.DistribuicaoDFe;
 using FiscalCore.Tipos;
@@ -16,12 +15,10 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
     public class DistribuicaoDFeServico : BaseSefazServicoBasico<DistribuicaoDFeServico>
     {
         public DistribuicaoDFeServico(
-                ConfiguracaoBasicaServico configuracao, 
-                ITransmitirSefazCommand transmitir, 
-                ILogger<DistribuicaoDFeServico> logger,
-                IStorageContext storageContext
-            ) 
-            : base(configuracao, transmitir, logger, storageContext)
+            ConfiguracaoBasicaServico configuracao,
+            ITransmitirSefazCommand transmitir,
+            ILogger<DistribuicaoDFeServico> logger)
+            : base(configuracao, transmitir, logger)
         {
         }
 

@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FiscalCore.Tipos;
 using System.IO;
-using AlgoPlus.Storage.Services;
 using FiscalCore.Exceptions;
 using System.Threading;
 using Microsoft.Extensions.Logging;
@@ -22,8 +21,8 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
         private readonly CancellationToken cancellation;
         private const string VERSAO = "1.00";
 
-        public CartaCorrecaoServico(ConfiguracaoServico cfgServico, IStorageContext storageContext, ITransmitirSefazCommand transmitir, ILogger<CartaCorrecaoServico> logger)
-            : base(cfgServico, transmitir, logger, storageContext)
+        public CartaCorrecaoServico(ConfiguracaoServico cfgServico, ITransmitirSefazCommand transmitir, ILogger<CartaCorrecaoServico> logger)
+            : base(cfgServico, transmitir, logger)
         {
             this.cfgServico = cfgServico;
             this.transmitir = transmitir;

@@ -6,7 +6,6 @@ using FiscalCore.Utils;
 using System.Threading.Tasks;
 using FiscalCore.Tipos;
 using FiscalCore.Fabrica;
-using AlgoPlus.Storage.Services;
 using System.IO;
 using FiscalCore.ValueObjects;
 using System.Threading;
@@ -20,8 +19,8 @@ namespace FiscalCore.Servicos
         private readonly CancellationToken cancellation;
         private const string versao= "4.00";
 
-        public ConsultaSituacaoNFeServico(ConfiguracaoBasicaServico cfgServico, IStorageContext storage, ITransmitirSefazCommand transmitir, ILogger<ConsultaSituacaoNFeServico> logger)
-            :base(cfgServico, transmitir, logger, storage)
+        public ConsultaSituacaoNFeServico(ConfiguracaoBasicaServico cfgServico, ITransmitirSefazCommand transmitir, ILogger<ConsultaSituacaoNFeServico> logger)
+            : base(cfgServico, transmitir, logger)
         {
             this.sefaz = transmitir;
             this.cancellation = new CancellationToken();

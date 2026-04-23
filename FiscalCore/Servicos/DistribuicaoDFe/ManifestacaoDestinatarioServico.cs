@@ -1,5 +1,4 @@
-﻿using AlgoPlus.Storage.Services;
-using FiscalCore.Configuracoes;
+﻿using FiscalCore.Configuracoes;
 using FiscalCore.Extensions;
 using FiscalCore.Fabrica;
 using FiscalCore.Modelos.Eventos;
@@ -21,8 +20,8 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
         private readonly int nSeqEvento;
         private readonly CancellationToken cancellation;
 
-        public ManifestacaoDestinatarioServico(ConfiguracaoServico config, IStorageContext storageContext, ITransmitirSefazCommand transmitir, ILogger<ManifestacaoDestinatarioServico> logger)
-            :base(config, transmitir, logger, storageContext)
+        public ManifestacaoDestinatarioServico(ConfiguracaoServico config, ITransmitirSefazCommand transmitir, ILogger<ManifestacaoDestinatarioServico> logger)
+            : base(config, transmitir, logger)
         {
             this.nSeqEvento = 1;
             this.cancellation = new CancellationToken();
