@@ -1,9 +1,11 @@
 ﻿using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Runtime.Versioning;
 
 namespace FiscalCore.Danfe.NFCe.Nativo
 {
+    [SupportedOSPlatform("windows")]
     internal class RedimensionarImagem
     {
         private readonly AdicionarImagem _adicionarImagem;

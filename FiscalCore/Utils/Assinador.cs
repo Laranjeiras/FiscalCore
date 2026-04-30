@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
 using System.Xml;
@@ -21,7 +22,11 @@ namespace FiscalCore.Utils
             var xml = XmlUtils.ClasseParaXmlString(objeto);
             documento.LoadXml(xml);
 
-            var docXml = new SignedXml(documento) { SigningKey = certificadoDigital.PrivateKey };
+            AsymmetricAlgorithm privateKey = certificadoDigital.GetRSAPrivateKey()
+                ?? (AsymmetricAlgorithm?)certificadoDigital.GetECDsaPrivateKey()
+                ?? throw new InvalidOperationException("Não foi possível obter a chave privada do certificado.");
+
+            var docXml = new SignedXml(documento) { SigningKey = privateKey };
 
             docXml.SignedInfo.SignatureMethod = signatureMethod;
 

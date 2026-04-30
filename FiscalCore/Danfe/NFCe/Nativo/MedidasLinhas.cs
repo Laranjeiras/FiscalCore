@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Drawing;
+using System.Runtime.Versioning;
 
 namespace FiscalCore.Danfe.NFCe.Nativo
 {
+    [SupportedOSPlatform("windows")]
     internal static class MedidasLinha
     {
         public static Medida GetMedidas(AdicionarTexto adicionarTexto)

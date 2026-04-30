@@ -1,8 +1,10 @@
 ﻿using System.Drawing;
 using System.IO;
+using System.Runtime.Versioning;
 
 namespace FiscalCore.Danfe.NFCe.Nativo
 {
+    [SupportedOSPlatform("windows")]
     internal class AdicionarImagem
     {
         private readonly Graphics _graphics;

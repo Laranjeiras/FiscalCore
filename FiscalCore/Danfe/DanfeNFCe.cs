@@ -1,8 +1,10 @@
-﻿using FiscalCore.Danfe.NFCe;
-using FiscalCore.Configuracoes;
+﻿using FiscalCore.Configuracoes;
+using FiscalCore.Danfe.NFCe;
+using System.Runtime.Versioning;
 
 namespace FiscalCore.Danfe
 {
+    [SupportedOSPlatform("windows")]
     public class DanfeNFCe
     {
         private readonly DanfeNativoNfce _danfe;

@@ -1,7 +1,9 @@
 ﻿using System.Drawing;
+using System.Runtime.Versioning;
 
 namespace FiscalCore.Danfe.NFCe.Nativo
 {
+    [SupportedOSPlatform("windows")]
     internal class AdicionarTexto
     {
         public static FontFamily FontPadrao { get; set; }

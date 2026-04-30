@@ -1,12 +1,14 @@
 ﻿using FiscalCore.Properties;
-using FiscalCore.Utils;
 using FiscalCore.Tipos;
+using FiscalCore.Utils;
 using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
+using System.Runtime.Versioning;
 
 namespace FiscalCore.Configuracoes
 {
+    [SupportedOSPlatform("windows")]
     public class ConfiguracaoDanfe : IConfiguracaoDanfe
     {
         public eVersaoQrCode VersaoQrCode { get; set; } = eVersaoQrCode.QrCodeVersao2;

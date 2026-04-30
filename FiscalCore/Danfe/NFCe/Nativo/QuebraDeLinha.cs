@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using System.Runtime.Versioning;
 
 namespace FiscalCore.Danfe.NFCe.Nativo
 {
+    [SupportedOSPlatform("windows")]
     internal class QuebraDeLinha
     {
         private readonly AdicionarTexto _adicionarTexto;

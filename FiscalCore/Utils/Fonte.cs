@@ -1,9 +1,11 @@
 ﻿using System.Drawing;
 using System.Drawing.Text;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace FiscalCore.Utils
 {
+    [SupportedOSPlatform("windows")]
     public static class Fonte
     {
         public static FontFamily CarregarDeByteArray(byte[] fonte, out PrivateFontCollection colecaoDeFonte)

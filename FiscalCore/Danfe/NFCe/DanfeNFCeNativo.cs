@@ -1,6 +1,9 @@
 ﻿using FiscalCore.Configuracoes;
 using FiscalCore.Danfe.NFCe.Nativo;
 using FiscalCore.Extensions;
+using FiscalCore.NotaFiscal;
+using FiscalCore.NotaFiscal.Informacoes.Destinatario;
+using FiscalCore.Tipos;
 using FiscalCore.Utils;
 using QRCoder;
 using System;
@@ -9,13 +12,12 @@ using System.Drawing.Imaging;
 using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Text;
-using FiscalCore.NotaFiscal;
-using FiscalCore.NotaFiscal.Informacoes.Destinatario;
-using FiscalCore.Tipos;
 
 namespace FiscalCore.Danfe.NFCe
 {
+    [SupportedOSPlatform("windows")]
     internal class DanfeNativoNfce
     {
         private NFe _nfe;
@@ -453,10 +455,12 @@ namespace FiscalCore.Danfe.NFCe
             using (var qrCodeGenerator = new QRCodeGenerator())
             {
                 QRCodeData qrCodeData = qrCodeGenerator.CreateQrCode(urlQrCode, QRCodeGenerator.ECCLevel.M);
-                QRCode qrCode = new QRCode(qrCodeData);
-                var qrCodeImagemTmp = qrCode.GetGraphic(25);
-                Bitmap qrCodeImagem = new Bitmap(qrCodeImagemTmp, new Size(100, 100));
-                Image img = (Image)qrCodeImagem;
+                var pngQrCode = new PngByteQRCode(qrCodeData);
+                byte[] qrCodeBytes = pngQrCode.GetGraphic(4);
+                using var qrMs = new MemoryStream(qrCodeBytes);
+                using var qrOriginal = new Bitmap(qrMs);
+                var qrCodeImagem = new Bitmap(qrOriginal, new Size(100, 100));
+                Image img = qrCodeImagem;
                 int qrCodeImagemX = (larguraLinha - img.Size.Width) / 2;
                 AdicionarImagem desenharQrCode = new AdicionarImagem(g, img, qrCodeImagemX, y);
                 desenharQrCode.Desenhar();

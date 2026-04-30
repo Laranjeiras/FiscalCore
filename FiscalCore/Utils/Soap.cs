@@ -1,20 +1,10 @@
 ﻿using System.IO;
-using System.Net;
 using System.Xml;
 
 namespace FiscalCore.Utils
 {
     public class Soap
     {
-        public static void InserirSoapEnvelopeWebRequest(XmlDocument soapEnvelopeXml, HttpWebRequest webRequest)
-        {
-            using (Stream stream = webRequest.GetRequestStream())
-            {
-                soapEnvelopeXml.PreserveWhitespace = true;
-                soapEnvelopeXml.Save(stream);
-            }
-        }
-
         private static string ObterTag(string ret, string tag)
         {
             XmlDocument doc = new XmlDocument();
