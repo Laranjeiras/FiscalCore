@@ -25,6 +25,8 @@ jobs:
       run: dotnet pack ${{ env.PROJECT_PATH }} -c Release -o out
 
     - name: Push to NuGet
-      run: |
-        cd out
-        dotnet nuget push *.nupkg --api-key ${{ secrets.FISCALCORE_SERVICOS_API_KEY }} --source ${{ secrets.NUGET_SERVER }} --skip-duplicate
+      run: >
+        dotnet nuget push out/*.nupkg
+        --api-key ${{ secrets.FISCALCORE_SERVICOS_API_KEY }}
+        --source ${{ secrets.NUGET_SERVER }}
+        --skip-duplicate
