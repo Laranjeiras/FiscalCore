@@ -28,5 +28,5 @@ jobs:
       run: >
         dotnet nuget push out/*.nupkg
         --api-key ${{ secrets.FISCALCORE_API_KEY }}
-        --source ${{ secrets.NUGET_SERVER }}
+        --source https://api.nuget.org/v3/index.json
         --skip-duplicate
