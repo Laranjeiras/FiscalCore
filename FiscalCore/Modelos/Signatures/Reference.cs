@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+#nullable disable
+#pragma warning disable CS8981
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace FiscalCore.Modelos.Signatures

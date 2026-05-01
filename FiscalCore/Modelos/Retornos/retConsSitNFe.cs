@@ -1,4 +1,6 @@
-﻿using FiscalCore.Modelos.Consulta;
+#nullable disable
+#pragma warning disable CS8981
+using FiscalCore.Modelos.Consulta;
 using FiscalCore.NotaFiscal.Protocolo;
 using FiscalCore.Tipos;
 using System;

@@ -1,4 +1,6 @@
-﻿using FiscalCore.NotaFiscal.Informacoes.Cana;
+#nullable disable
+#pragma warning disable CS8981
+using FiscalCore.NotaFiscal.Informacoes.Cana;
 using FiscalCore.NotaFiscal.Informacoes.Cobranca;
 using FiscalCore.NotaFiscal.Informacoes.Destinatario;
 using FiscalCore.NotaFiscal.Informacoes.Detalhe;

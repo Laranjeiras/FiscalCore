@@ -12,7 +12,7 @@ namespace FiscalCore.Utils
         public static string ClasseParaXmlString<T>(T objeto)
         {
             XElement xml;
-            var ser = XmlSerializer.FromTypes(new[] { typeof(T) })[0];
+            var ser = XmlSerializer.FromTypes(new[] { typeof(T) })[0]!;
 
             using (var memory = new MemoryStream())
             {
@@ -29,9 +29,9 @@ namespace FiscalCore.Utils
 
         public static T XmlStringParaClasse<T>(string input) where T : class
         {
-            var ser = XmlSerializer.FromTypes(new[] { typeof(T) })[0];
+            var ser = XmlSerializer.FromTypes(new[] { typeof(T) })[0]!;
             using var sr = new StringReader(input);
-            return (T)ser.Deserialize(sr);
+            return (T)ser.Deserialize(sr)!;
         }
 
         public static string ObterTagXml(string xml, string tag)
@@ -39,7 +39,7 @@ namespace FiscalCore.Utils
             XmlDocument doc = new XmlDocument();
             doc.Load(new StringReader(xml));
             XmlNodeList xmlList = doc.GetElementsByTagName(tag);
-            var xmlConverter = xmlList[0].OuterXml;
+            var xmlConverter = xmlList[0]!.OuterXml;
             return xmlConverter;
         }
     }

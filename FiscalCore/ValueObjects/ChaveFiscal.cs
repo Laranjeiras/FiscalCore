@@ -57,7 +57,7 @@ namespace FiscalCore.ValueObjects
             }
         }
 
-        private string chave;
+        private string chave = null!;
         public string Chave => chave;
 
         private byte digitoVerificador;
@@ -69,13 +69,13 @@ namespace FiscalCore.ValueObjects
             Modelo == eModeloDocumento.NFCe || Modelo == eModeloDocumento.NFe ? "NFe" : throw new ArgumentOutOfRangeException("Modelo documento");
 
         public eUF UF { get; protected set; }
-        public string AnoMesEmissao { get; protected set; }
+        public string AnoMesEmissao { get; protected set; } = null!;
         public Cnpj Cnpj { get; protected set; }
         public eModeloDocumento Modelo { get; protected set; }
         public int Serie { get; protected set; }
         public long Numero { get; protected set; }
         public eTipoEmissao TipoEmissao { get; protected set; }
-        public Cnf CNF { get; protected set; }
+        public Cnf CNF { get; protected set; } = null!;
 
         private string GerarChave()
         {

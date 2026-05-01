@@ -1,4 +1,6 @@
-﻿using FiscalCore.Utils;
+#nullable disable
+#pragma warning disable CS8981
+using FiscalCore.Utils;
 using FiscalCore.NotaFiscal.Informacoes.Detalhe.Tributacao.Estadual;
 using FiscalCore.NotaFiscal.Informacoes.Detalhe.Tributacao.Federal;
 using FiscalCore.NotaFiscal.Informacoes.Detalhe.Tributacao.Municipal;

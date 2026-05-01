@@ -1,4 +1,4 @@
-﻿using FiscalCore.Configuracoes;
+using FiscalCore.Configuracoes;
 using FiscalCore.Extensions;
 using FiscalCore.Modelos.Consulta;
 using FiscalCore.Modelos.Retornos;
@@ -17,7 +17,9 @@ namespace FiscalCore.Servicos
     public class ConsultaSituacaoNFeServico : BaseSefazServicoBasico<ConsultaSituacaoNFeServico>
     {
         private readonly ITransmitirSefazCommand sefaz;
+        #pragma warning disable CS0414
         private readonly CancellationToken cancellation;
+        #pragma warning restore CS0414
         private const string versao= "4.00";
 
         public ConsultaSituacaoNFeServico(ConfiguracaoBasicaServico cfgServico, IStorageContext storage, ITransmitirSefazCommand transmitir, ILogger<ConsultaSituacaoNFeServico> logger)
@@ -49,7 +51,7 @@ namespace FiscalCore.Servicos
 
             var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.ConsultaSituacaoNFe, xmlEvento);
 
-            var retornoXmlString = await transmitir.TransmitirAsync(sefazUrl, envelope);
+            var retornoXmlString = await transmitir.TransmitirAsync(sefazUrl, envelope!);
 
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retConsSitNFe").OuterXml;
 

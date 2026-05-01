@@ -1,4 +1,6 @@
-﻿using FiscalCore.NotaFiscal.RetornoServicos.Evento;
+#nullable disable
+#pragma warning disable CS8981
+using FiscalCore.NotaFiscal.RetornoServicos.Evento;
 using System.Xml.Serialization;
 
 namespace FiscalCore.NotaFiscal.RetornoServicos.Consulta

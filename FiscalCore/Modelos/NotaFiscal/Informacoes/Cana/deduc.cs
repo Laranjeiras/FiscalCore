@@ -1,4 +1,6 @@
-﻿#region
+#nullable disable
+#pragma warning disable CS8981
+#region
 
 #endregion
 

@@ -1,4 +1,6 @@
-﻿namespace FiscalCore.NotaFiscal.Informacoes.Transporte
+#nullable disable
+#pragma warning disable CS8981
+namespace FiscalCore.NotaFiscal.Informacoes.Transporte
 {
     public class reboque
     {

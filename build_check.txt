@@ -1,0 +1,12 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+D:\Dev\src\FiscalCore\FiscalCore\Danfe\NFCe\Nativo\RedimensionarImagem.cs(31,51): warning CS8604: Possible null reference argument for parameter 'novaImagem' in 'AdicionarImagem.AdicionarImagem(AdicionarImagem adicionarImagem, Image novaImagem)'. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+  FiscalCore -> D:\Dev\src\FiscalCore\FiscalCore\bin\Release\net8.0\FiscalCore.dll
+
+Build succeeded.
+
+D:\Dev\src\FiscalCore\FiscalCore\Danfe\NFCe\Nativo\RedimensionarImagem.cs(31,51): warning CS8604: Possible null reference argument for parameter 'novaImagem' in 'AdicionarImagem.AdicionarImagem(AdicionarImagem adicionarImagem, Image novaImagem)'. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+    1 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:06.12

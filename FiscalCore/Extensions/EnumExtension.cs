@@ -6,7 +6,7 @@ namespace FiscalCore.Extensions
 {
     public static class EnumExtension
     {
-        public static T ObterAtributo<T>(this Enum value) where T : Attribute
+        public static T? ObterAtributo<T>(this Enum value) where T : Attribute
         {
             try
             {
@@ -23,7 +23,7 @@ namespace FiscalCore.Extensions
             }
         }
 
-        public static string Descricao(this Enum value)
+        public static string? Descricao(this Enum value)
         {
             try
             {
@@ -41,7 +41,7 @@ namespace FiscalCore.Extensions
         public static string XmlDescricao(this Enum value)
         {
             var attribute = value.ObterAtributo<XmlEnumAttribute>();
-            return attribute == null ? value.ToString() : attribute.Name.ToString();
+            return attribute == null ? value.ToString() : attribute.Name!.ToString();
         }
     }
 }

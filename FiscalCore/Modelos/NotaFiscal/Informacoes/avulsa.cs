@@ -1,4 +1,6 @@
-﻿using FiscalCore.Utils;
+#nullable disable
+#pragma warning disable CS8981
+using FiscalCore.Utils;
 
 namespace FiscalCore.NotaFiscal.Informacoes
 {

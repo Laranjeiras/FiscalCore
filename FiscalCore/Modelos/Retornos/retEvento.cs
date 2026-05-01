@@ -1,4 +1,6 @@
-﻿using System.Xml.Serialization;
+#nullable disable
+#pragma warning disable CS8981
+using System.Xml.Serialization;
 
 namespace FiscalCore.Modelos.Retornos
 {

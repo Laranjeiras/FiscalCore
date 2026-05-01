@@ -63,7 +63,7 @@ namespace FiscalCore.Fabrica
             return urls;
         }
 
-        public static UrlConsultaNfce ObterUrlConsultaNfce(eTipoAmbiente tipoAmbiente, eUF uf, eVersaoQrCode versaoQrCode)
+        public static UrlConsultaNfce? ObterUrlConsultaNfce(eTipoAmbiente tipoAmbiente, eUF uf, eVersaoQrCode versaoQrCode)
         {
             try
             {

@@ -1,4 +1,6 @@
-﻿namespace FiscalCore.NotaFiscal.RetornoServicos.Autorizacao
+#nullable disable
+#pragma warning disable CS8981
+namespace FiscalCore.NotaFiscal.RetornoServicos.Autorizacao
 {
     public class infRec
     {

@@ -24,12 +24,14 @@ namespace FiscalCore.ValueObjects
         private string value;
         public string Value => Formatar(value);
 
-        public override bool Equals(object obj)
+        public override int GetHashCode() => Value?.GetHashCode() ?? 0;
+
+        public override bool Equals(object? obj)
         {
             return Equals(obj as Cnf);
         }
 
-        public bool Equals(Cnf other)
+        public bool Equals(Cnf? other)
         {
             return !(other is null) &&
                    Value == other.Value &&

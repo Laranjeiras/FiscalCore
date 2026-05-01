@@ -21,14 +21,15 @@ namespace FiscalCore.Danfe.NFCe.Nativo
 
         public void Desenhar()
         {
-            Image logo = _adicionarImagem.Logo;
+            Image? logo = _adicionarImagem.Logo;
 
-            if (logo.Size.Width != 50 || logo.Size.Height != 24)
+            if (logo != null && (logo.Size.Width != 50 || logo.Size.Height != 24))
             {
                 logo = Redimensionar(logo, _largura, _altura);
             }
 
-            new AdicionarImagem(_adicionarImagem, logo).Desenhar();
+            if (logo != null)
+                new AdicionarImagem(_adicionarImagem, logo).Desenhar();
         }
 
         /// <summary>

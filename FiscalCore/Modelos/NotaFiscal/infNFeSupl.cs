@@ -1,4 +1,6 @@
-﻿using System;
+#nullable disable
+#pragma warning disable CS8981
+using System;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;

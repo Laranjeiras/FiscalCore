@@ -1,4 +1,4 @@
-﻿using AlgoPlus.Storage.Services;
+using AlgoPlus.Storage.Services;
 using FiscalCore.Configuracoes;
 using FiscalCore.Extensions;
 using FiscalCore.Modelos.Consulta;
@@ -46,7 +46,7 @@ namespace FiscalCore.Servicos.NotaFiscal
 
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.ConsultaSituacaoNFe, xmlEvento);
 
-            var retornoXmlString = await transmitir.TransmitirAsync(sefazUrl, envelope);
+            var retornoXmlString = await transmitir.TransmitirAsync(sefazUrl, envelope!);
 
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retConsSitNFe").OuterXml;
 

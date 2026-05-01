@@ -19,18 +19,18 @@ namespace FiscalCore.Servicos
 {
     public class AutorizarNFe4 : AutorizarNFe, IAutorizarNFeServico
     {
-        private readonly string versaoServico;
+        private readonly string versaoServico = null!;
 
         public AutorizarNFe4(ConfiguracaoServico configuracao, ITransmitirSefazCommand transmitir, IStorageContext storageContext, ILogger<AutorizarNFe4> logger)
             : base(configuracao, transmitir, logger, storageContext)
         {
             this.cancellation = new CancellationToken(); // PARA FUNCIONAR O STORAGE
-            this.versaoServico = configuracao.VersaoAutorizacaoNFe.Descricao();
+            this.versaoServico = configuracao.VersaoAutorizacaoNFe.Descricao() ?? string.Empty;
         }
 
         public async Task<IRetornoAutorizacao> Autorizar(NFe nfe, CancellationToken cancellation, int idLote = 0)
         {
-            logger?.LogDebug("RECEBENDO NFe", nfe);
+            logger?.LogDebug("RECEBENDO NFe {Nfe}", nfe);
             var lista = new List<NFe> { nfe };
             return  await Autorizar(lista, cancellation, idLote);
         }
@@ -84,7 +84,7 @@ namespace FiscalCore.Servicos
             var xml = XmlUtils.ClasseParaXmlString<NFe>(nfeAssinada);
             xml = xml.Replace("xmlns=\"http://www.portalfiscal.inf.br/nfe\"", string.Empty);
 
-            logger.LogDebug($"NFe [{nfe.infNFe.Id}] ASSINADA");
+            logger?.LogDebug($"NFe [{nfe.infNFe.Id}] ASSINADA");
 
             if (configuracao.ValidarXmlSchema)
             {

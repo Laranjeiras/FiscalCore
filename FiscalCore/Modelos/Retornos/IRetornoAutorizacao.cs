@@ -1,4 +1,6 @@
-﻿namespace FiscalCore.Modelos.Retornos
+#nullable disable
+#pragma warning disable CS8981
+namespace FiscalCore.Modelos.Retornos
 {
     public interface IRetornoAutorizacao
     {

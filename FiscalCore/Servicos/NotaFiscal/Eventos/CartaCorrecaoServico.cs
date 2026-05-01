@@ -18,8 +18,10 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
     public class CartaCorrecaoServico : BaseSefazServico<CartaCorrecaoServico>, IEventoServico
     {
         private readonly ConfiguracaoServico cfgServico;
-        private readonly ITransmitirSefazCommand transmitir;
+        private readonly new ITransmitirSefazCommand transmitir;
+#pragma warning disable CS0414
         private readonly CancellationToken cancellation;
+#pragma warning restore CS0414
         private const string VERSAO = "1.00";
 
         public CartaCorrecaoServico(ConfiguracaoServico cfgServico, IStorageContext storageContext, ITransmitirSefazCommand transmitir, ILogger<CartaCorrecaoServico> logger)
@@ -70,8 +72,8 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
                 var infEvento = new infEventoEnv
                 {
                     chNFe = chave,
-                    CNPJ = cfgServico.Emitente.CNPJ,
-                    CPF = cfgServico.Emitente.CPF,
+                    CNPJ = cfgServico.Emitente!.CNPJ,
+                CPF = cfgServico.Emitente.CPF,
                     cOrgao = cfgServico.UF,
                     dhEvento = DateTime.Now,
                     nSeqEvento = nSeqEvento,
@@ -113,7 +115,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             var sefazUrl = Fabrica.FabricarUrl.ObterUrl(eTipoServico.CartaCorrecao, cfgServico.TipoAmbiente, eModeloDocumento.NFe, cfgServico.UF);
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.CartaCorrecao, xmlEvento);
 
-            var retornoXmlString = await transmitir.TransmitirAsync(sefazUrl, envelope);
+            var retornoXmlString = await transmitir.TransmitirAsync(sefazUrl, envelope!);
 
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retEnvEvento").OuterXml;
 

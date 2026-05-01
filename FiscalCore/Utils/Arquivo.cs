@@ -27,7 +27,7 @@ namespace FiscalCore.Utils
 
         public static string MontarNomeArquivo(string sufixo, ConfiguracaoServico config)
         {
-            return $"{config.Emitente.CNPJ ?? config.Emitente.CPF}-{DateTime.Now.Ticks}-{sufixo}";
+            return $"{config.Emitente?.CNPJ ?? config.Emitente?.CPF}-{DateTime.Now.Ticks}-{sufixo}";
         }
 
         public static string MontarNomeArquivo(string sufixo, ConfiguracaoBasicaServico config)

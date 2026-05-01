@@ -1,4 +1,6 @@
-﻿
+#nullable disable
+#pragma warning disable CS8981
+
 #region
 
 using System;

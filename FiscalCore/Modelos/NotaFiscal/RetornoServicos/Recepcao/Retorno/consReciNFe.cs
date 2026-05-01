@@ -1,4 +1,6 @@
-﻿using System.Xml.Serialization;
+#nullable disable
+#pragma warning disable CS8981
+using System.Xml.Serialization;
 using FiscalCore.Tipos;
 
 namespace FiscalCore.NotaFiscal.RetornoServicos.Recepcao.Retorno

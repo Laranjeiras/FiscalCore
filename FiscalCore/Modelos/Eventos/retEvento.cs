@@ -1,4 +1,6 @@
-﻿using FiscalCore.Modelos.Retornos;
+#nullable disable
+#pragma warning disable CS8981
+using FiscalCore.Modelos.Retornos;
 using System.Xml.Serialization;
 
 namespace FiscalCore.Modelos.Eventos

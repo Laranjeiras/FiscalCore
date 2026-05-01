@@ -1,4 +1,4 @@
-﻿using AlgoPlus.Storage.Services;
+using AlgoPlus.Storage.Services;
 using FiscalCore.Configuracoes;
 using FiscalCore.Modelos.Retornos;
 using FiscalCore.Tipos;
@@ -34,8 +34,8 @@ namespace FiscalCore.Servicos.NotaFiscal.Autorizacao
 
             logger?.LogDebug($"TRANSMITIR SEFAZ");
 
-            var retornoXmlString = await transmitir.TransmitirAsync(urlSefaz, envelope);
-            logger?.LogDebug($"RETORNO SEFAZ", retornoXmlString);
+            var retornoXmlString = await transmitir.TransmitirAsync(urlSefaz, envelope!);
+            logger?.LogDebug("RETORNO SEFAZ {Retorno}", retornoXmlString);
             var retornoLimpo = Soap.LimparEnvelope(retornoXmlString, "retEnviNFe").OuterXml;
 
             var arqRet = Path.Combine("Logs", $"{DateTime.Now.Ticks}-ret-env-nfe.xml");
@@ -56,7 +56,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Autorizacao
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "OCORREU UM ERRO AO SALVAR ARQUIVO NO STORAGE. {}");
+                logger.LogError(ex, "OCORREU UM ERRO AO SALVAR ARQUIVO NO STORAGE.");
 
                 if (!configuracao.IgnorarErroDeStorage)
                 {

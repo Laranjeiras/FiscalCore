@@ -1,4 +1,6 @@
-﻿using FiscalCore.Modelos.Signatures;
+#nullable disable
+#pragma warning disable CS8981
+using FiscalCore.Modelos.Signatures;
 using System.Xml.Serialization;
 
 namespace FiscalCore.Modelos.Inutilizacao

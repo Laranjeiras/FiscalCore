@@ -11,7 +11,7 @@ namespace FiscalCore.Configuracoes
         {
         }
 
-        public ConfiguracaoCertificado(X509Certificate2 certificado, string senha = null)
+        public ConfiguracaoCertificado(X509Certificate2 certificado, string? senha = null)
         {
             _certificado = certificado;
             Senha = senha;
@@ -43,13 +43,13 @@ namespace FiscalCore.Configuracoes
         }
 
         public eTipoCertificado TipoCertificado { get; set; }
-        public string ArquivoCertificado { get; set; }
-        public string Serial { get; set; }
-        public string Senha { get; set; }
+        public string? ArquivoCertificado { get; set; }
+        public string? Serial { get; set; }
+        public string? Senha { get; set; }
         public string SignatureMethodSignedXml { get; set; } = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
         public string DigestMethodReference { get; set; } = "http://www.w3.org/2000/09/xmldsig#sha1";
 
-        private X509Certificate2 _certificado;
+        private X509Certificate2? _certificado;
         public X509Certificate2 Certificado => _certificado ?? Obter();
 
         private X509Certificate2 Obter()
@@ -57,11 +57,11 @@ namespace FiscalCore.Configuracoes
             switch (TipoCertificado)
             {
                 case eTipoCertificado.A1Repositorio:
-                    return Utils.Certificado.ObterDoRepositorio(Serial);
+                    return Utils.Certificado.ObterDoRepositorio(Serial!);
                 case eTipoCertificado.A1Arquivo:
-                    return Utils.Certificado.ObterDeArquivo(ArquivoCertificado, Senha);
+                    return Utils.Certificado.ObterDeArquivo(ArquivoCertificado!, Senha!);
                 case eTipoCertificado.A3:
-                    return Utils.Certificado.ObterDoRepositorio(Serial);
+                    return Utils.Certificado.ObterDoRepositorio(Serial!);
                 default:
                     throw new ArgumentOutOfRangeException();
             }

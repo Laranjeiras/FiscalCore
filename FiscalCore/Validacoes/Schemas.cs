@@ -9,7 +9,7 @@ namespace FiscalCore.Validacoes
         public static string ObterSchema(eTipoServico tipoServico)
         {
             var schema = ListaSchemas.Where(x => x.TipoServico == tipoServico).SingleOrDefault();
-            return schema.Arquivo;
+            return schema!.Arquivo;
         }
 
         private static IList<Schema> ListaSchemas => new List<Schema>
@@ -27,6 +27,6 @@ namespace FiscalCore.Validacoes
     {
         public eTipoServico TipoServico { get; set; }
 
-        public string Arquivo { get; set; }
+        public string Arquivo { get; set; } = null!;
     }
 }

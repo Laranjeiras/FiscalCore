@@ -1,4 +1,6 @@
-﻿namespace FiscalCore.NotaFiscal.Informacoes.Pagamento
+#nullable disable
+#pragma warning disable CS8981
+namespace FiscalCore.NotaFiscal.Informacoes.Pagamento
 {
     public class card
     {

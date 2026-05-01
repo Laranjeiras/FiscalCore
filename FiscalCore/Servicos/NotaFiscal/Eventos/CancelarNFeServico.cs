@@ -1,4 +1,4 @@
-﻿using FiscalCore.Configuracoes;
+using FiscalCore.Configuracoes;
 using FiscalCore.Extensions;
 using FiscalCore.Modelos.Eventos;
 using FiscalCore.Modelos.Retornos;
@@ -93,7 +93,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             var sefazUrl = Fabrica.FabricarUrl.ObterUrl(eTipoServico.CancelarNFe, configuracao.TipoAmbiente, modeloDoc, configuracao.UF);
             var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.CancelarNFe, xmlEvento);
 
-            var retornoXmlString = await transmitir.TransmitirAsync(sefazUrl, envelope);
+            var retornoXmlString = await transmitir.TransmitirAsync(sefazUrl, envelope!);
 
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retEnvEvento").OuterXml;
 

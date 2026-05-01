@@ -51,9 +51,9 @@ namespace FiscalCore.Validacoes
             cfg.Schemas.XmlResolver = new XmlUrlResolver();
             cfg.Schemas.Add(null, arquivoSchema);
 
-            cfg.ValidationEventHandler += delegate (object sender, ValidationEventArgs args)
+            cfg.ValidationEventHandler += delegate (object? sender, ValidationEventArgs args)
             {
-                Erros.Add($"[{args.Severity}] - {args.Message} {args.Exception?.Message} na linha {args.Exception.LineNumber} posição {args.Exception.LinePosition} em {args.Exception.SourceUri}".ToString());
+                Erros.Add($"[{args.Severity}] - {args.Message} {args.Exception?.Message} na linha {args.Exception?.LineNumber} posição {args.Exception?.LinePosition} em {args.Exception?.SourceUri}".ToString());
             };
 
             var reader = XmlReader.Create(new StringReader(xml), cfg);

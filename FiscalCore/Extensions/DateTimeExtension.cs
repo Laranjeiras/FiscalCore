@@ -9,7 +9,7 @@ namespace FiscalCore.Extensions
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static string ParaDataString(this DateTimeOffset data)
+        public static string? ParaDataString(this DateTimeOffset data)
         {
             return data == DateTimeOffset.MinValue ? null : data.ToString("yyyy-MM-dd");
         }
@@ -19,7 +19,7 @@ namespace FiscalCore.Extensions
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static string ParaDataString(this DateTimeOffset? data)
+        public static string? ParaDataString(this DateTimeOffset? data)
         {
             if (data == null) return null;
             return data == DateTimeOffset.MinValue ? null : data.Value.ToString("yyyy-MM-dd");
@@ -30,7 +30,7 @@ namespace FiscalCore.Extensions
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static string ParaDataHoraStringUtc(this DateTimeOffset data)
+        public static string? ParaDataHoraStringUtc(this DateTimeOffset data)
         {
             return data == DateTimeOffset.MinValue ? null : data.ToString("yyyy-MM-ddTHH:mm:sszzz");
         }
@@ -40,7 +40,7 @@ namespace FiscalCore.Extensions
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static string ParaDataHoraStringSemUtc(this DateTimeOffset data)
+        public static string? ParaDataHoraStringSemUtc(this DateTimeOffset data)
         {
             return data == DateTimeOffset.MinValue ? null : data.ToString("yyyy-MM-ddTHH:mm:dd");
         }
@@ -50,7 +50,7 @@ namespace FiscalCore.Extensions
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static string ParaDataHoraStringSemUtc(this DateTimeOffset? data)
+        public static string? ParaDataHoraStringSemUtc(this DateTimeOffset? data)
         {
             return ParaDataHoraStringSemUtc(data.GetValueOrDefault());
         }
@@ -60,7 +60,7 @@ namespace FiscalCore.Extensions
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static string ParaDataHoraStringUtc(this DateTimeOffset? data)
+        public static string? ParaDataHoraStringUtc(this DateTimeOffset? data)
         {
             return ParaDataHoraStringUtc(data.GetValueOrDefault());
         }
@@ -80,7 +80,7 @@ namespace FiscalCore.Extensions
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static string ParaDataString(this DateTime data)
+        public static string? ParaDataString(this DateTime data)
         {
             return data == DateTime.MinValue ? null : data.ToString("yyyy-MM-dd");
         }
@@ -90,7 +90,7 @@ namespace FiscalCore.Extensions
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static string ParaDataString(this DateTime? data)
+        public static string? ParaDataString(this DateTime? data)
         {
             if (data == null) return null;
             return data == DateTime.MinValue ? null : data.Value.ToString("yyyy-MM-dd");
@@ -101,7 +101,7 @@ namespace FiscalCore.Extensions
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static string ParaDataHoraStringUtc(this DateTime data)
+        public static string? ParaDataHoraStringUtc(this DateTime data)
         {
             return data == DateTime.MinValue ? null : data.ToString("yyyy-MM-ddTHH:mm:sszzz");
         }
@@ -111,7 +111,7 @@ namespace FiscalCore.Extensions
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static string ParaDataHoraStringSemUtc(this DateTime data)
+        public static string? ParaDataHoraStringSemUtc(this DateTime data)
         {
             return data == DateTime.MinValue ? null : data.ToString("yyyy-MM-ddTHH:mm:dd");
         }
@@ -121,7 +121,7 @@ namespace FiscalCore.Extensions
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static string ParaDataHoraStringSemUtc(this DateTime? data)
+        public static string? ParaDataHoraStringSemUtc(this DateTime? data)
         {
             return ParaDataHoraStringSemUtc(data.GetValueOrDefault());
         }
@@ -131,7 +131,7 @@ namespace FiscalCore.Extensions
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static string ParaDataHoraStringUtc(this DateTime? data)
+        public static string? ParaDataHoraStringUtc(this DateTime? data)
         {
             return ParaDataHoraStringUtc(data.GetValueOrDefault());
         }

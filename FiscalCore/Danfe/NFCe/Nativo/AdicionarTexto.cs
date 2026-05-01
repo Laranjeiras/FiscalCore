@@ -6,13 +6,13 @@ namespace FiscalCore.Danfe.NFCe.Nativo
     [SupportedOSPlatform("windows")]
     internal class AdicionarTexto
     {
-        public static FontFamily FontPadrao { get; set; }
+        public static FontFamily? FontPadrao { get; set; }
         private readonly Graphics _graphics;
         private float _pontoX;
         private float _pontoY;
-        private readonly SolidBrush _br;
+        private readonly SolidBrush? _br;
 
-        public AdicionarTexto(Graphics graphics, string texto, int tamanhoFonte, SolidBrush br = null, Font font = null)
+        public AdicionarTexto(Graphics graphics, string texto, int tamanhoFonte, SolidBrush? br = null, Font? font = null)
         {
             _graphics = graphics;
             Texto = texto;
@@ -22,7 +22,7 @@ namespace FiscalCore.Danfe.NFCe.Nativo
             if (font != null)
                 Fonte = font;
 
-            if (font == null)
+            if (font == null && FontPadrao != null)
                 Fonte = new Font(FontPadrao, TamanhoFonte);
 
             Medida = MedidasLinha.GetMedidas(this);
@@ -42,9 +42,9 @@ namespace FiscalCore.Danfe.NFCe.Nativo
             _graphics.DrawString(Texto, Fonte, Brushes.Black, new PointF(_pontoX, _pontoY));
         }
 
-        public Medida Medida { get; private set; }
-        public string Texto { get; private set; }
-        public Font Fonte { get; private set; }
+        public Medida Medida { get; private set; } = null!;
+        public string Texto { get; private set; } = null!;
+        public Font Fonte { get; private set; } = null!;
         public int TamanhoFonte { get; private set; }
     }
 }

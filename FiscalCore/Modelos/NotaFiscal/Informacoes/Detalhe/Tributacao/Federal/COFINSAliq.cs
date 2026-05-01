@@ -1,4 +1,6 @@
-﻿using FiscalCore.NotaFiscal.Informacoes.Detalhe.Tributacao.Federal.Tipos;
+#nullable disable
+#pragma warning disable CS8981
+using FiscalCore.NotaFiscal.Informacoes.Detalhe.Tributacao.Federal.Tipos;
 using FiscalCore.Utils;
 
 namespace FiscalCore.NotaFiscal.Informacoes.Detalhe.Tributacao.Federal

@@ -1,4 +1,4 @@
-﻿using FiscalCore.Configuracoes;
+using FiscalCore.Configuracoes;
 using FiscalCore.Extensions;
 using FiscalCore.Modelos.Inutilizacao;
 using FiscalCore.Modelos.Retornos;
@@ -22,7 +22,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
 
         public async Task<retInutNFe> Inutilizar(int ano, eModeloDocumento modeloDocumento, int serie, int numeroInicial, int numeroFinal, string justificativa, CancellationToken cancellation) 
         {
-            var cnpj = configuracao.Emitente.CNPJ ?? configuracao.Emitente.CPF;
+            var cnpj = (configuracao.Emitente!.CNPJ ?? configuracao.Emitente.CPF) ?? string.Empty;
             var tpAmb = configuracao.TipoAmbiente;
             var uf = configuracao.UF;
             var pedInutilizacao = FabricarInutNFe(tpAmb, uf, ano, cnpj, modeloDocumento, serie, numeroInicial, numeroFinal, justificativa);
@@ -34,7 +34,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
 
             var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.InutilizacaoNFe, xmlInutilizacao);
             var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.InutilizacaoNFe, configuracao.TipoAmbiente, modeloDocumento, configuracao.UF);
-            var retornoXmlString = await transmitir.TransmitirAsync(sefazUrl, envelope);
+            var retornoXmlString = await transmitir.TransmitirAsync(sefazUrl, envelope!);
             var retornoLimpo = Soap.LimparEnvelope(retornoXmlString, "retInutNFe").OuterXml;
 
             var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ret-inut.xml", configuracao));
@@ -45,7 +45,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
 
         private inutNFe FabricarInutNFe(eTipoAmbiente tpAmb, eUF uf, int ano, string cnpj, eModeloDocumento modelo, int serie, int numeroInicial, int numeroFinal, string justificativa)
         {
-            string versaoServico = configuracao.VersaoInutilizacaoNFe.Descricao();
+            string versaoServico = configuracao.VersaoInutilizacaoNFe.Descricao() ?? string.Empty;
 
             var pedInutilizacao = new inutNFe
             {

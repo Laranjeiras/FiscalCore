@@ -64,12 +64,12 @@ namespace FiscalCore.Utils
             return new X509Certificate2(bytes, senha, X509KeyStorageFlags.Exportable);
         }
 
-        public static string ExtrairCNPJArquivo(this X509Certificate2 certificado)
+        public static string? ExtrairCNPJArquivo(this X509Certificate2 certificado)
         {
             const string oIdSubjectAlternativeName = "2.5.29.17";
 
             var extensao = certificado.Extensions[oIdSubjectAlternativeName];
-            var texto = Encoding.UTF8.GetString(extensao.RawData);
+            var texto = Encoding.UTF8.GetString(extensao!.RawData);
 
             var matches = Regex.Matches(texto, @"(?<!\d)\d{14}(?!\d)");
 

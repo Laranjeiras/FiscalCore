@@ -1,0 +1,42 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+D:\Dev\src\FiscalCore\FiscalCore\Danfe\NFCe\Nativo\RedimensionarImagem.cs(24,26): warning CS8600: Converting null literal or possible null value to non-nullable type. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Danfe\NFCe\Nativo\RedimensionarImagem.cs(26,17): warning CS8602: Dereference of a possibly null reference. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Utils\XmlUtils.cs(21,21): warning CS8602: Dereference of a possibly null reference. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Utils\Certificado.cs(72,49): warning CS8602: Dereference of a possibly null reference. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Utils\Certificado.cs(77,20): warning CS8603: Possible null reference return. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Utils\XmlUtils.cs(34,23): warning CS8602: Dereference of a possibly null reference. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Servicos\NotaFiscal\Autorizacao\TratarNFeAutorizacao.cs(53,27): warning CS8602: Dereference of a possibly null reference. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Servicos\NotaFiscal\Eventos\InutilizarNFeServico.cs(28,67): warning CS8604: Possible null reference argument for parameter 'cnpj' in 'inutNFe InutilizarNFeServico.FabricarInutNFe(eTipoAmbiente tpAmb, eUF uf, int ano, string cnpj, eModeloDocumento modelo, int serie, int numeroInicial, int numeroFinal, string justificativa)'. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Danfe\NFCe\DanfeNFCeNativo.cs(537,35): warning CS8604: Possible null reference argument for parameter 'value' in 'string? EnumExtension.Descricao(Enum value)'. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Danfe\NFCe\DanfeNFCeNativo.cs(25,33): warning CS0649: Field 'DanfeNativoNfce._logo' is never assigned to, and will always have its default value null [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Servicos\DistribuicaoDFe\ManifestacaoDestinatarioServico.cs(22,44): warning CS0414: The field 'ManifestacaoDestinatarioServico.cancellation' is assigned but its value is never used [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Servicos\NotaFiscal\ConsultaSituacaoNFeServico.cs(20,44): warning CS0414: The field 'ConsultaSituacaoNFeServico.cancellation' is assigned but its value is never used [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Servicos\NotaFiscal\Eventos\CartaCorrecaoServico.cs(22,44): warning CS0414: The field 'CartaCorrecaoServico.cancellation' is assigned but its value is never used [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Servicos\NotaFiscal\Autorizacao\AutorizarNFe4.cs(33,30): warning CA2017: Number of parameters supplied in the logging message template do not match the number of named placeholders (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2017) [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Servicos\NotaFiscal\Autorizacao\AutorizarNFe.cs(38,30): warning CA2017: Number of parameters supplied in the logging message template do not match the number of named placeholders (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2017) [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Servicos\NotaFiscal\Autorizacao\AutorizarNFe.cs(59,37): warning CA2017: Number of parameters supplied in the logging message template do not match the number of named placeholders (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2017) [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+  FiscalCore -> D:\Dev\src\FiscalCore\FiscalCore\bin\Release\net8.0\FiscalCore.dll
+
+Build succeeded.
+
+D:\Dev\src\FiscalCore\FiscalCore\Danfe\NFCe\Nativo\RedimensionarImagem.cs(24,26): warning CS8600: Converting null literal or possible null value to non-nullable type. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Danfe\NFCe\Nativo\RedimensionarImagem.cs(26,17): warning CS8602: Dereference of a possibly null reference. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Utils\XmlUtils.cs(21,21): warning CS8602: Dereference of a possibly null reference. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Utils\Certificado.cs(72,49): warning CS8602: Dereference of a possibly null reference. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Utils\Certificado.cs(77,20): warning CS8603: Possible null reference return. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Utils\XmlUtils.cs(34,23): warning CS8602: Dereference of a possibly null reference. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Servicos\NotaFiscal\Autorizacao\TratarNFeAutorizacao.cs(53,27): warning CS8602: Dereference of a possibly null reference. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Servicos\NotaFiscal\Eventos\InutilizarNFeServico.cs(28,67): warning CS8604: Possible null reference argument for parameter 'cnpj' in 'inutNFe InutilizarNFeServico.FabricarInutNFe(eTipoAmbiente tpAmb, eUF uf, int ano, string cnpj, eModeloDocumento modelo, int serie, int numeroInicial, int numeroFinal, string justificativa)'. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Danfe\NFCe\DanfeNFCeNativo.cs(537,35): warning CS8604: Possible null reference argument for parameter 'value' in 'string? EnumExtension.Descricao(Enum value)'. [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Danfe\NFCe\DanfeNFCeNativo.cs(25,33): warning CS0649: Field 'DanfeNativoNfce._logo' is never assigned to, and will always have its default value null [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Servicos\DistribuicaoDFe\ManifestacaoDestinatarioServico.cs(22,44): warning CS0414: The field 'ManifestacaoDestinatarioServico.cancellation' is assigned but its value is never used [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Servicos\NotaFiscal\ConsultaSituacaoNFeServico.cs(20,44): warning CS0414: The field 'ConsultaSituacaoNFeServico.cancellation' is assigned but its value is never used [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Servicos\NotaFiscal\Eventos\CartaCorrecaoServico.cs(22,44): warning CS0414: The field 'CartaCorrecaoServico.cancellation' is assigned but its value is never used [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Servicos\NotaFiscal\Autorizacao\AutorizarNFe4.cs(33,30): warning CA2017: Number of parameters supplied in the logging message template do not match the number of named placeholders (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2017) [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Servicos\NotaFiscal\Autorizacao\AutorizarNFe.cs(38,30): warning CA2017: Number of parameters supplied in the logging message template do not match the number of named placeholders (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2017) [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+D:\Dev\src\FiscalCore\FiscalCore\Servicos\NotaFiscal\Autorizacao\AutorizarNFe.cs(59,37): warning CA2017: Number of parameters supplied in the logging message template do not match the number of named placeholders (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2017) [D:\Dev\src\FiscalCore\FiscalCore\FiscalCore.csproj]
+    16 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:05.38

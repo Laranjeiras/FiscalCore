@@ -1,4 +1,4 @@
-﻿using AlgoPlus.Storage.Services;
+using AlgoPlus.Storage.Services;
 using FiscalCore.Configuracoes;
 using FiscalCore.Fabrica;
 using FiscalCore.Modelos.DistribuicaoDFe;
@@ -131,7 +131,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.NFeDistribuicaoDFe, configuracao.TipoAmbiente, eModeloDocumento.NFe, eUF.AN);
             logger?.LogInformation($"URL OBTIDA {sefazUrl.Url}");
 
-            var retorno = await transmitir.TransmitirAsync(sefazUrl, envelope);
+            var retorno = await transmitir.TransmitirAsync(sefazUrl, envelope!);
 
             logger?.LogDebug($"LIMPAR ENVELOPE");
             var retornoLimpo = Soap.LimparEnvelope(retorno, "retDistDFeInt").OuterXml;

@@ -1,4 +1,6 @@
-﻿namespace FiscalCore.Modelos.Signatures
+#nullable disable
+#pragma warning disable CS8981
+namespace FiscalCore.Modelos.Signatures
 {
     public class KeyInfo
     {

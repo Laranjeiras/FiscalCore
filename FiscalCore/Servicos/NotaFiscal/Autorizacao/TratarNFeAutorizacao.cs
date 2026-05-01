@@ -50,7 +50,7 @@ namespace FiscalCore.Servicos
                 if (nfe.infNFe?.dest != null)
                     nfe.infNFe.dest.xNome = "NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL";
 
-                var det = nfe.infNFe.det[0];
+                var det = nfe.infNFe!.det![0];
                 det.prod.xProd = "NOTA FISCAL EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL";
             }
         }

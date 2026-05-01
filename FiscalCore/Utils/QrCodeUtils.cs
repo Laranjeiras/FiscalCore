@@ -16,7 +16,7 @@ namespace FiscalCore.Utils
 
             var url = FabricarUrl.ObterUrlConsultaNfce(tipoAmbiente, uf, eVersaoQrCode.QrCodeVersao2);
 
-            var urlQrCode = url.UrlQrCode;
+            var urlQrCode = url!.UrlQrCode;
 
             if (!urlQrCode.EndsWith(interrogacao))
                 urlQrCode += interrogacao;

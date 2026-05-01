@@ -1,4 +1,6 @@
-﻿using FiscalCore.Tipos;
+#nullable disable
+#pragma warning disable CS8981
+using FiscalCore.Tipos;
 
 namespace FiscalCore.NotaFiscal.Informacoes.Identificacao
 {

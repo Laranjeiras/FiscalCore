@@ -5,7 +5,7 @@ namespace FiscalCore.Fabrica
 {
     public static class SoapEnvelopeFabrica
     {
-        public static XmlDocument FabricarEnvelope(eTipoServico tipoServico, string xml)
+        public static XmlDocument? FabricarEnvelope(eTipoServico tipoServico, string xml)
         {
             switch (tipoServico)
             {

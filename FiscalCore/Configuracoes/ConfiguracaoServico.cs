@@ -25,7 +25,7 @@ namespace FiscalCore.Configuracoes
             this.UF = uf;
             this.Emitente = emitente;
             this.Csc = csc;
-            this.CNPJEmitente = emitente.CpfCnpj;
+            this.CNPJEmitente = emitente.CpfCnpj ?? string.Empty;
 
             TipoEmissao = eTipoEmissao.Normal;
 
@@ -38,35 +38,35 @@ namespace FiscalCore.Configuracoes
 
         public eTipoEmissao TipoEmissao { get; set; }
 
-        private string _diretorioSalvarXml;
+        private string? _diretorioSalvarXml;
         public string DiretorioSalvarXml
         {
             get { return _diretorioSalvarXml ?? Directory.GetCurrentDirectory(); }
             set { _diretorioSalvarXml = value; }
         }
 
-        private string _diretorioSalvarDanfe;
+        private string? _diretorioSalvarDanfe;
         public string DiretorioSalvarDanfe
         {
             get { return _diretorioSalvarDanfe ?? Directory.GetCurrentDirectory(); }
             set { _diretorioSalvarDanfe = value; }
         }
 
-        public emit Emitente { get; set; }
+        public emit? Emitente { get; set; }
 
-        public IConfiguracaoDanfe ConfigDanfe { get; set; }
-        public ConfiguracaoCsc Csc { get; set; }
+        public IConfiguracaoDanfe? ConfigDanfe { get; set; }
+        public ConfiguracaoCsc? Csc { get; set; }
 
         /// <summary>
         /// Versão do Processo de emissão da NF-e.
         /// </summary>
-        public string VersaoProc { get; set; }
+        public string? VersaoProc { get; set; }
 
         public eVersaoServico VersaoInutilizacaoNFe { get; set; }
         public eVersaoServico VersaoCancelamentoNFe { get; set; }
         public eVersaoServico VersaoAutorizacaoNFe { get; set; }
         public eVersaoServico VersaoManifestacaoDestinatario { get; set; }
-        public string ImpressoraCupom { get; set; }
+        public string? ImpressoraCupom { get; set; }
         public int NFeSerie { get; set; }
         public int NFCeSerie { get; set; }
 
@@ -85,7 +85,7 @@ namespace FiscalCore.Configuracoes
             }
         }
 
-        public void Validar()
+        public new void Validar()
         {
             base.Validar();
             if (Emitente == null)

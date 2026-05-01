@@ -1,4 +1,6 @@
-﻿using FiscalCore.Modelos.Eventos;
+#nullable disable
+#pragma warning disable CS8981
+using FiscalCore.Modelos.Eventos;
 using FiscalCore.Modelos.Retornos;
 using System;
 using System.Collections.Generic;

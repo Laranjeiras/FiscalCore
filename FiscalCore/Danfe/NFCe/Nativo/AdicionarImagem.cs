@@ -8,10 +8,10 @@ namespace FiscalCore.Danfe.NFCe.Nativo
     internal class AdicionarImagem
     {
         private readonly Graphics _graphics;
-        private readonly string _caminhoImagem;
+        private readonly string? _caminhoImagem;
         private readonly int _posicaoX;
         private readonly int _posicaoY;
-        private readonly Image _imagem;
+        private readonly Image? _imagem;
 
         public AdicionarImagem(Graphics graphics, string caminhoImagem, int posicaoX, int posicaoY)
         {
@@ -37,7 +37,7 @@ namespace FiscalCore.Danfe.NFCe.Nativo
             _posicaoY = adicionarImagem.PosicaoY;
         }
 
-        public Image Logo { get { return _imagem; } }
+        public Image? Logo { get { return _imagem; } }
         public Graphics Graphics { get { return _graphics; } }
         public int PosicaoX { get { return _posicaoX; } }
         public int PosicaoY { get { return _posicaoY; } }
@@ -46,17 +46,18 @@ namespace FiscalCore.Danfe.NFCe.Nativo
         {
             try
             {
-                Image imagemUtilizada = null;
+                Image? imagemUtilizada = null;
 
                 if (_imagem != null)
                 {
                     imagemUtilizada = _imagem;
                 }
 
-                if (File.Exists(_caminhoImagem))
+                if (_caminhoImagem != null && File.Exists(_caminhoImagem))
                     imagemUtilizada = Image.FromFile(_caminhoImagem);
 
-                _graphics.DrawImage(imagemUtilizada, new Point(_posicaoX, _posicaoY));
+                if (imagemUtilizada != null)
+                    _graphics.DrawImage(imagemUtilizada, new Point(_posicaoX, _posicaoY));
             }
             catch
             {

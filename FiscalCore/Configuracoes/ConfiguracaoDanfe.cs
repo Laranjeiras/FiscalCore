@@ -12,19 +12,19 @@ namespace FiscalCore.Configuracoes
     public class ConfiguracaoDanfe : IConfiguracaoDanfe
     {
         public eVersaoQrCode VersaoQrCode { get; set; } = eVersaoQrCode.QrCodeVersao2;
-        public string FontPadraoNfceNativa { get; set; }
-        public string NFCeUrlConsultaSefaz { get; set; }
+        public string? FontPadraoNfceNativa { get; set; }
+        public string? NFCeUrlConsultaSefaz { get; set; }
         public bool SegundaViaContingencia { get; set; }
-        public string NFCeUrlConsultaQrCodeSefaz { get; set; }
+        public string? NFCeUrlConsultaQrCodeSefaz { get; set; }
 
-        private string diretorioSalvarDanfe { get; set; }
+        private string? diretorioSalvarDanfe { get; set; }
         public string DiretorioSalvarDanfe
         {
             get => ObterDiretorioSalvarDanfe();
             set => DefinirDiretorioSalvarDanfe(value);  
         }
 
-        public FontFamily CarregarFontePadraoNfceNativa(string font = null)
+        public FontFamily CarregarFontePadraoNfceNativa(string? font = null)
         {
             if (font != null)
             {
@@ -42,10 +42,10 @@ namespace FiscalCore.Configuracoes
         {
             if (diretorioSalvarDanfe == null || !Directory.Exists(diretorioSalvarDanfe))
                 DefinirDiretorioSalvarDanfe(null);
-            return diretorioSalvarDanfe;
+            return diretorioSalvarDanfe!;
         }
 
-        private void DefinirDiretorioSalvarDanfe(string diretorioSalvarDanfe)
+        private void DefinirDiretorioSalvarDanfe(string? diretorioSalvarDanfe)
         {
             if (diretorioSalvarDanfe == null)
                 diretorioSalvarDanfe = Path.Combine(Directory.GetCurrentDirectory(), "Danfes");

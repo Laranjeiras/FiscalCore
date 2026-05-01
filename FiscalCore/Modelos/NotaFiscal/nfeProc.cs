@@ -1,4 +1,6 @@
-﻿using FiscalCore.NotaFiscal.Protocolo;
+#nullable disable
+#pragma warning disable CS8981
+using FiscalCore.NotaFiscal.Protocolo;
 using System.Xml.Serialization;
 
 namespace FiscalCore.NotaFiscal

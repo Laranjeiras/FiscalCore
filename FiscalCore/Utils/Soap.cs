@@ -10,7 +10,7 @@ namespace FiscalCore.Utils
             XmlDocument doc = new XmlDocument();
             doc.Load(new StringReader(ret));
             XmlNodeList xmlList = doc.GetElementsByTagName(tag);
-            var xmlConverter = xmlList[0].OuterXml;
+            var xmlConverter = xmlList[0]!.OuterXml;
             return xmlConverter;
         }
 
@@ -21,7 +21,7 @@ namespace FiscalCore.Utils
             var documento = new XmlDocument();
             documento.LoadXml(xmlTag);
 
-            return documento.DocumentElement;
+            return documento.DocumentElement!;
         }
     }
 }

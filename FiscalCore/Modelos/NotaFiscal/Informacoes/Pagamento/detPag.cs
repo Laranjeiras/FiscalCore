@@ -1,4 +1,6 @@
-﻿using FiscalCore.Utils;
+#nullable disable
+#pragma warning disable CS8981
+using FiscalCore.Utils;
 using FiscalCore.Tipos;
 
 namespace FiscalCore.NotaFiscal.Informacoes.Pagamento

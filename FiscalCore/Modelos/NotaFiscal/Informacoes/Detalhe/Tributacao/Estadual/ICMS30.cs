@@ -1,4 +1,6 @@
-﻿using System.Xml.Serialization;
+#nullable disable
+#pragma warning disable CS8981
+using System.Xml.Serialization;
 using FiscalCore.NotaFiscal.Informacoes.Detalhe.Tributacao.Estadual.Tipos;
 using FiscalCore.Utils;
 

@@ -1,4 +1,4 @@
-﻿using AlgoPlus.Storage.Services;
+using AlgoPlus.Storage.Services;
 using FiscalCore.Configuracoes;
 using FiscalCore.Extensions;
 using FiscalCore.Fabrica;
@@ -19,7 +19,9 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
     public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDestinatarioServico>
     {
         private readonly int nSeqEvento;
+        #pragma warning disable CS0414
         private readonly CancellationToken cancellation;
+        #pragma warning restore CS0414
 
         public ManifestacaoDestinatarioServico(ConfiguracaoServico config, IStorageContext storageContext, ITransmitirSefazCommand transmitir, ILogger<ManifestacaoDestinatarioServico> logger)
             :base(config, transmitir, logger, storageContext)
@@ -47,7 +49,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
 
             var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.ManifestacaoDestinatario, xmlEvento);
             var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.ManifestacaoDestinatario, configuracao.TipoAmbiente, eModeloDocumento.NFe, eUF.AN);
-            var xmlRetorno = await transmitir.TransmitirAsync(sefazUrl, envelope);
+            var xmlRetorno = await transmitir.TransmitirAsync(sefazUrl, envelope!);
             var xmlRetLimpo = Soap.LimparEnvelope(xmlRetorno, "retEnvEvento").OuterXml;
 
             var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ret-eve.xml", configuracao));
@@ -57,7 +59,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             return retEnvEvento;
         }
 
-        private string GerarXmlEvento(string chaveAcesso, eTipoEventoNFe tipoEvento, string justificativa = null)
+        private string GerarXmlEvento(string chaveAcesso, eTipoEventoNFe tipoEvento, string? justificativa = null)
         {
             if (tipoEvento == eTipoEventoNFe.OperacaoNaoRealizada && justificativa == null)
                 throw new ArgumentNullException("Justificativa deve ser informada");
@@ -68,7 +70,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             var infEvento = new infEventoEnv
             {
                 chNFe = chaveAcesso,
-                CNPJ = configuracao.Emitente.CNPJ,
+                CNPJ = configuracao.Emitente!.CNPJ,
                 CPF = configuracao.Emitente.CPF,
                 cOrgao = eUF.AN,
                 dhEvento = DateTime.Now,
@@ -80,7 +82,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
                 detEvento = new detEvento()
                 {
                     versao = configuracao.VersaoManifestacaoDestinatario.Descricao(),
-                    descEvento = tipoEvento.Descricao().RemoverAcentos()
+                    descEvento = (tipoEvento.Descricao() ?? string.Empty).RemoverAcentos()
                 }
             };
 

@@ -1,4 +1,6 @@
-﻿using FiscalCore.Extensions;
+#nullable disable
+#pragma warning disable CS8981
+using FiscalCore.Extensions;
 using FiscalCore.Tipos;
 using System;
 using System.Xml.Serialization;

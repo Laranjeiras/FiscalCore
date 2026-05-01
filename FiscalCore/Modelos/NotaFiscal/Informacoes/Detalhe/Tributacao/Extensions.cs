@@ -1,4 +1,6 @@
-﻿using System;
+#nullable disable
+#pragma warning disable CS8981
+using System;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using FiscalCore.NotaFiscal.Informacoes.Detalhe.Tributacao.Estadual.Tipos;

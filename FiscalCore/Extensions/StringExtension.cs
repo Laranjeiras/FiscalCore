@@ -16,7 +16,7 @@ namespace FiscalCore.Extensions
             return texto;
         }
 
-        public static string SomenteNumeros(this string value)
+        public static string? SomenteNumeros(this string value)
         {
             return string.IsNullOrEmpty(value) ? null : new string(value.Where(Char.IsDigit).ToArray());
         }

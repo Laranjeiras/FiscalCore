@@ -20,9 +20,11 @@ namespace FiscalCore.Danfe.NFCe
     [SupportedOSPlatform("windows")]
     internal class DanfeNativoNfce
     {
-        private NFe _nfe;
-        private nfeProc _proc;
-        private readonly Image _logo;        
+        private NFe _nfe = null!;
+        private nfeProc? _proc;
+#pragma warning disable CS0649
+        private readonly Image? _logo;
+#pragma warning restore CS0649
         private readonly string _cIdToken, _csc;
         private readonly IConfiguracaoDanfe _configDanfe;
         private const int larguraLinha = 284;
@@ -62,7 +64,7 @@ namespace FiscalCore.Danfe.NFCe
 
         //Função para mandar imprimir na impressora padrão
         //Utilizado em AppDesktop
-        public void Imprimir(string nomeImpressora = null, string salvarArquivoPdfEm = null)
+        public void Imprimir(string? nomeImpressora = null, string? salvarArquivoPdfEm = null)
         {
             PrintDocument printCupom = new PrintDocument();
 
@@ -83,7 +85,8 @@ namespace FiscalCore.Danfe.NFCe
 
         private void printCupom_PrintPage(object sender, PrintPageEventArgs e)
         {
-            GerarNfCe(e.Graphics);
+            if (e.Graphics != null)
+                GerarNfCe(e.Graphics);
         }
 
         public void SalvarJpg(string filename)
@@ -229,8 +232,8 @@ namespace FiscalCore.Danfe.NFCe
                 nome.Desenhar(x + 50, y);
                 y += nome.Medida.Altura;
 
-                var ucom = detalhe.prod?.uCom.Length > 3 ? detalhe.prod.uCom.Substring(0, 3) : string.Empty;
-                AdicionarTexto quantidade = new AdicionarTexto(g, $"{detalhe.prod.qCom.ToString("N4")}   {ucom}", 7);
+                var ucom = detalhe.prod?.uCom?.Length > 3 ? detalhe.prod.uCom.Substring(0, 3) : string.Empty;
+                AdicionarTexto quantidade = new AdicionarTexto(g, $"{detalhe.prod!.qCom.ToString("N4")}   {ucom}", 7);
                 AdicionarTexto valorUnitario = new AdicionarTexto(g, detalhe.prod.vUnCom.ToString("C"), 7);
                 AdicionarTexto vezesX = new AdicionarTexto(g, "x", 7);
 
@@ -400,7 +403,7 @@ namespace FiscalCore.Danfe.NFCe
             AdicionarTexto textoConsulteChave = new AdicionarTexto(g, "Consulte pela Chave de Acesso em", 7);
             AdicionarTextoCentralizado(textoConsulteChave);
 
-            AdicionarTexto textoUrlSefaz = new AdicionarTexto(g, _configDanfe.NFCeUrlConsultaSefaz, 7);
+            AdicionarTexto textoUrlSefaz = new AdicionarTexto(g, _configDanfe.NFCeUrlConsultaSefaz ?? string.Empty, 7);
             AdicionarTextoCentralizado(textoUrlSefaz);
 
             string novaChave = FormatarChaveAcesso(_nfe);
@@ -433,7 +436,7 @@ namespace FiscalCore.Danfe.NFCe
         {
             if (_nfe.infNFe.ide.tpEmis == eTipoEmissao.Normal)
             {
-                var protocolo = _proc.protNFe.infProt;
+                var protocolo = _proc!.protNFe.infProt;
                 var textoProtocoloAutorizacao = new StringBuilder("Protocolo de autorização: ");
                 textoProtocoloAutorizacao.Append(protocolo.nProt);
                 AdicionarTexto protocoloAutorizacao = new AdicionarTexto(g, textoProtocoloAutorizacao.ToString(), 7);
@@ -533,11 +536,11 @@ namespace FiscalCore.Danfe.NFCe
 
         private void DesenharFormaPagamento(int x, int larguraLinhaMargemDireita, Graphics g, eFormaPagamento? formaPagamento, decimal? vPag)
         {
-            var _formaPagamento = formaPagamento.Descricao();
+            var _formaPagamento = formaPagamento.HasValue ? formaPagamento.Value.Descricao() ?? string.Empty : string.Empty;
             AdicionarTexto textoFormaPagamento = new AdicionarTexto(g, _formaPagamento, 7);
             textoFormaPagamento.Desenhar(x, y);
 
-            AdicionarTexto textoValorFormaPagamento = new AdicionarTexto(g, vPag.Value.ToString("C"), 7);
+            AdicionarTexto textoValorFormaPagamento = new AdicionarTexto(g, vPag.GetValueOrDefault().ToString("C"), 7);
             int textoValorFormaPagamentoX = (larguraLinhaMargemDireita - textoValorFormaPagamento.Medida.Largura);
             textoValorFormaPagamento.Desenhar(textoValorFormaPagamentoX, y);
 

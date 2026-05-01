@@ -28,7 +28,7 @@ namespace FiscalCore.Utils
 
             var docXml = new SignedXml(documento) { SigningKey = privateKey };
 
-            docXml.SignedInfo.SignatureMethod = signatureMethod;
+            docXml.SignedInfo!.SignatureMethod = signatureMethod;
 
             var reference = new Reference { Uri = "#" + id, DigestMethod = digestMethod };
 

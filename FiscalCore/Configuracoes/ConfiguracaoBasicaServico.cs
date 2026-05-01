@@ -6,8 +6,8 @@ namespace FiscalCore.Configuracoes
 {
     public class ConfiguracaoBasicaServico
     {
-        public ConfiguracaoCertificado ConfigCertificado { get; set; }
-        public string CNPJEmitente { get; set; }
+        public ConfiguracaoCertificado ConfigCertificado { get; set; } = null!;
+        public string CNPJEmitente { get; set; } = null!;
         public eTipoAmbiente TipoAmbiente { get; set; } = eTipoAmbiente.Homologacao;
         public eUF UF { get; set; } = eUF.RJ;
         public int TimeOut { get; set; } = 5000;
@@ -17,7 +17,7 @@ namespace FiscalCore.Configuracoes
         /// </summary>
         public bool IgnorarErroDeStorage { get; set; }
 
-        private string _diretorioSchemas;
+        private string? _diretorioSchemas;
         public string DiretorioSchemas
         {
             get { return _diretorioSchemas ?? Directory.GetCurrentDirectory(); }

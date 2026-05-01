@@ -32,7 +32,7 @@ namespace FiscalCore.Servicos
                     .Select(x => new { CpfCnpj = x.infNFe.emit.CNPJ ?? x.infNFe.emit.CPF })
                     .Distinct()
                     .SingleOrDefault();
-                return !(cpfCnpjEmitente.CpfCnpj != cnpjEmissor);
+                return !(cpfCnpjEmitente!.CpfCnpj != cnpjEmissor);
             }
             catch
             {
