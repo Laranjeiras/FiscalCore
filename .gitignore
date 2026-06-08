@@ -360,3 +360,5 @@ FiscalCore.WebPrint/.config/dotnet-tools.json
 /FiscalCore.Testes/appsettings.json
 /FiscalCore.Testes/NFes/NFe_1.cs
 /FiscalCore.Testes/*
+docs/**/*
+.claudeignore

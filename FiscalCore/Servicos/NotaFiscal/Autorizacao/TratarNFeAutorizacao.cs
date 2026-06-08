@@ -20,6 +20,7 @@ namespace FiscalCore.Servicos
         {
             NaoContribuinteTemQueSerConsumidorFinal(nfe);
             NFCeNaoInformarIPI(nfe);
+            NFCeDefinirCamposObrigatorios(nfe);
             TratarDestinatarioHomologacao(nfe);
         }
 
@@ -53,6 +54,17 @@ namespace FiscalCore.Servicos
                 var det = nfe.infNFe!.det![0];
                 det.prod.xProd = "NOTA FISCAL EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL";
             }
+        }
+
+        public static void NFCeDefinirCamposObrigatorios(NFe nfe)
+        {
+            if (nfe.infNFe.ide.mod != eModeloDocumento.NFCe)
+                return;
+
+            nfe.infNFe.ide.dhSaiEnt = null;
+            nfe.infNFe.ide.indPres = ePresencaComprador.Presencial;
+            nfe.infNFe.transp.modFrete = eModalidadeFrete.SemFrete;
+            nfe.infNFe.transp.veicTransp = null;
         }
     }
 }
