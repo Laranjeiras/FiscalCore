@@ -298,12 +298,16 @@ namespace FiscalCore.NotaFiscal.Informacoes.Detalhe.Tributacao
 
 
 
-        private static string GetCstCofins(object instance, string propName)
+        private static string ExtrairCst<TEnum>(object instance, string propName) where TEnum : Enum
         {
             try
             {
                 var property = instance.GetType().GetProperty(propName, BindingFlags.Public | BindingFlags.Instance);
-                var w = property != null ? ((CSTCOFINS)property.GetValue(instance, null)).ToString() : "";
+                if (property == null)
+                    return "";
+
+                var rawValue = property.GetValue(instance, null);
+                var w = rawValue != null ? ((TEnum)rawValue).ToString() : "";
                 return w != "" ? Regex.Match(w, "[0-9]+").Value : "";
             }
             catch (Exception)
@@ -312,47 +316,17 @@ namespace FiscalCore.NotaFiscal.Informacoes.Detalhe.Tributacao
             }
         }
 
-        private static string GetCstIpi(object instance, string propName)
-        {
-            try
-            {
-                var property = instance.GetType().GetProperty(propName, BindingFlags.Public | BindingFlags.Instance);
-                var w = property != null ? ((CSTIPI)property.GetValue(instance, null)).ToString() : "";
-                return w != "" ? Regex.Match(w, "[0-9]+").Value : "";
-            }
-            catch (Exception)
-            {
-                return "";
-            }
-        }
+        private static string GetCstCofins(object instance, string propName) =>
+            ExtrairCst<CSTCOFINS>(instance, propName);
 
-        private static string GetCstPis(object instance, string propName)
-        {
-            try
-            {
-                var property = instance.GetType().GetProperty(propName, BindingFlags.Public | BindingFlags.Instance);
-                var w = property != null ? ((CSTPIS)property.GetValue(instance, null)).ToString() : "";
-                return w != "" ? Regex.Match(w, "[0-9]+").Value : "";
-            }
-            catch (Exception)
-            {
-                return "";
-            }
-        }
+        private static string GetCstIpi(object instance, string propName) =>
+            ExtrairCst<CSTIPI>(instance, propName);
 
-        private static string GetCstIcms(object instance, string propName)
-        {
-            try
-            {
-                var property = instance.GetType().GetProperty(propName, BindingFlags.Public | BindingFlags.Instance);
-                var w = property != null ? ((Csticms)property.GetValue(instance, null)).ToString() : "";
-                return w != "" ? Regex.Match(w, "[0-9]+").Value : "";
-            }
-            catch (Exception)
-            {
-                return "";
-            }
-        }
+        private static string GetCstPis(object instance, string propName) =>
+            ExtrairCst<CSTPIS>(instance, propName);
+
+        private static string GetCstIcms(object instance, string propName) =>
+            ExtrairCst<Csticms>(instance, propName);
 
         private static string GetModBCst(object instance, string propName)
         {
