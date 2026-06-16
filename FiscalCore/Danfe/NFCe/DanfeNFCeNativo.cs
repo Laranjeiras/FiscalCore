@@ -175,10 +175,10 @@ namespace FiscalCore.Danfe.NFCe
             if (_logo == null)
                 larguraLogo = 0;
 
-            y = MontarLinhaTitulo(g, MontarMensagemRazaoSocial(), tamanhoFonteTitulo, larguraLogo, x, y, larguraLinha);
-            y = MontarLinhaTitulo(g, MontarMensagemCpfCnpjIE(), tamanhoFonteTitulo, larguraLogo, x, y, larguraLinha);
+            y = MontarLinhaTitulo(g, DanfeNfceTextos.MontarMensagemRazaoSocial(_nfe), tamanhoFonteTitulo, larguraLogo, x, y, larguraLinha);
+            y = MontarLinhaTitulo(g, DanfeNfceTextos.MontarMensagemCpfCnpjIE(_nfe), tamanhoFonteTitulo, larguraLogo, x, y, larguraLinha);
 
-            string enderecoEmitente = MontarMensagemEnderecoEmitente();
+            string enderecoEmitente = DanfeNfceTextos.MontarMensagemEnderecoEmitente(_nfe);
 
             AdicionarTexto textoEndereco = new AdicionarTexto(g, enderecoEmitente, 7);
             AdicionarTextoCentralizado(textoEndereco);
@@ -406,7 +406,7 @@ namespace FiscalCore.Danfe.NFCe
             AdicionarTexto textoUrlSefaz = new AdicionarTexto(g, _configDanfe.NFCeUrlConsultaSefaz ?? string.Empty, 7);
             AdicionarTextoCentralizado(textoUrlSefaz);
 
-            string novaChave = FormatarChaveAcesso(_nfe);
+            string novaChave = NfceQrCode.FormatarChaveAcesso(_nfe);
 
             AdicionarTexto chave = new AdicionarTexto(g, novaChave, 7);
             AdicionarTextoCentralizado(chave);
@@ -416,7 +416,7 @@ namespace FiscalCore.Danfe.NFCe
 
         private void DesenharMensagemConsumidor(Graphics g)
         {
-            string mensagemConsumidor = MontarMensagemConsumidor(_nfe.infNFe.dest);
+            string mensagemConsumidor = DanfeNfceTextos.MontarMensagemConsumidor(_nfe.infNFe.dest);
 
             AdicionarTexto consumidor = new AdicionarTexto(g, mensagemConsumidor, 9);
             QuebraDeLinha quebraLinhaConsumidor = new QuebraDeLinha(consumidor,
@@ -427,7 +427,7 @@ namespace FiscalCore.Danfe.NFCe
 
         private void DesenharMensagemDadosNFCe(Graphics g)
         {
-            string mensagemDadosNfCe = MontarMensagemDadosNfce();
+            string mensagemDadosNfCe = DanfeNfceTextos.MontarMensagemDadosNfce(_nfe);
             AdicionarTexto dadosNfce = new AdicionarTexto(g, mensagemDadosNfCe, 7);
             AdicionarTextoCentralizado(dadosNfce);
         }
@@ -453,7 +453,7 @@ namespace FiscalCore.Danfe.NFCe
         {
             y += 8;
 
-            string urlQrCode = ObtemUrlQrCode(_nfe, _cIdToken, _csc);
+            string urlQrCode = NfceQrCode.ObterUrlQrCode(_nfe, _configDanfe, _csc);
 
             using (var qrCodeGenerator = new QRCodeGenerator())
             {
@@ -547,202 +547,11 @@ namespace FiscalCore.Danfe.NFCe
             y += textoFormaPagamento.Medida.Altura;
         }
 
-        private string MontarMensagemEnderecoEmitente()
-        {
-            var enderEmit = _nfe.infNFe.emit.enderEmit;
-
-            string foneEmit = string.Empty;
-
-            if (enderEmit.fone != null)
-            {
-                foneEmit = $"\nFONE: {enderEmit.fone}";
-            }
-
-
-            StringBuilder enderecoEmitenteBuilder = new StringBuilder();
-            enderecoEmitenteBuilder.Append(enderEmit.xLgr);
-            enderecoEmitenteBuilder.Append(" ");
-
-            if (string.IsNullOrEmpty(enderEmit.nro))
-            {
-                enderecoEmitenteBuilder.Append("S/N, ");
-            }
-
-            if (!string.IsNullOrEmpty(enderEmit.nro))
-            {
-                enderecoEmitenteBuilder.Append(enderEmit.nro);
-                enderecoEmitenteBuilder.Append(", ");
-            }
-            enderecoEmitenteBuilder.Append("\n");
-            enderecoEmitenteBuilder.Append(enderEmit.xBairro);
-            enderecoEmitenteBuilder.Append(", ");
-            enderecoEmitenteBuilder.Append(enderEmit.xMun);
-            enderecoEmitenteBuilder.Append(", ");
-            enderecoEmitenteBuilder.Append(enderEmit.UF);
-            enderecoEmitenteBuilder.Append(foneEmit);
-
-            return enderecoEmitenteBuilder.ToString();
-        }
-
-        private string MontarMensagemRazaoSocial()
-        {
-            var emitente = _nfe.infNFe.emit;
-            return string.IsNullOrEmpty(emitente.xFant) ? emitente.xNome : emitente.xFant;
-        }
-
-        private string MontarMensagemCpfCnpjIE()
-        {
-            var emitente = _nfe.infNFe.emit;
-            return string.IsNullOrEmpty(emitente.CNPJ) ? $"CPF: {emitente.CPF}" : $"CNPJ: {emitente.CNPJ}    IE: {emitente.IE}";
-        }
-
-        private string MontarMensagemDadosNfce()
-        {
-            StringBuilder mensagem = new StringBuilder("NFC-e nº ");
-            mensagem.Append(_nfe.infNFe.ide.nNF.ToString("D9"));
-            mensagem.Append(" Série ");
-            mensagem.Append(_nfe.infNFe.ide.serie.ToString("D3"));
-            mensagem.Append(" ");
-            mensagem.Append(_nfe.infNFe.ide.dhEmi.ToString("G"));
-            mensagem.Append(" - ");
-            mensagem.Append("Via consumidor");
-
-            return mensagem.ToString();
-        }
-
-        private string MontarMensagemConsumidor(dest dest)
-        {
-            StringBuilder mensagem = new StringBuilder("CONSUMIDOR ");
-
-            if (dest == null || (string.IsNullOrEmpty(dest.CPF) && string.IsNullOrEmpty(dest.CNPJ)))
-            {
-                mensagem.Append("NÃO IDENTIFICADO");
-                return mensagem.ToString();
-            }
-
-            if (!string.IsNullOrEmpty(dest.idEstrangeiro))
-            {
-                mensagem.Append("Id ");
-                mensagem.Append(dest.idEstrangeiro);
-            }
-
-            if (!string.IsNullOrEmpty(dest.CPF))
-            {
-                mensagem.Append("CPF ");
-                mensagem.Append(dest.CPF);
-            }
-
-            if (!string.IsNullOrEmpty(dest.CNPJ))
-            {
-                mensagem.Append("CNPJ ");
-                mensagem.Append(dest.CNPJ);
-            }
-
-            if (!string.IsNullOrEmpty(dest.xNome))
-            {
-                mensagem.Append(" ");
-                mensagem.Append(dest.xNome);
-            }
-
-            enderDest enderecoDest = dest.enderDest;
-
-            if (enderecoDest == null) return mensagem.ToString().Replace(", ,", ", ");
-
-            string rua = string.Empty;
-            if (!string.IsNullOrEmpty(enderecoDest.xLgr))
-                rua = enderecoDest.xLgr;
-
-            string numero = "S/N";
-            if (!string.IsNullOrEmpty(enderecoDest.nro))
-                numero = enderecoDest.nro;
-
-            string bairro = string.Empty;
-            if (!string.IsNullOrEmpty(enderecoDest.xBairro))
-                bairro = enderecoDest.xBairro;
-
-            string cidade = string.Empty;
-            if (!string.IsNullOrEmpty(enderecoDest.xMun))
-                bairro = enderecoDest.xMun;
-
-            string siglaUf = string.Empty;
-            if (!string.IsNullOrEmpty(enderecoDest.UF))
-                bairro = enderecoDest.UF;
-
-            if (string.IsNullOrEmpty(rua)) return mensagem.ToString();
-            mensagem.Append(" - ");
-            mensagem.Append(rua);
-            mensagem.Append(", ");
-            mensagem.Append(numero);
-            mensagem.Append(", ");
-            mensagem.Append(bairro);
-            mensagem.Append(", ");
-            mensagem.Append(cidade);
-            mensagem.Append(" - ");
-            mensagem.Append(siglaUf);
-
-            return mensagem.ToString().Replace(", ,", ", ");
-        }
-
         private void AdicionarTextoCentralizado(AdicionarTexto texto)
         {
             int textoConsulteChaveX = ((larguraLinha - texto.Medida.Largura) / 2);
             texto.Desenhar(textoConsulteChaveX, y);
             y += texto.Medida.Altura;
-        }
-
-        private string ObtemUrlQrCode(NFe nfce, string idToken, string csc)
-        {
-            var url = _configDanfe.NFCeUrlConsultaQrCodeSefaz;
-
-            const string pipe = "|";
-
-            //Chave de Acesso da NFC-e 
-            var chave = _nfe.infNFe.Id.Substring(3);
-
-            //Identificação do Ambiente (1 – Produção, 2 – Homologação) 
-            var ambiente = (int)_nfe.infNFe.ide.tpAmb;
-
-            //Identificador do CSC (Código de Segurança do Contribuinte no Banco de Dados da SEFAZ). Informar sem os zeros não significativos
-            var idCsc = Convert.ToInt16(csc);
-
-            string dadosBase;
-
-            if (_nfe.infNFe.ide.tpEmis == eTipoEmissao.OffLine)
-            {
-                var diaEmi = _nfe.infNFe.ide.dhEmi.Day.ToString("D2");
-                var valorNfce = _nfe.infNFe.total.ICMSTot.vNF.ToString("0.00").Replace(',', '.');
-                var digVal = Nativo.Conversor.ObterHexDeString(_nfe.Signature.SignedInfo.Reference.DigestValue);
-                dadosBase = string.Concat(chave, pipe, 2, pipe, ambiente, pipe, diaEmi, pipe, valorNfce, pipe, digVal, pipe, idCsc);
-            }
-            else
-            {
-                dadosBase = string.Concat(chave, pipe, 2, pipe, ambiente, pipe, idCsc);
-            }
-
-            var dadosSha1 = string.Concat(dadosBase, csc);
-            var sh1 = Nativo.Conversor.ObterHexSha1DeString(dadosSha1);
-
-            return string.Concat(url, dadosBase, pipe, sh1);
-        }
-
-        private string FormatarChaveAcesso(NFe nfce)
-        {
-            string chaveAcesso = nfce.infNFe.Id.Substring(3);
-            string novaChave = string.Empty;
-            int contaChaveAcesso = 0;
-
-            foreach (char c in chaveAcesso)
-            {
-                contaChaveAcesso++;
-                novaChave += c;
-
-                if (contaChaveAcesso == 4)
-                {
-                    novaChave += " ";
-                    contaChaveAcesso = 0;
-                }
-            }
-            return novaChave;
         }
 
         private static AdicionarTexto CriaHeaderColuna(string texto, Graphics graphics, int x, int y)
