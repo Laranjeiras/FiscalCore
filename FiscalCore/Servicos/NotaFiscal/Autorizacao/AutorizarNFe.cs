@@ -50,13 +50,13 @@ namespace FiscalCore.Servicos.NotaFiscal.Autorizacao
         {
             try
             {
-                logger.LogInformation($"SALVAR LOG XML {filename}");
+                logger?.LogInformation($"SALVAR LOG XML {filename}");
                 var fileInfo = await storage.SaveAsync(filename, conteudo, cancellation);
-                logger.LogInformation($"LOG SALVO {fileInfo.AbsolutePath}");
+                logger?.LogInformation($"LOG SALVO {fileInfo.AbsolutePath}");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "OCORREU UM ERRO AO SALVAR ARQUIVO NO STORAGE.");
+                logger?.LogError(ex, "OCORREU UM ERRO AO SALVAR ARQUIVO NO STORAGE.");
 
                 if (!configuracao.IgnorarErroDeStorage)
                 {
