@@ -1,5 +1,6 @@
 ﻿using AlgoPlus.Storage.Services;
 using FiscalCore.Configuracoes;
+using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
@@ -51,10 +52,9 @@ namespace FiscalCore.Servicos
         {
             try
             {
-                logger?.LogDebug($"SALVAR LOG XML {filename}");
                 var storage = storageContext.GetStorage(STORAGE_NAME);
                 var fileInfo = await storage.SaveAsync(filename, conteudo, cancellation);
-                logger?.LogDebug($"LOG SALVO {fileInfo.AbsolutePath}");
+                logger?.LogDebug($"LOG SALVO {Path.Combine(fileInfo.AbsolutePath, fileInfo.Filename)}");
             }
             catch (Exception ex)
             {

@@ -50,9 +50,8 @@ namespace FiscalCore.Servicos.NotaFiscal.Autorizacao
         {
             try
             {
-                logger?.LogInformation($"SALVAR LOG XML {filename}");
                 var fileInfo = await storage.SaveAsync(filename, conteudo, cancellation);
-                logger?.LogInformation($"LOG SALVO {fileInfo.AbsolutePath}");
+                logger?.LogInformation($"LOG SALVO {Path.Combine(fileInfo.AbsolutePath, fileInfo.Filename)}");
             }
             catch (Exception ex)
             {
