@@ -11,96 +11,230 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FiscalCore.Servicos.DistribuicaoDFe
-{
-    public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDestinatarioServico>
-    {
-        private readonly int nSeqEvento;
-        #pragma warning disable CS0414
-        private readonly CancellationToken cancellation;
-        #pragma warning restore CS0414
+namespace FiscalCore.Servicos.DistribuicaoDFe;
 
-        public ManifestacaoDestinatarioServico(ConfiguracaoServico config, IStorageContext storageContext, ITransmitirSefazCommand transmitir, ILogger<ManifestacaoDestinatarioServico> logger)
-            :base(config, transmitir, logger, storageContext)
+public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDestinatarioServico>
+{
+    private const int QuantidadeMinimaLote = 1;
+    private const int QuantidadeMaximaLote = 20;
+    private const int SequenciaEvento = 1;
+    private const int StatusEventoRegistrado = 135;
+    private const int StatusDuplicidadeEvento = 573;
+
+    public ManifestacaoDestinatarioServico(
+        ConfiguracaoServico config,
+        IStorageContext storageContext,
+        ITransmitirSefazCommand transmitir,
+        ILogger<ManifestacaoDestinatarioServico> logger)
+        : base(config, transmitir, logger, storageContext)
+    {
+    }
+
+    /// <summary>
+    /// Mantém o contrato público legado. A transmissão usa o mesmo pipeline de um lote unitário.
+    /// </summary>
+    public async Task<retEnvEvento> ManifestarAsync(
+        ChaveFiscal chaveNFe,
+        eTipoEventoNFe tipoEvento,
+        string justificativa,
+        CancellationToken cancellation)
+    {
+        var item = new ManifestacaoDestinatarioItem(chaveNFe, tipoEvento, justificativa);
+        var resultado = await ManifestarLoteAsync(new[] { item }, cancellation).ConfigureAwait(false);
+        return resultado.RetornoSefaz;
+    }
+
+    /// <summary>
+    /// Transmite de 1 a 20 manifestações em um único envEvento. Cada infEvento é assinada individualmente.
+    /// O status 573 é devolvido como reconciliação pendente para que o consumidor confirme a evidência local.
+    /// </summary>
+    public async Task<ManifestacaoDestinatarioLoteResultado> ManifestarLoteAsync(
+        IReadOnlyList<ManifestacaoDestinatarioItem> itens,
+        CancellationToken cancellation = default)
+    {
+        ValidarItens(itens);
+        logger.LogInformation("INICIANDO MANIFESTACAO DO DESTINATARIO EM LOTE COM {Quantidade} EVENTOS", itens.Count);
+
+        var envio = CriarEnvEvento(itens);
+        var xmlEvento = XmlUtils.ClasseParaXmlString<envEvento>(envio);
+        var arquivoEnvio = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ped-eve.xml", configuracao));
+        await SalvarLog(arquivoEnvio, xmlEvento, cancellation).ConfigureAwait(false);
+
+        if (configuracao.ValidarXmlSchema)
         {
-            this.nSeqEvento = 1;
-            this.cancellation = new CancellationToken();
+            ValidarXml(eTipoServico.ManifestacaoDestinatario, configuracao, xmlEvento);
         }
 
-        public async Task<retEnvEvento> ManifestarAsync(ChaveFiscal chaveNFe, eTipoEventoNFe tipoEvento, string justificativa, CancellationToken cancellation)
+        var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.ManifestacaoDestinatario, xmlEvento);
+        var sefazUrl = FabricarUrl.ObterUrl(
+            eTipoServico.ManifestacaoDestinatario,
+            configuracao.TipoAmbiente,
+            eModeloDocumento.NFe,
+            eUF.AN);
+        var xmlRetorno = await transmitir.TransmitirAsync(sefazUrl, envelope!).ConfigureAwait(false);
+        var xmlRetornoLimpo = Soap.LimparEnvelope(xmlRetorno, "retEnvEvento").OuterXml;
+
+        var arquivoRetorno = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ret-eve.xml", configuracao));
+        await SalvarLog(arquivoRetorno, xmlRetornoLimpo, cancellation).ConfigureAwait(false);
+
+        var retornoSefaz = XmlUtils.XmlStringParaClasse<retEnvEvento>(xmlRetornoLimpo);
+        var resultados = CriarResultados(itens, retornoSefaz);
+        return new ManifestacaoDestinatarioLoteResultado(retornoSefaz, resultados);
+    }
+
+    internal envEvento CriarEnvEvento(IReadOnlyList<ManifestacaoDestinatarioItem> itens)
+    {
+        var eventos = new List<evento>(itens.Count);
+        foreach (var item in itens)
         {
-            logger.LogInformation("INICIANDO MANIFESTACAO DO DESTINATARIO");
+            eventos.Add(CriarEvento(item));
+        }
 
-            if (!PodeManifestar(tipoEvento))
-                throw new Exception("Evento não permitido nesse serviço");
+        return envEvento.Criar(configuracao.VersaoManifestacaoDestinatario.Descricao(), SequenciaEvento, eventos);
+    }
 
-            var xmlEvento = GerarXmlEvento(chaveNFe.Chave, tipoEvento, justificativa);
+    internal static void ValidarItens(IReadOnlyList<ManifestacaoDestinatarioItem> itens)
+    {
+        if (itens == null)
+        {
+            throw new ArgumentNullException(nameof(itens));
+        }
 
-            var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ped-eve.xml", configuracao));
-            await SalvarLog(arqEnv, xmlEvento, cancellation);
+        if (itens.Count < QuantidadeMinimaLote || itens.Count > QuantidadeMaximaLote)
+        {
+            throw new ArgumentOutOfRangeException(nameof(itens), itens.Count, "O lote deve conter entre 1 e 20 manifestações.");
+        }
 
-            if (configuracao.ValidarXmlSchema)
+        foreach (var item in itens)
+        {
+            if (item == null)
             {
-                ValidarXml(eTipoServico.ManifestacaoDestinatario, configuracao, xmlEvento);
+                throw new ArgumentException("O lote não pode conter itens nulos.", nameof(itens));
             }
 
-            var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.ManifestacaoDestinatario, xmlEvento);
-            var sefazUrl = FabricarUrl.ObterUrl(eTipoServico.ManifestacaoDestinatario, configuracao.TipoAmbiente, eModeloDocumento.NFe, eUF.AN);
-            var xmlRetorno = await transmitir.TransmitirAsync(sefazUrl, envelope!);
-            var xmlRetLimpo = Soap.LimparEnvelope(xmlRetorno, "retEnvEvento").OuterXml;
-
-            var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ret-eve.xml", configuracao));
-            await SalvarLog(arqEnv, xmlRetLimpo, cancellation);
-
-            var retEnvEvento = XmlUtils.XmlStringParaClasse<retEnvEvento>(xmlRetLimpo);
-            return retEnvEvento;
-        }
-
-        private string GerarXmlEvento(string chaveAcesso, eTipoEventoNFe tipoEvento, string? justificativa = null)
-        {
-            if (tipoEvento == eTipoEventoNFe.OperacaoNaoRealizada && justificativa == null)
-                throw new ArgumentNullException("Justificativa deve ser informada");
-            
-            if (tipoEvento != eTipoEventoNFe.OperacaoNaoRealizada)
-                justificativa = null;
-
-            var infEvento = new infEventoEnv
+            if (!PodeManifestar(item.TipoEvento))
             {
-                chNFe = chaveAcesso,
-                CNPJ = configuracao.Emitente!.CNPJ,
-                CPF = configuracao.Emitente.CPF,
-                cOrgao = eUF.AN,
-                dhEvento = DateTime.Now,
-                nSeqEvento = 1,
-                tpAmb = configuracao.TipoAmbiente,
-                tpEvento = tipoEvento,
-                verEvento = configuracao.VersaoManifestacaoDestinatario.Descricao(),
-                Id = "ID" + ((int)tipoEvento) + chaveAcesso + nSeqEvento.ToString().PadLeft(2, '0'),                
-                detEvento = new detEvento()
-                {
-                    versao = configuracao.VersaoManifestacaoDestinatario.Descricao(),
-                    descEvento = (tipoEvento.Descricao() ?? string.Empty).RemoverAcentos()
-                }
+                throw new ArgumentException("Evento não permitido nesse serviço.", nameof(itens));
+            }
+
+            ValidarJustificativa(item);
+        }
+    }
+
+    private evento CriarEvento(ManifestacaoDestinatarioItem item)
+    {
+        var versao = configuracao.VersaoManifestacaoDestinatario.Descricao();
+        var infEvento = new infEventoEnv
+        {
+            chNFe = item.ChaveNFe.Chave,
+            CNPJ = configuracao.Emitente!.CNPJ,
+            CPF = configuracao.Emitente.CPF,
+            cOrgao = eUF.AN,
+            dhEvento = DateTime.Now,
+            nSeqEvento = SequenciaEvento,
+            tpAmb = configuracao.TipoAmbiente,
+            tpEvento = item.TipoEvento,
+            verEvento = versao,
+            Id = "ID" + ((int)item.TipoEvento) + item.ChaveNFe.Chave + SequenciaEvento.ToString().PadLeft(2, '0'),
+            detEvento = new detEvento
+            {
+                versao = versao,
+                descEvento = (item.TipoEvento.Descricao() ?? string.Empty).RemoverAcentos(),
+                xJust = item.Justificativa
+            }
+        };
+
+        var evento = Modelos.Eventos.evento.CriarEvento(versao, infEvento);
+        evento.Assinar(
+            configuracao.ConfigCertificado.Certificado,
+            configuracao.ConfigCertificado.SignatureMethodSignedXml,
+            configuracao.ConfigCertificado.DigestMethodReference);
+        return evento;
+    }
+
+    internal static IReadOnlyList<ManifestacaoDestinatarioResultado> CriarResultados(
+        IReadOnlyList<ManifestacaoDestinatarioItem> itens,
+        retEnvEvento retornoSefaz)
+    {
+        var retornosPorEvento = (retornoSefaz.retEvento ?? new List<Modelos.Retornos.retEvento>())
+            .Where(retorno => retorno?.infEvento?.chNFe != null && retorno.infEvento.tpEvento.HasValue)
+            .GroupBy(retorno => new
+            {
+                ChaveAcesso = retorno.infEvento.chNFe,
+                TipoEvento = retorno.infEvento.tpEvento,
+                Sequencia = retorno.infEvento.nSeqEvento
+            })
+            .ToDictionary(grupo => grupo.Key, grupo => grupo.Last().infEvento);
+
+        return itens.Select(item =>
+        {
+            var chaveRetorno = new
+            {
+                ChaveAcesso = item.ChaveNFe.Chave,
+                TipoEvento = (eTipoEventoNFe?)item.TipoEvento,
+                Sequencia = (int?)SequenciaEvento
             };
 
-            evento evento = evento.CriarEvento(configuracao.VersaoManifestacaoDestinatario.Descricao(), infEvento);
+            if (!retornosPorEvento.TryGetValue(chaveRetorno, out var retorno))
+            {
+                return new ManifestacaoDestinatarioResultado(
+                    item.ChaveNFe.Chave,
+                    item.TipoEvento,
+                    retornoSefaz.cStat,
+                    retornoSefaz.xMotivo,
+                    null,
+                    null,
+                    SituacaoManifestacaoDestinatario.Rejeitada);
+            }
 
-            evento.Assinar(configuracao.ConfigCertificado.Certificado, configuracao.ConfigCertificado.SignatureMethodSignedXml, configuracao.ConfigCertificado.DigestMethodReference);
+            return new ManifestacaoDestinatarioResultado(
+                item.ChaveNFe.Chave,
+                item.TipoEvento,
+                retorno.cStat,
+                retorno.xMotivo,
+                retorno.nProt,
+                retorno.dhRegEvento,
+                ObterSituacao(retorno.cStat));
+        }).ToList();
+    }
 
-            envEvento pedEnvEvento = envEvento.Criar(configuracao.VersaoManifestacaoDestinatario.Descricao(), 1, evento);
+    private static SituacaoManifestacaoDestinatario ObterSituacao(int codigoStatus)
+    {
+        return codigoStatus switch
+        {
+            StatusEventoRegistrado => SituacaoManifestacaoDestinatario.Confirmada,
+            StatusDuplicidadeEvento => SituacaoManifestacaoDestinatario.ReconciliacaoPendente,
+            _ => SituacaoManifestacaoDestinatario.Rejeitada
+        };
+    }
 
-            var xmlEvento = XmlUtils.ClasseParaXmlString<envEvento>(pedEnvEvento);
-            return xmlEvento;
+    private static void ValidarJustificativa(ManifestacaoDestinatarioItem item)
+    {
+        if (item.TipoEvento == eTipoEventoNFe.OperacaoNaoRealizada)
+        {
+            if (string.IsNullOrWhiteSpace(item.Justificativa) || item.Justificativa.Length < 15 || item.Justificativa.Length > 255)
+            {
+                throw new ArgumentException("A justificativa de Operação não Realizada deve conter entre 15 e 255 caracteres.", nameof(item));
+            }
+
+            return;
         }
 
-        private bool PodeManifestar(eTipoEventoNFe tipoEvento) => tipoEvento == eTipoEventoNFe.CienciaOperacao
-                || tipoEvento == eTipoEventoNFe.ConfirmacaoOperacao
-                || tipoEvento == eTipoEventoNFe.DesconhecimentoOperacao
-                || tipoEvento == eTipoEventoNFe.OperacaoNaoRealizada;
+        if (!string.IsNullOrWhiteSpace(item.Justificativa))
+        {
+            throw new ArgumentException("Justificativa é permitida somente para Operação não Realizada.", nameof(item));
+        }
+    }
 
-
+    private static bool PodeManifestar(eTipoEventoNFe tipoEvento)
+    {
+        return tipoEvento == eTipoEventoNFe.CienciaOperacao
+            || tipoEvento == eTipoEventoNFe.ConfirmacaoOperacao
+            || tipoEvento == eTipoEventoNFe.DesconhecimentoOperacao
+            || tipoEvento == eTipoEventoNFe.OperacaoNaoRealizada;
     }
 }
