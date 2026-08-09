@@ -1,6 +1,7 @@
 #nullable disable
 #pragma warning disable CS8981
 using System.Collections.Generic;
+using System;
 using System.Xml.Serialization;
 
 namespace FiscalCore.Modelos.Eventos
@@ -28,11 +29,20 @@ namespace FiscalCore.Modelos.Eventos
         public List<evento> evento { get; set; }
 
         public static envEvento Criar(string versao, int idLote, evento evento) =>
+            Criar(versao, idLote, new List<evento> { evento });
+
+        public static envEvento Criar(string versao, int idLote, IReadOnlyList<evento> eventos)
+        {
+            if (eventos == null)
+                throw new ArgumentNullException(nameof(eventos));
+
+            return
             new envEvento
             {
                 versao = versao,
                 idLote = idLote,
-                evento = new List<evento> { evento }
+                evento = new List<evento>(eventos)
             };
+        }
     }
 }
