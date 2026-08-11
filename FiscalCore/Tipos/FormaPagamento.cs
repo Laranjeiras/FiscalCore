@@ -21,7 +21,7 @@ namespace FiscalCore.Tipos
         [XmlEnum("04")]
         CartaoDebito = 4,
 
-        [Description("Crédito Loja")]
+        [Description("Cartão da Loja (Private Label), Crediário Digital, Outros Crediários")]
         [XmlEnum("05")]
         CreditoLoja = 5,
 
@@ -53,11 +53,11 @@ namespace FiscalCore.Tipos
         [XmlEnum("16")]
         DepositoBancario = 16, // VERSÃO 4.00 NT2020.006
 
-        [Description("Pix - Pagamento Instantâneo")]
+        [Description("Pagamento Instantâneo (PIX) - Dinâmico")]
         [XmlEnum("17")]
         PixPagamentoInstantaneo = 17, // VERSÃO 4.00 NT2020.006
 
-        [Description("Transferência Bancária, Carteira Digital")]
+        [Description("TED (Transferência Eletrônica Disponível)")]
         [XmlEnum("18")]
         TransferenciaBancariaCarteiraDigital = 18, // VERSÃO 4.00 NT2020.006
 
@@ -65,9 +65,33 @@ namespace FiscalCore.Tipos
         [XmlEnum("19")]
         ProgramadeFidelidadeCashbackCreditoVirtual = 19, // VERSÃO 4.00 NT2020.006
 
+        [Description("Pagamento Instantâneo (PIX) - Estático")]
+        [XmlEnum("20")]
+        PixPagamentoInstantaneoEstatico = 20,
+
+        [Description("Crédito em Loja")]
+        [XmlEnum("21")]
+        CreditoEmLoja = 21,
+
+        [Description("Pagamento Eletrônico não Informado - falha de hardware do sistema emissor")]
+        [XmlEnum("22")]
+        PagamentoEletronicoNaoInformadoFalhaHardware = 22,
+
+        [Description("Pagamento Instantâneo (PIX) - Automático")]
+        [XmlEnum("23")]
+        PixPagamentoInstantaneoAutomatico = 23,
+
+        [Description("TEF - \"Book Transfer\"")]
+        [XmlEnum("24")]
+        TefBookTransfer = 24,
+
         [Description("Sem pagamento")]
         [XmlEnum("90")]
         SemPagamento = 90, // VERSÃO 4.00
+
+        [Description("Pagamento Posterior")]
+        [XmlEnum("91")]
+        PagamentoPosterior = 91,
 
         [Description("Outros")]
         [XmlEnum("99")]

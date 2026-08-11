@@ -25,14 +25,24 @@ namespace FiscalCore.NotaFiscal.Informacoes.Pagamento
     ///     <para>02=Cheque</para>
     ///     <para>03=Cartão de Crédito</para>
     ///     <para>04=Cartão de Débito</para>
-    ///     <para>05=Crédito Loja</para>
+    ///     <para>05=Cartão da Loja (Private Label), Crediário Digital, Outros Crediários</para>
     ///     <para>10=Vale Alimentação</para>
     ///     <para>11=Vale Refeição</para>
     ///     <para>12=Vale Presente</para>
     ///     <para>13=Vale Combustível</para>
     ///     <para>14=Duplicata Mercantil (versão 4.00)</para>
     ///     <para>15=Boleto Bancário (versão 4.00)</para>
+    ///     <para>16=Depósito Bancário</para>
+    ///     <para>17=Pagamento Instantâneo (PIX) - Dinâmico</para>
+    ///     <para>18=TED (Transferência Eletrônica Disponível)</para>
+    ///     <para>19=Programa de fidelidade, Cashback, Crédito Virtual</para>
+    ///     <para>20=Pagamento Instantâneo (PIX) - Estático</para>
+    ///     <para>21=Crédito em Loja</para>
+    ///     <para>22=Pagamento Eletrônico não Informado - falha de hardware do sistema emissor</para>
+    ///     <para>23=Pagamento Instantâneo (PIX) - Automático</para>
+    ///     <para>24=TEF - "Book Transfer"</para>
     ///     <para>90=Sem pagamento (versão 4.00)</para>
+    ///     <para>91=Pagamento Posterior</para>
     ///     <para>99=Outros</para>
     /// </summary>
     public enum FormaPagamento
@@ -64,7 +74,7 @@ namespace FiscalCore.NotaFiscal.Informacoes.Pagamento
         /// <summary>
         ///     05-Crédito Loja
         /// </summary>
-        [Description("Crédito Loja")] [XmlEnum("05")]
+        [Description("Cartão da Loja (Private Label), Crediário Digital, Outros Crediários")] [XmlEnum("05")]
         fpCreditoLoja = 05,
 
         /// <summary>
@@ -108,11 +118,41 @@ namespace FiscalCore.NotaFiscal.Informacoes.Pagamento
         [Description("Boleto Bancário")] [XmlEnum("15")]
         fpBoletoBancario = 15, // VERSÃO 4.00
 
+        [Description("Depósito Bancário")] [XmlEnum("16")]
+        fpDepositoBancario = 16,
+
+        [Description("Pagamento Instantâneo (PIX) - Dinâmico")] [XmlEnum("17")]
+        fpPixDinamico = 17,
+
+        [Description("TED (Transferência Eletrônica Disponível)")] [XmlEnum("18")]
+        fpTed = 18,
+
+        [Description("Programa de fidelidade, Cashback, Crédito Virtual")] [XmlEnum("19")]
+        fpProgramaFidelidadeCashbackCreditoVirtual = 19,
+
+        [Description("Pagamento Instantâneo (PIX) - Estático")] [XmlEnum("20")]
+        fpPixEstatico = 20,
+
+        [Description("Crédito em Loja")] [XmlEnum("21")]
+        fpCreditoEmLoja = 21,
+
+        [Description("Pagamento Eletrônico não Informado - falha de hardware do sistema emissor")] [XmlEnum("22")]
+        fpPagamentoEletronicoNaoInformadoFalhaHardware = 22,
+
+        [Description("Pagamento Instantâneo (PIX) - Automático")] [XmlEnum("23")]
+        fpPixAutomatico = 23,
+
+        [Description("TEF - \"Book Transfer\"")] [XmlEnum("24")]
+        fpTefBookTransfer = 24,
+
         /// <summary>
         ///     90-Sem pagamento
         /// </summary>
         [Description("Sem pagamento")] [XmlEnum("90")]
         fpSemPagamento = 90, // VERSÃO 4.00
+
+        [Description("Pagamento Posterior")] [XmlEnum("91")]
+        fpPagamentoPosterior = 91,
 
         /// <summary>
         ///     99-Outros
