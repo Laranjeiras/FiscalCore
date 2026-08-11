@@ -13,6 +13,9 @@ namespace FiscalCore.Tipos
         SimplesNacionalExcessoSublimite = 2,
         [Description("Regime Normal")]
         [XmlEnum("3")]
-        RegimeNormal = 3
+        RegimeNormal = 3,
+        [Description("Simples Nacional - Microempreendedor Individual - MEI")]
+        [XmlEnum("4")]
+        SimplesNacionalMicroempreendedorIndividual = 4
     }
 }
