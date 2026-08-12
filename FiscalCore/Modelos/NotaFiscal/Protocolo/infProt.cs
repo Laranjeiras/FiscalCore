@@ -69,21 +69,23 @@ public class infProt
         get
         {
             var mensagens = new List<MensagemSefaz>(LimiteMensagensSefaz);
+            var elementosMensagemSefaz = ElementosMensagemSefaz ?? [];
+            var tiposElementosMensagemSefaz = TiposElementosMensagemSefaz ?? [];
 
             for (var indice = 0;
-                 indice + 1 < ElementosMensagemSefaz.Length && mensagens.Count < LimiteMensagensSefaz;
+                 indice + 1 < elementosMensagemSefaz.Length && mensagens.Count < LimiteMensagensSefaz;
                  indice++)
             {
-                if (TiposElementosMensagemSefaz.Length <= indice + 1
-                    || TiposElementosMensagemSefaz[indice] != TipoElementoMensagemSefaz.Codigo
-                    || TiposElementosMensagemSefaz[indice + 1] != TipoElementoMensagemSefaz.Mensagem)
+                if (tiposElementosMensagemSefaz.Length <= indice + 1
+                    || tiposElementosMensagemSefaz[indice] != TipoElementoMensagemSefaz.Codigo
+                    || tiposElementosMensagemSefaz[indice + 1] != TipoElementoMensagemSefaz.Mensagem)
                 {
                     continue;
                 }
 
                 mensagens.Add(new MensagemSefaz(
-                    ElementosMensagemSefaz[indice],
-                    ElementosMensagemSefaz[indice + 1]));
+                    elementosMensagemSefaz[indice],
+                    elementosMensagemSefaz[indice + 1]));
                 indice++;
             }
 

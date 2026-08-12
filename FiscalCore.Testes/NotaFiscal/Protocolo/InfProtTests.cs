@@ -1,4 +1,5 @@
 using FiscalCore.NotaFiscal.RetornoServicos.Recepcao.Retorno;
+using FiscalCore.Modelos.Retornos;
 using FiscalCore.Utils;
 using Xunit;
 
@@ -6,6 +7,32 @@ namespace FiscalCore.Testes.NotaFiscal.Protocolo;
 
 public sealed class InfProtTests
 {
+    [Fact]
+    public void XmlStringParaClasse_ProtocoloSemAlertas_RetornaColecaoVazia()
+    {
+        // Arrange
+        const string xml = """
+            <retEnviNFe xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
+              <tpAmb>2</tpAmb><verAplic>SVRS20260812</verAplic>
+              <cStat>104</cStat><xMotivo>Lote processado</xMotivo><cUF>43</cUF>
+              <dhRecbto>2026-08-12T10:30:00-03:00</dhRecbto>
+              <protNFe versao="4.00"><infProt>
+                <tpAmb>2</tpAmb><verAplic>SVRS20260812</verAplic>
+                <chNFe>43260829310114000110550010000017401123456780</chNFe>
+                <dhRecbto>2026-08-12T10:30:00-03:00</dhRecbto>
+                <nProt>143260000000001</nProt><digVal>YWJjZGVmZ2hpamtsbW5vcHFyc3Q=</digVal>
+                <cStat>100</cStat><xMotivo>Autorizado o uso da NF-e</xMotivo>
+              </infProt></protNFe>
+            </retEnviNFe>
+            """;
+
+        // Act
+        var mensagens = XmlUtils.XmlStringParaClasse<retEnviNFe>(xml).protNFe.infProt.MensagensSefaz;
+
+        // Assert
+        Assert.Empty(mensagens);
+    }
+
     [Fact]
     public void XmlStringParaClasse_ProtocoloComCincoAlertas_PreservaOrdemEConteudo()
     {
