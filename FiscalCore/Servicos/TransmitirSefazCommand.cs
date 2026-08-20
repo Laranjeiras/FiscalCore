@@ -31,6 +31,11 @@ namespace FiscalCore.Servicos
 
         public virtual async Task<string> TransmitirAsync(UrlSefaz sefazUrl, XmlDocument envelope, CancellationToken cancellation)
         {
+            cancellation.ThrowIfCancellationRequested();
+
+            if (SobrescreveTransmissaoLegada())
+                return await TransmitirAsync(sefazUrl, envelope).ConfigureAwait(false);
+
             logger?.LogDebug("INICIANDO TRANSMISSÃO SEFAZ [{Url}]", sefazUrl.Url);
 
             TemCertificado(configuracao);
@@ -41,6 +46,18 @@ namespace FiscalCore.Servicos
             logger?.LogDebug("ENCERRANDO TRANSMISSÃO SEFAZ");
 
             return soapResult;
+        }
+
+        private bool SobrescreveTransmissaoLegada()
+        {
+            var metodo = GetType().GetMethod(
+                nameof(TransmitirAsync),
+                new[] { typeof(UrlSefaz), typeof(XmlDocument) });
+
+            return metodo is not null
+                && metodo.DeclaringType != typeof(TransmitirSefazCommand)
+                && metodo.IsVirtual
+                && metodo.GetBaseDefinition().DeclaringType == typeof(TransmitirSefazCommand);
         }
 
         private static void TemCertificado(ConfiguracaoBasicaServico configuracao)

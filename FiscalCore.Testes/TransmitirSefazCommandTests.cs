@@ -1,5 +1,9 @@
 using FiscalCore.Configuracoes;
 using FiscalCore.Servicos;
+using FiscalCore.Servicos.DistribuicaoDFe;
+using FiscalCore.Tipos;
+using FiscalCore.ValueObjects;
+using Microsoft.Extensions.Logging.Abstractions;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
@@ -12,6 +16,34 @@ namespace FiscalCore.Testes;
 
 public sealed class TransmitirSefazCommandTests
 {
+    [Fact]
+    public async Task FluxoMde_WhenLegacySubclassOverridesTwoArguments_UsesTheOverride()
+    {
+        // Arrange
+        var transmissor = new TransmissorLegado();
+        var envelope = new XmlDocument();
+        envelope.LoadXml("<Envelope />");
+        var url = new UrlSefaz(
+            eTipoServico.ManifestacaoDestinatario,
+            eUF.AN,
+            eTipoAmbiente.Homologacao,
+            eModeloDocumento.NFe,
+            "https://sefaz.example.test/recepcao",
+            string.Empty);
+
+        // Act
+        var retorno = await ManifestacaoDestinatarioServico.TransmitirComRetryAntesDoEnvioAsync(
+            transmissor,
+            NullLogger.Instance,
+            url,
+            envelope,
+            CancellationToken.None);
+
+        // Assert
+        Assert.Equal("<retorno-legado />", retorno);
+        Assert.Equal(1, transmissor.ChamadasLegadas);
+    }
+
     [Fact]
     public async Task EnviarSoapAsync_WhenCancellationProvided_PassesItToHttpHandler()
     {
@@ -45,6 +77,22 @@ public sealed class TransmitirSefazCommandTests
             EnviarSoapAsync("https://sefaz.example.test/recepcao", envelope, null!, cancellationToken);
 
         protected override HttpMessageHandler CriarHttpMessageHandler(X509Certificate2 certificado) => handler;
+    }
+
+    private sealed class TransmissorLegado : TransmitirSefazCommand
+    {
+        public TransmissorLegado()
+            : base(new ConfiguracaoBasicaServico())
+        {
+        }
+
+        public int ChamadasLegadas { get; private set; }
+
+        public override Task<string> TransmitirAsync(UrlSefaz sefazUrl, XmlDocument envelope)
+        {
+            ChamadasLegadas++;
+            return Task.FromResult("<retorno-legado />");
+        }
     }
 
     private sealed class CapturadorHttpMessageHandler : HttpMessageHandler

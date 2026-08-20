@@ -91,7 +91,7 @@ public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDest
             await antesDeTransmitir(xmlEvento, idLote, cancellation).ConfigureAwait(false);
 
         var cronometro = Stopwatch.StartNew();
-        var xmlRetorno = await TransmitirComRetryAntesDoEnvioAsync(sefazUrl, envelope!, cancellation).ConfigureAwait(false);
+        var xmlRetorno = await TransmitirComRetryAntesDoEnvioAsync(transmitir, logger, sefazUrl, envelope!, cancellation).ConfigureAwait(false);
         cronometro.Stop();
         var xmlRetornoLimpo = Soap.LimparEnvelope(xmlRetorno, "retEnvEvento").OuterXml;
 
@@ -263,7 +263,9 @@ public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDest
             || tipoEvento == eTipoEventoNFe.OperacaoNaoRealizada;
     }
 
-    private async Task<string> TransmitirComRetryAntesDoEnvioAsync(
+    internal static async Task<string> TransmitirComRetryAntesDoEnvioAsync(
+        ITransmitirSefazCommand transmitir,
+        ILogger logger,
         UrlSefaz sefazUrl,
         System.Xml.XmlDocument envelope,
         CancellationToken cancellation)
