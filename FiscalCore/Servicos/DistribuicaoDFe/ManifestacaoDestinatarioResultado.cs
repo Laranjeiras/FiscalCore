@@ -9,7 +9,8 @@ public sealed class ManifestacaoDestinatarioResultado
     public ManifestacaoDestinatarioResultado(
         string chaveAcesso,
         eTipoEventoNFe tipoEvento,
-        int codigoStatus,
+        int sequenciaEvento,
+        int? codigoStatus,
         string? motivo,
         string? protocolo,
         DateTime? dataRegistro,
@@ -17,6 +18,7 @@ public sealed class ManifestacaoDestinatarioResultado
     {
         ChaveAcesso = chaveAcesso ?? throw new ArgumentNullException(nameof(chaveAcesso));
         TipoEvento = tipoEvento;
+        SequenciaEvento = sequenciaEvento;
         CodigoStatus = codigoStatus;
         Motivo = motivo;
         Protocolo = protocolo;
@@ -26,7 +28,8 @@ public sealed class ManifestacaoDestinatarioResultado
 
     public string ChaveAcesso { get; }
     public eTipoEventoNFe TipoEvento { get; }
-    public int CodigoStatus { get; }
+    public int SequenciaEvento { get; }
+    public int? CodigoStatus { get; }
     public string? Motivo { get; }
     public string? Protocolo { get; }
     public DateTime? DataRegistro { get; }

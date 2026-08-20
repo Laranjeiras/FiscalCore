@@ -4,6 +4,8 @@ using FiscalCore.Tipos;
 using FiscalCore.ValueObjects;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using Xunit;
 
 namespace FiscalCore.Testes;
@@ -107,8 +109,8 @@ public sealed class ManifestacaoDestinatarioServicoTests
         Assert.Equal(2, resultados.Count);
         Assert.Equal(primeiraChave.Chave, resultados[0].ChaveAcesso);
         Assert.Equal(eTipoEventoNFe.CienciaOperacao, resultados[0].TipoEvento);
-        Assert.Equal(128, resultados[0].CodigoStatus);
-        Assert.Equal(SituacaoManifestacaoDestinatario.Rejeitada, resultados[0].Situacao);
+        Assert.Null(resultados[0].CodigoStatus);
+        Assert.Equal(SituacaoManifestacaoDestinatario.ReconciliacaoPendente, resultados[0].Situacao);
         Assert.Equal(segundaChave.Chave, resultados[1].ChaveAcesso);
         Assert.Equal(eTipoEventoNFe.ConfirmacaoOperacao, resultados[1].TipoEvento);
         Assert.Equal(573, resultados[1].CodigoStatus);
@@ -165,6 +167,64 @@ public sealed class ManifestacaoDestinatarioServicoTests
         Assert.Null(item.Justificativa);
     }
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(3)]
+    public void ValidarItens_WhenSequenciaIsInvalid_ThrowsArgumentOutOfRangeException(int sequencia)
+    {
+        // Arrange
+        var item = new ManifestacaoDestinatarioItem(CriarChave(1), eTipoEventoNFe.ConfirmacaoOperacao, sequencia);
+
+        // Act
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => ManifestacaoDestinatarioServico.ValidarItens(new[] { item }));
+
+        // Assert
+        Assert.Equal("itens", exception.ParamName);
+    }
+
+    [Fact]
+    public void CriarResultados_WhenEvento136_ReturnsRegistradaSemVinculo()
+    {
+        // Arrange
+        var chave = CriarChave(1);
+        var item = new ManifestacaoDestinatarioItem(chave, eTipoEventoNFe.ConfirmacaoOperacao, 2);
+        var retorno = new retEnvEvento
+        {
+            cStat = 128,
+            retEvento = new List<retEvento> { CriarRetorno(chave.Chave, eTipoEventoNFe.ConfirmacaoOperacao, 136, "Registrado sem vínculo", "135000000000001", 2) }
+        };
+
+        // Act
+        var resultado = ManifestacaoDestinatarioServico.CriarResultados(new[] { item }, retorno).Single();
+
+        // Assert
+        Assert.Equal(2, resultado.SequenciaEvento);
+        Assert.Equal(136, resultado.CodigoStatus);
+        Assert.Equal(SituacaoManifestacaoDestinatario.RegistradaSemVinculo, resultado.Situacao);
+    }
+
+    [Theory]
+    [InlineData(WebExceptionStatus.NameResolutionFailure, true)]
+    [InlineData(WebExceptionStatus.ConnectFailure, true)]
+    [InlineData(WebExceptionStatus.ProxyNameResolutionFailure, true)]
+    [InlineData(WebExceptionStatus.TrustFailure, true)]
+    [InlineData(WebExceptionStatus.SecureChannelFailure, true)]
+    [InlineData(WebExceptionStatus.Timeout, false)]
+    [InlineData(WebExceptionStatus.SendFailure, false)]
+    [InlineData(WebExceptionStatus.ReceiveFailure, false)]
+    [InlineData(WebExceptionStatus.ConnectionClosed, false)]
+    public void EhFalhaSeguraAntesDoEnvio_WhenStatusIsClassified_ReturnsExpected(WebExceptionStatus status, bool esperado)
+    {
+        // Arrange
+        var exception = new WebException("falha", status);
+
+        // Act
+        var resultado = ManifestacaoDestinatarioServico.EhFalhaSeguraAntesDoEnvio(exception);
+
+        // Assert
+        Assert.Equal(esperado, resultado);
+    }
+
     private static List<ManifestacaoDestinatarioItem> CriarItens(int quantidade)
     {
         var itens = new List<ManifestacaoDestinatarioItem>(quantidade);
@@ -181,13 +241,14 @@ public sealed class ManifestacaoDestinatarioServicoTests
         eTipoEventoNFe tipoEvento,
         int codigoStatus,
         string motivo,
-        string protocolo) => new()
+        string protocolo,
+        int sequencia = 1) => new()
     {
         infEvento = new infEventoRet
         {
             chNFe = chave,
             tpEvento = tipoEvento,
-            nSeqEvento = 1,
+            nSeqEvento = sequencia,
             cStat = codigoStatus,
             xMotivo = motivo,
             nProt = protocolo,

@@ -5,5 +5,6 @@ public enum SituacaoManifestacaoDestinatario
 {
     Rejeitada = 0,
     Confirmada = 1,
-    ReconciliacaoPendente = 2
+    ReconciliacaoPendente = 2,
+    RegistradaSemVinculo = 3
 }
