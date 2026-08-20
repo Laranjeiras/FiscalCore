@@ -45,6 +45,30 @@ public sealed class TransmitirSefazCommandTests
     }
 
     [Fact]
+    public async Task TransmitirAsync_WhenLegacyOverrideCallsBase_ExecutesCoreOnceWithoutRecursion()
+    {
+        // Arrange
+        var transmissor = new TransmissorLegadoQueDelegaParaBase();
+        var envelope = new XmlDocument();
+        envelope.LoadXml("<Envelope />");
+        var url = new UrlSefaz(
+            eTipoServico.ManifestacaoDestinatario,
+            eUF.AN,
+            eTipoAmbiente.Homologacao,
+            eModeloDocumento.NFe,
+            "https://sefaz.example.test/recepcao",
+            string.Empty);
+
+        // Act
+        var retorno = await transmissor.TransmitirAsync(url, envelope, CancellationToken.None);
+
+        // Assert
+        Assert.Equal("<retorno-core />", retorno);
+        Assert.Equal(1, transmissor.ChamadasLegadas);
+        Assert.Equal(1, transmissor.ChamadasCore);
+    }
+
+    [Fact]
     public async Task EnviarSoapAsync_WhenCancellationProvided_PassesItToHttpHandler()
     {
         // Arrange
@@ -92,6 +116,29 @@ public sealed class TransmitirSefazCommandTests
         {
             ChamadasLegadas++;
             return Task.FromResult("<retorno-legado />");
+        }
+    }
+
+    private sealed class TransmissorLegadoQueDelegaParaBase : TransmitirSefazCommand
+    {
+        public TransmissorLegadoQueDelegaParaBase()
+            : base(new ConfiguracaoBasicaServico())
+        {
+        }
+
+        public int ChamadasLegadas { get; private set; }
+        public int ChamadasCore { get; private set; }
+
+        public override async Task<string> TransmitirAsync(UrlSefaz sefazUrl, XmlDocument envelope)
+        {
+            ChamadasLegadas++;
+            return await base.TransmitirAsync(sefazUrl, envelope);
+        }
+
+        protected override Task<string> TransmitirInternamenteAsync(UrlSefaz sefazUrl, XmlDocument envelope, CancellationToken cancellation)
+        {
+            ChamadasCore++;
+            return Task.FromResult("<retorno-core />");
         }
     }
 

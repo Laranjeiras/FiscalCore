@@ -26,7 +26,7 @@ namespace FiscalCore.Servicos
 
         public virtual async Task<string> TransmitirAsync(UrlSefaz sefazUrl, XmlDocument envelope)
         {
-            return await TransmitirAsync(sefazUrl, envelope, CancellationToken.None).ConfigureAwait(false);
+            return await TransmitirInternamenteAsync(sefazUrl, envelope, CancellationToken.None).ConfigureAwait(false);
         }
 
         public virtual async Task<string> TransmitirAsync(UrlSefaz sefazUrl, XmlDocument envelope, CancellationToken cancellation)
@@ -36,6 +36,11 @@ namespace FiscalCore.Servicos
             if (SobrescreveTransmissaoLegada())
                 return await TransmitirAsync(sefazUrl, envelope).ConfigureAwait(false);
 
+            return await TransmitirInternamenteAsync(sefazUrl, envelope, cancellation).ConfigureAwait(false);
+        }
+
+        protected virtual async Task<string> TransmitirInternamenteAsync(UrlSefaz sefazUrl, XmlDocument envelope, CancellationToken cancellation)
+        {
             logger?.LogDebug("INICIANDO TRANSMISSÃO SEFAZ [{Url}]", sefazUrl.Url);
 
             TemCertificado(configuracao);
