@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -57,8 +58,13 @@ public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDest
     /// </summary>
     public async Task<ManifestacaoDestinatarioLoteResultado> ManifestarLoteAsync(
         IReadOnlyList<ManifestacaoDestinatarioItem> itens,
-        CancellationToken cancellation = default,
-        Func<string, int, CancellationToken, Task>? antesDeTransmitir = null)
+        CancellationToken cancellation = default) =>
+        await ManifestarLoteAsync(itens, cancellation, null).ConfigureAwait(false);
+
+    public async Task<ManifestacaoDestinatarioLoteResultado> ManifestarLoteAsync(
+        IReadOnlyList<ManifestacaoDestinatarioItem> itens,
+        CancellationToken cancellation,
+        Func<string, int, CancellationToken, Task>? antesDeTransmitir)
     {
         ValidarItens(itens);
         cancellation.ThrowIfCancellationRequested();
@@ -269,7 +275,7 @@ public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDest
             {
                 return await transmitir.TransmitirAsync(sefazUrl, envelope, cancellation).ConfigureAwait(false);
             }
-            catch (WebException ex) when (EhFalhaSeguraAntesDoEnvio(ex))
+            catch (Exception ex) when (EhFalhaSeguraAntesDoEnvio(ex))
             {
                 if (tentativa == maximoTentativas)
                     throw new TransmissaoNaoIniciadaException("A transmissão não foi iniciada após falha de conexão pré-envio.", ex);
@@ -283,12 +289,15 @@ public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDest
         throw new InvalidOperationException("Fluxo de repetição de transmissão inválido.");
     }
 
-    public static bool EhFalhaSeguraAntesDoEnvio(WebException exception) =>
-        exception.Status is WebExceptionStatus.NameResolutionFailure
+    public static bool EhFalhaSeguraAntesDoEnvio(Exception exception) =>
+        (exception is WebException webException && webException.Status is WebExceptionStatus.NameResolutionFailure
             or WebExceptionStatus.ConnectFailure
             or WebExceptionStatus.ProxyNameResolutionFailure
             or WebExceptionStatus.TrustFailure
-            or WebExceptionStatus.SecureChannelFailure;
+            or WebExceptionStatus.SecureChannelFailure)
+        || (exception is HttpRequestException httpException && httpException.HttpRequestError is HttpRequestError.NameResolutionError
+            or HttpRequestError.ConnectionError
+            or HttpRequestError.SecureConnectionError);
 
     private static int GerarIdLote() => Interlocked.Increment(ref proximoIdLote) & int.MaxValue;
 

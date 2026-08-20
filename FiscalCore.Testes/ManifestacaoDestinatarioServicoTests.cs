@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace FiscalCore.Testes;
@@ -109,7 +110,8 @@ public sealed class ManifestacaoDestinatarioServicoTests
         Assert.Equal(2, resultados.Count);
         Assert.Equal(primeiraChave.Chave, resultados[0].ChaveAcesso);
         Assert.Equal(eTipoEventoNFe.CienciaOperacao, resultados[0].TipoEvento);
-        Assert.Null(resultados[0].CodigoStatus);
+        Assert.False(resultados[0].PossuiCodigoStatus);
+        Assert.Equal(0, resultados[0].CodigoStatus);
         Assert.Equal(SituacaoManifestacaoDestinatario.ReconciliacaoPendente, resultados[0].Situacao);
         Assert.Equal(segundaChave.Chave, resultados[1].ChaveAcesso);
         Assert.Equal(eTipoEventoNFe.ConfirmacaoOperacao, resultados[1].TipoEvento);
@@ -223,6 +225,16 @@ public sealed class ManifestacaoDestinatarioServicoTests
 
         // Assert
         Assert.Equal(esperado, resultado);
+    }
+
+    [Fact]
+    public void EhFalhaSeguraAntesDoEnvio_WhenCancellationIsAmbiguous_ReturnsFalse()
+    {
+        // Act
+        var resultado = ManifestacaoDestinatarioServico.EhFalhaSeguraAntesDoEnvio(new TaskCanceledException());
+
+        // Assert
+        Assert.False(resultado);
     }
 
     private static List<ManifestacaoDestinatarioItem> CriarItens(int quantidade)

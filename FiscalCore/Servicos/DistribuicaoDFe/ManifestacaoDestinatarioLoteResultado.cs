@@ -7,6 +7,11 @@ namespace FiscalCore.Servicos.DistribuicaoDFe;
 /// <summary>Retorno de uma única transmissão de lote de manifestação.</summary>
 public sealed class ManifestacaoDestinatarioLoteResultado
 {
+    public ManifestacaoDestinatarioLoteResultado(retEnvEvento retornoSefaz, IReadOnlyList<ManifestacaoDestinatarioResultado> resultados)
+        : this(0, retornoSefaz, resultados, string.Empty, string.Empty)
+    {
+    }
+
     public ManifestacaoDestinatarioLoteResultado(
         int idLote,
         retEnvEvento retornoSefaz,
