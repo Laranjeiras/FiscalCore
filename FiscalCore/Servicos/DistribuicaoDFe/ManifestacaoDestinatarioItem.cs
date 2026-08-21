@@ -8,15 +8,23 @@ namespace FiscalCore.Servicos.DistribuicaoDFe;
 public sealed class ManifestacaoDestinatarioItem
 {
     public ManifestacaoDestinatarioItem(ChaveFiscal chaveNFe, eTipoEventoNFe tipoEvento, string? justificativa = null)
+        : this(chaveNFe, tipoEvento, sequenciaEvento: 1, justificativa)
+    {
+    }
+
+    public ManifestacaoDestinatarioItem(ChaveFiscal chaveNFe, eTipoEventoNFe tipoEvento, int sequenciaEvento, string? justificativa = null)
     {
         ChaveNFe = chaveNFe ?? throw new ArgumentNullException(nameof(chaveNFe));
         TipoEvento = tipoEvento;
+        SequenciaEvento = sequenciaEvento;
         Justificativa = string.IsNullOrWhiteSpace(justificativa) ? null : justificativa.Trim();
     }
 
     public ChaveFiscal ChaveNFe { get; }
 
     public eTipoEventoNFe TipoEvento { get; }
+
+    public int SequenciaEvento { get; }
 
     public string? Justificativa { get; }
 }

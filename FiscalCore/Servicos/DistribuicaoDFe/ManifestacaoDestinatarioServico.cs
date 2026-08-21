@@ -10,8 +10,11 @@ using FiscalCore.ValueObjects;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,9 +24,10 @@ public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDest
 {
     private const int QuantidadeMinimaLote = 1;
     private const int QuantidadeMaximaLote = 20;
-    private const int SequenciaEvento = 1;
     private const int StatusEventoRegistrado = 135;
+    private const int StatusEventoRegistradoSemVinculo = 136;
     private const int StatusDuplicidadeEvento = 573;
+    private static int proximoIdLote = (int)(DateTime.UtcNow.Ticks % 1_000_000_000);
 
     public ManifestacaoDestinatarioServico(
         ConfiguracaoServico config,
@@ -43,7 +47,7 @@ public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDest
         string justificativa,
         CancellationToken cancellation)
     {
-        var item = new ManifestacaoDestinatarioItem(chaveNFe, tipoEvento, justificativa);
+        var item = new ManifestacaoDestinatarioItem(chaveNFe, tipoEvento, sequenciaEvento: 1, justificativa);
         var resultado = await ManifestarLoteAsync(new[] { item }, cancellation).ConfigureAwait(false);
         return resultado.RetornoSefaz;
     }
@@ -54,12 +58,20 @@ public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDest
     /// </summary>
     public async Task<ManifestacaoDestinatarioLoteResultado> ManifestarLoteAsync(
         IReadOnlyList<ManifestacaoDestinatarioItem> itens,
-        CancellationToken cancellation = default)
+        CancellationToken cancellation = default) =>
+        await ManifestarLoteAsync(itens, cancellation, null).ConfigureAwait(false);
+
+    public async Task<ManifestacaoDestinatarioLoteResultado> ManifestarLoteAsync(
+        IReadOnlyList<ManifestacaoDestinatarioItem> itens,
+        CancellationToken cancellation,
+        Func<string, int, CancellationToken, Task>? antesDeTransmitir)
     {
         ValidarItens(itens);
+        cancellation.ThrowIfCancellationRequested();
         logger.LogInformation("INICIANDO MANIFESTACAO DO DESTINATARIO EM LOTE COM {Quantidade} EVENTOS", itens.Count);
 
-        var envio = CriarEnvEvento(itens);
+        var idLote = GerarIdLote();
+        var envio = CriarEnvEvento(itens, idLote);
         var xmlEvento = XmlUtils.ClasseParaXmlString<envEvento>(envio);
         var arquivoEnvio = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ped-eve.xml", configuracao));
         await SalvarLog(arquivoEnvio, xmlEvento, cancellation).ConfigureAwait(false);
@@ -75,7 +87,12 @@ public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDest
             configuracao.TipoAmbiente,
             eModeloDocumento.NFe,
             eUF.AN);
-        var xmlRetorno = await transmitir.TransmitirAsync(sefazUrl, envelope!).ConfigureAwait(false);
+        if (antesDeTransmitir is not null)
+            await antesDeTransmitir(xmlEvento, idLote, cancellation).ConfigureAwait(false);
+
+        var cronometro = Stopwatch.StartNew();
+        var xmlRetorno = await TransmitirComRetryAntesDoEnvioAsync(transmitir, logger, sefazUrl, envelope!, cancellation).ConfigureAwait(false);
+        cronometro.Stop();
         var xmlRetornoLimpo = Soap.LimparEnvelope(xmlRetorno, "retEnvEvento").OuterXml;
 
         var arquivoRetorno = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ret-eve.xml", configuracao));
@@ -83,10 +100,11 @@ public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDest
 
         var retornoSefaz = XmlUtils.XmlStringParaClasse<retEnvEvento>(xmlRetornoLimpo);
         var resultados = CriarResultados(itens, retornoSefaz);
-        return new ManifestacaoDestinatarioLoteResultado(retornoSefaz, resultados);
+        logger.LogInformation("Manifestação destinatário: lote {IdLote}, duração {DuracaoMs}ms, cStat lote {CodigoStatus}", idLote, cronometro.ElapsedMilliseconds, retornoSefaz.cStat);
+        return new ManifestacaoDestinatarioLoteResultado(idLote, retornoSefaz, resultados, xmlEvento, xmlRetornoLimpo);
     }
 
-    internal envEvento CriarEnvEvento(IReadOnlyList<ManifestacaoDestinatarioItem> itens)
+    internal envEvento CriarEnvEvento(IReadOnlyList<ManifestacaoDestinatarioItem> itens, int idLote)
     {
         var eventos = new List<evento>(itens.Count);
         foreach (var item in itens)
@@ -94,7 +112,7 @@ public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDest
             eventos.Add(CriarEvento(item));
         }
 
-        return envEvento.Criar(configuracao.VersaoManifestacaoDestinatario.Descricao(), SequenciaEvento, eventos);
+        return envEvento.Criar(configuracao.VersaoManifestacaoDestinatario.Descricao(), idLote, eventos);
     }
 
     internal static void ValidarItens(IReadOnlyList<ManifestacaoDestinatarioItem> itens)
@@ -121,6 +139,16 @@ public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDest
                 throw new ArgumentException("Evento não permitido nesse serviço.", nameof(itens));
             }
 
+            if (item.SequenciaEvento is < 1 or > 2)
+            {
+                throw new ArgumentOutOfRangeException(nameof(itens), "A sequência do evento deve ser 1 ou 2.");
+            }
+
+            if (item.TipoEvento == eTipoEventoNFe.CienciaOperacao && item.SequenciaEvento != 1)
+            {
+                throw new ArgumentException("Ciência da Operação aceita somente sequência 1.", nameof(itens));
+            }
+
             ValidarJustificativa(item);
         }
     }
@@ -135,11 +163,11 @@ public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDest
             CPF = configuracao.Emitente.CPF,
             cOrgao = eUF.AN,
             dhEvento = DateTime.Now,
-            nSeqEvento = SequenciaEvento,
+            nSeqEvento = item.SequenciaEvento,
             tpAmb = configuracao.TipoAmbiente,
             tpEvento = item.TipoEvento,
             verEvento = versao,
-            Id = "ID" + ((int)item.TipoEvento) + item.ChaveNFe.Chave + SequenciaEvento.ToString().PadLeft(2, '0'),
+            Id = "ID" + ((int)item.TipoEvento) + item.ChaveNFe.Chave + item.SequenciaEvento.ToString().PadLeft(2, '0'),
             detEvento = new detEvento
             {
                 versao = versao,
@@ -160,44 +188,40 @@ public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDest
         IReadOnlyList<ManifestacaoDestinatarioItem> itens,
         retEnvEvento retornoSefaz)
     {
+        ArgumentNullException.ThrowIfNull(retornoSefaz);
         var retornosPorEvento = (retornoSefaz.retEvento ?? new List<Modelos.Retornos.retEvento>())
-            .Where(retorno => retorno?.infEvento?.chNFe != null && retorno.infEvento.tpEvento.HasValue)
-            .GroupBy(retorno => new
-            {
-                ChaveAcesso = retorno.infEvento.chNFe,
-                TipoEvento = retorno.infEvento.tpEvento,
-                Sequencia = retorno.infEvento.nSeqEvento
-            })
+            .Where(retorno => retorno?.infEvento?.chNFe != null
+                && retorno.infEvento.tpEvento.HasValue
+                && retorno.infEvento.nSeqEvento.HasValue)
+            .GroupBy(retorno => CriarChaveCorrelacao(
+                retorno.infEvento.chNFe,
+                retorno.infEvento.tpEvento.GetValueOrDefault(),
+                retorno.infEvento.nSeqEvento.GetValueOrDefault()))
             .ToDictionary(grupo => grupo.Key, grupo => grupo.Last().infEvento);
 
         return itens.Select(item =>
         {
-            var chaveRetorno = new
-            {
-                ChaveAcesso = item.ChaveNFe.Chave,
-                TipoEvento = (eTipoEventoNFe?)item.TipoEvento,
-                Sequencia = (int?)SequenciaEvento
-            };
-
-            if (!retornosPorEvento.TryGetValue(chaveRetorno, out var retorno))
+            if (!retornosPorEvento.TryGetValue(CriarChaveCorrelacao(item.ChaveNFe.Chave, item.TipoEvento, item.SequenciaEvento), out var retorno))
             {
                 return new ManifestacaoDestinatarioResultado(
                     item.ChaveNFe.Chave,
                     item.TipoEvento,
-                    retornoSefaz.cStat,
+                    item.SequenciaEvento,
+                    null,
                     retornoSefaz.xMotivo,
                     null,
                     null,
-                    SituacaoManifestacaoDestinatario.Rejeitada);
+                    SituacaoManifestacaoDestinatario.ReconciliacaoPendente);
             }
 
             return new ManifestacaoDestinatarioResultado(
                 item.ChaveNFe.Chave,
                 item.TipoEvento,
+                item.SequenciaEvento,
                 retorno.cStat,
                 retorno.xMotivo,
                 retorno.nProt,
-                retorno.dhRegEvento,
+                retorno.dhRegEvento == DateTime.MinValue ? null : retorno.dhRegEvento,
                 ObterSituacao(retorno.cStat));
         }).ToList();
     }
@@ -207,6 +231,7 @@ public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDest
         return codigoStatus switch
         {
             StatusEventoRegistrado => SituacaoManifestacaoDestinatario.Confirmada,
+            StatusEventoRegistradoSemVinculo => SituacaoManifestacaoDestinatario.RegistradaSemVinculo,
             StatusDuplicidadeEvento => SituacaoManifestacaoDestinatario.ReconciliacaoPendente,
             _ => SituacaoManifestacaoDestinatario.Rejeitada
         };
@@ -237,4 +262,47 @@ public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDest
             || tipoEvento == eTipoEventoNFe.DesconhecimentoOperacao
             || tipoEvento == eTipoEventoNFe.OperacaoNaoRealizada;
     }
+
+    internal static async Task<string> TransmitirComRetryAntesDoEnvioAsync(
+        ITransmitirSefazCommand transmitir,
+        ILogger logger,
+        UrlSefaz sefazUrl,
+        System.Xml.XmlDocument envelope,
+        CancellationToken cancellation)
+    {
+        const int maximoTentativas = 3;
+        for (var tentativa = 1; tentativa <= maximoTentativas; tentativa++)
+        {
+            try
+            {
+                return await transmitir.TransmitirAsync(sefazUrl, envelope, cancellation).ConfigureAwait(false);
+            }
+            catch (Exception ex) when (EhFalhaSeguraAntesDoEnvio(ex))
+            {
+                if (tentativa == maximoTentativas)
+                    throw new TransmissaoNaoIniciadaException("A transmissão não foi iniciada após falha de conexão pré-envio.", ex);
+
+                var atraso = TimeSpan.FromMilliseconds((100 * (1 << (tentativa - 1))) + Random.Shared.Next(0, 100));
+                logger.LogWarning(ex, "Falha pré-envio na manifestação. Nova tentativa {Tentativa} em {AtrasoMs}ms.", tentativa + 1, atraso.TotalMilliseconds);
+                await Task.Delay(atraso, cancellation).ConfigureAwait(false);
+            }
+        }
+
+        throw new InvalidOperationException("Fluxo de repetição de transmissão inválido.");
+    }
+
+    public static bool EhFalhaSeguraAntesDoEnvio(Exception exception) =>
+        (exception is WebException webException && webException.Status is WebExceptionStatus.NameResolutionFailure
+            or WebExceptionStatus.ConnectFailure
+            or WebExceptionStatus.ProxyNameResolutionFailure
+            or WebExceptionStatus.TrustFailure
+            or WebExceptionStatus.SecureChannelFailure)
+        || (exception is HttpRequestException httpException && httpException.HttpRequestError is HttpRequestError.NameResolutionError
+            or HttpRequestError.ConnectionError
+            or HttpRequestError.SecureConnectionError);
+
+    private static int GerarIdLote() => Interlocked.Increment(ref proximoIdLote) & int.MaxValue;
+
+    private static string CriarChaveCorrelacao(string chave, eTipoEventoNFe tipoEvento, int sequencia) =>
+        $"{chave}|{(int)tipoEvento}|{sequencia}";
 }

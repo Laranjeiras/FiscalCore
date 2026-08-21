@@ -8,6 +8,7 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Xml;
 
 namespace FiscalCore.Servicos
@@ -25,16 +26,43 @@ namespace FiscalCore.Servicos
 
         public virtual async Task<string> TransmitirAsync(UrlSefaz sefazUrl, XmlDocument envelope)
         {
+            return await TransmitirInternamenteAsync(sefazUrl, envelope, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        public virtual async Task<string> TransmitirAsync(UrlSefaz sefazUrl, XmlDocument envelope, CancellationToken cancellation)
+        {
+            cancellation.ThrowIfCancellationRequested();
+
+            if (SobrescreveTransmissaoLegada())
+                return await TransmitirAsync(sefazUrl, envelope).ConfigureAwait(false);
+
+            return await TransmitirInternamenteAsync(sefazUrl, envelope, cancellation).ConfigureAwait(false);
+        }
+
+        protected virtual async Task<string> TransmitirInternamenteAsync(UrlSefaz sefazUrl, XmlDocument envelope, CancellationToken cancellation)
+        {
             logger?.LogDebug("INICIANDO TRANSMISSÃO SEFAZ [{Url}]", sefazUrl.Url);
 
             TemCertificado(configuracao);
             var certificado = CarregarCertificado();
 
             logger?.LogDebug("TRANSMITINDO...");
-            var soapResult = await EnviarSoapAsync(sefazUrl.Url, envelope, certificado);
+            var soapResult = await EnviarSoapAsync(sefazUrl.Url, envelope, certificado, cancellation).ConfigureAwait(false);
             logger?.LogDebug("ENCERRANDO TRANSMISSÃO SEFAZ");
 
             return soapResult;
+        }
+
+        private bool SobrescreveTransmissaoLegada()
+        {
+            var metodo = GetType().GetMethod(
+                nameof(TransmitirAsync),
+                new[] { typeof(UrlSefaz), typeof(XmlDocument) });
+
+            return metodo is not null
+                && metodo.DeclaringType != typeof(TransmitirSefazCommand)
+                && metodo.IsVirtual
+                && metodo.GetBaseDefinition().DeclaringType == typeof(TransmitirSefazCommand);
         }
 
         private static void TemCertificado(ConfiguracaoBasicaServico configuracao)
@@ -43,7 +71,7 @@ namespace FiscalCore.Servicos
                 throw new ArgumentNullException(nameof(configuracao), "NÃO FOI POSSÍVEL CARREGAR CONFIGURAÇÕES DO CERTIFICADO");
         }
 
-        private static async Task<string> EnviarSoapAsync(string url, XmlDocument envelope, X509Certificate2 certificado)
+        protected virtual HttpMessageHandler CriarHttpMessageHandler(X509Certificate2 certificado)
         {
             var handler = new HttpClientHandler
             {
@@ -51,8 +79,12 @@ namespace FiscalCore.Servicos
                 ServerCertificateCustomValidationCallback = (_, _, _, _) => true
             };
             handler.ClientCertificates.Add(certificado);
+            return handler;
+        }
 
-            using var client = new HttpClient(handler);
+        protected virtual async Task<string> EnviarSoapAsync(string url, XmlDocument envelope, X509Certificate2 certificado, CancellationToken cancellation)
+        {
+            using var client = new HttpClient(CriarHttpMessageHandler(certificado));
 
             envelope.PreserveWhitespace = true;
             var content = new StringContent(envelope.OuterXml, Encoding.UTF8, "application/soap+xml");
@@ -60,10 +92,10 @@ namespace FiscalCore.Servicos
             using var request = new HttpRequestMessage(HttpMethod.Post, url) { Content = content };
             request.Headers.TryAddWithoutValidation("SOAP:Action", string.Empty);
 
-            var response = await client.SendAsync(request);
+            var response = await client.SendAsync(request, cancellation).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 
-            return await response.Content.ReadAsStringAsync();
+            return await response.Content.ReadAsStringAsync(cancellation).ConfigureAwait(false);
         }
 
         private X509Certificate2 CarregarCertificado()
