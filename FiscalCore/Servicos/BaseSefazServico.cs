@@ -40,6 +40,7 @@ namespace FiscalCore.Servicos
         protected readonly ILogger<T> logger;
         protected readonly ITransmitirSefazCommand transmitir;
         private const string STORAGE_NAME = "FiscalCore";
+        private static readonly TimeSpan STORAGE_TIMEOUT = TimeSpan.FromSeconds(5);
 
         protected BaseServico(IStorageContext storageContext, ILogger<T> logger, ITransmitirSefazCommand transmitir)
         {
@@ -50,15 +51,30 @@ namespace FiscalCore.Servicos
 
         protected async Task SalvarLog(string filename, string conteudo, CancellationToken cancellation)
         {
+            using var timeoutCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellation);
+            timeoutCancellation.CancelAfter(STORAGE_TIMEOUT);
+
             try
             {
                 var storage = storageContext.GetStorage(STORAGE_NAME);
-                var fileInfo = await storage.SaveAsync(filename, conteudo, cancellation);
+                var fileInfo = await storage.SaveAsync(filename, conteudo, timeoutCancellation.Token).ConfigureAwait(false);
                 logger?.LogDebug($"LOG SALVO {Path.Combine(fileInfo.AbsolutePath, fileInfo.Filename)}");
+            }
+            catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (OperationCanceledException ex)
+            {
+                logger.LogWarning(
+                    ex,
+                    "TEMPO LIMITE AO SALVAR O LOG (STORAGE: {StorageName}) APOS {TimeoutSeconds}s",
+                    STORAGE_NAME,
+                    STORAGE_TIMEOUT.TotalSeconds);
             }
             catch (Exception ex)
             {
-                logger.LogWarning("OCORREU UM ERRO AO SALVAR O LOG (STORAGE: FiscalCore) | {}", ex.Message);
+                logger.LogWarning(ex, "OCORREU UM ERRO AO SALVAR O LOG (STORAGE: {StorageName})", STORAGE_NAME);
             }
         }
         
