@@ -101,13 +101,13 @@ namespace FiscalCore.Servicos.DistribuicaoDFe
             {
                 throw new ArgumentNullException(nameof(nsu));
             }
-                
-            if (nsu.Length > 15)
+
+            if (nsu.Length > LayoutFiscal.TamanhoNsu)
             {
                 throw new ArgumentOutOfRangeException(nameof(nsu));
             }
 
-            nsu = nsu.PadLeft(15, '0');
+            nsu = nsu.PadLeft(LayoutFiscal.TamanhoNsu, '0');
             return nsu;
         }
 

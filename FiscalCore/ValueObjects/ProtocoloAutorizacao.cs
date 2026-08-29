@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using FiscalCore.Tipos;
 
 namespace FiscalCore.ValueObjects
 {
@@ -31,7 +32,7 @@ namespace FiscalCore.ValueObjects
             protocolo = new string(protocolo.Where(Char.IsDigit).ToArray());
             if (string.IsNullOrEmpty(protocolo))
                 throw new Exception("Protocolo de autorização inválido");
-            if (!(protocolo.Length == 15))
+            if (!(protocolo.Length == LayoutFiscal.TamanhoProtocolo))
                 throw new Exception("Protocolo de autorização inválido");
         }
     }
