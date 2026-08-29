@@ -45,13 +45,18 @@ namespace FiscalCore.ValueObjects
             if (string.IsNullOrWhiteSpace(value))
                 return string.Empty;
 
-            Span<char> buffer = stackalloc char[value.Length];
+            // A entrada chega de XML e de certificado, fora do controle desta camada:
+            // o buffer é dimensionado pelo tamanho útil, nunca pelo da entrada.
+            Span<char> buffer = stackalloc char[Tamanho];
             var tamanho = 0;
 
             foreach (var c in value)
             {
                 if (c == '.' || c == '/' || c == '-' || c == ' ')
                     continue;
+
+                if (tamanho == Tamanho)
+                    return string.Empty; // excede o comprimento de um CNPJ
 
                 buffer[tamanho++] = char.ToUpperInvariant(c);
             }

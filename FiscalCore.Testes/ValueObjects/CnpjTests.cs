@@ -87,4 +87,17 @@ public sealed class CnpjTests
 
         Assert.False(cnpj.Valido);
     }
+
+    /// <summary>
+    /// O valor chega de XML e de certificado, fora do controle desta camada. O buffer
+    /// interno é dimensionado pelo comprimento de um CNPJ, não pelo da entrada — caso
+    /// contrário uma entrada longa derrubaria o processo com StackOverflowException,
+    /// que não é capturável.
+    /// </summary>
+    [Fact]
+    public void IsValid_ComEntradaExcessivamenteLonga_DeveRejeitarSemEstourarAPilha()
+    {
+        Assert.False(Cnpj.IsValid(new string('1', 5_000_000)));
+        Assert.True(Cnpj.IsValid(new string('.', 5_000_000) + "12ABC34501DE35"));
+    }
 }
