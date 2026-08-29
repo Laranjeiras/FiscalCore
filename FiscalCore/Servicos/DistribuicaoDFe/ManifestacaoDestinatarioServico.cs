@@ -167,7 +167,7 @@ public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDest
             tpAmb = configuracao.TipoAmbiente,
             tpEvento = item.TipoEvento,
             verEvento = versao,
-            Id = "ID" + ((int)item.TipoEvento) + item.ChaveNFe.Chave + item.SequenciaEvento.ToString().PadLeft(2, '0'),
+            Id = "ID" + ((int)item.TipoEvento) + item.ChaveNFe.Chave + item.SequenciaEvento.ToString().PadLeft(LayoutFiscal.TamanhoSequenciaEvento, '0'),
             detEvento = new detEvento
             {
                 versao = versao,

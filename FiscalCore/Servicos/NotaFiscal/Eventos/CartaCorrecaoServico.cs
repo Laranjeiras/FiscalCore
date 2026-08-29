@@ -61,7 +61,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
 
                 eModeloDocumento _modeloDocumento = 
                     chave
-                        .AsSpan(20, 2)
+                        .AsSpan(LayoutFiscal.PosicaoChave.Modelo, LayoutFiscal.PosicaoChave.ModeloTamanho)
                         .ToString()
                         .ModeloDocumento();
 

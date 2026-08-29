@@ -35,20 +35,20 @@ namespace FiscalCore.ValueObjects
             {
                 if (chave.StartsWith("NFe"))
                     chave = chave.Replace("NFe", string.Empty);
-                if (!(chave.Length == 44))
+                if (!(chave.Length == LayoutFiscal.TamanhoChaveAcesso))
                     throw new Exception();
 
                 chave = new string(chave.Where(Char.IsDigit).ToArray());
 
-                this.UF = Enum.Parse<eUF>(chave.AsSpan(0, 2));
-                this.AnoMesEmissao = new string(chave.AsSpan(2, 4));
-                this.Cnpj = new string(chave.AsSpan(6, 14));
-                this.Modelo = Enum.Parse<eModeloDocumento>(chave.AsSpan(20, 2));
-                this.Serie = int.Parse(chave.AsSpan(22, 3));
-                this.Numero = long.Parse(chave.AsSpan(25, 9));
-                this.TipoEmissao = Enum.Parse<eTipoEmissao>(chave.AsSpan(34, 1));
-                this.CNF = new Cnf(new string(chave.AsSpan(35, 8)));
-                this.digitoVerificador = byte.Parse(chave.AsSpan(43, 1));
+                this.UF = Enum.Parse<eUF>(chave.AsSpan(LayoutFiscal.PosicaoChave.Uf, LayoutFiscal.PosicaoChave.UfTamanho));
+                this.AnoMesEmissao = new string(chave.AsSpan(LayoutFiscal.PosicaoChave.AnoMesEmissao, LayoutFiscal.PosicaoChave.AnoMesEmissaoTamanho));
+                this.Cnpj = new string(chave.AsSpan(LayoutFiscal.PosicaoChave.Cnpj, LayoutFiscal.PosicaoChave.CnpjTamanho));
+                this.Modelo = Enum.Parse<eModeloDocumento>(chave.AsSpan(LayoutFiscal.PosicaoChave.Modelo, LayoutFiscal.PosicaoChave.ModeloTamanho));
+                this.Serie = int.Parse(chave.AsSpan(LayoutFiscal.PosicaoChave.Serie, LayoutFiscal.PosicaoChave.SerieTamanho));
+                this.Numero = long.Parse(chave.AsSpan(LayoutFiscal.PosicaoChave.Numero, LayoutFiscal.PosicaoChave.NumeroTamanho));
+                this.TipoEmissao = Enum.Parse<eTipoEmissao>(chave.AsSpan(LayoutFiscal.PosicaoChave.TipoEmissao, LayoutFiscal.PosicaoChave.TipoEmissaoTamanho));
+                this.CNF = new Cnf(new string(chave.AsSpan(LayoutFiscal.PosicaoChave.Cnf, LayoutFiscal.PosicaoChave.CnfTamanho)));
+                this.digitoVerificador = byte.Parse(chave.AsSpan(LayoutFiscal.PosicaoChave.DigitoVerificador, LayoutFiscal.PosicaoChave.DigitoVerificadorTamanho));
                 this.chave = GerarChave();
             }
             catch

@@ -1,4 +1,5 @@
-﻿using FiscalCore.Utils;
+﻿using FiscalCore.Tipos;
+using FiscalCore.Utils;
 using System;
 using System.Linq;
 
@@ -25,7 +26,7 @@ namespace FiscalCore.Validacoes
                 return new Notificacao("cNF", mensagem);
             if (string.IsNullOrEmpty(value)) 
                 return new Notificacao("cNF", mensagem);
-            if (!(value.Length == 8))
+            if (!(value.Length == LayoutFiscal.TamanhoCnf))
                 return new Notificacao("cNF", mensagem);
 
             return new Notificacao("cNF", "Válido", false);

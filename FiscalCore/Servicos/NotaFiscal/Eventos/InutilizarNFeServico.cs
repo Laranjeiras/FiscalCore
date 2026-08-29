@@ -68,9 +68,9 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
                 (int)pedInutilizacao.infInut.cUF,
                 pedInutilizacao.infInut.ano.ToString("D2"),
                 pedInutilizacao.infInut.CNPJ, (int)pedInutilizacao.infInut.mod,
-                pedInutilizacao.infInut.serie.ToString().PadLeft(3, '0'),
-                pedInutilizacao.infInut.nNFIni.ToString().PadLeft(9, '0'),
-                pedInutilizacao.infInut.nNFFin.ToString().PadLeft(9, '0')
+                pedInutilizacao.infInut.serie.ToString().PadLeft(LayoutFiscal.TamanhoSerie, '0'),
+                pedInutilizacao.infInut.nNFIni.ToString().PadLeft(LayoutFiscal.TamanhoNumeroNF, '0'),
+                pedInutilizacao.infInut.nNFFin.ToString().PadLeft(LayoutFiscal.TamanhoNumeroNF, '0')
             );
             pedInutilizacao.infInut.Id = "ID" + numId;
 
