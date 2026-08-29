@@ -1,80 +1,138 @@
-﻿namespace FiscalCore.ValueObjects
+using System;
+
+namespace FiscalCore.ValueObjects
 {
+    /// <summary>
+    /// CNPJ numérico ou alfanumérico, conforme IN RFB nº 2.119/2022 (Anexo XV).
+    /// Posições 1–12 aceitam [A-Z0-9]; posições 13–14 (dígitos verificadores) são
+    /// sempre numéricas. CNPJs numéricos legados permanecem válidos.
+    /// </summary>
     public struct Cnpj
     {
+        private const int TamanhoBase = 12;
+        private const int Tamanho = 14;
+
         private readonly string _value;
+        private readonly string _normalizado;
 
         public readonly bool Valido;
+
+        /// <summary>Indica se o CNPJ contém letras (inscrição alfanumérica).</summary>
+        public readonly bool Alfanumerico;
+
         static readonly int[] Multiplicador1 = { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
         static readonly int[] Multiplicador2 = { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
 
         public Cnpj(string value)
         {
             _value = value;
+            _normalizado = Normalizar(value);
+            Alfanumerico = ContemLetra(_normalizado);
+            Valido = Validar(_normalizado);
+        }
 
-            if (value == null)
+        /// <summary>CNPJ sem máscara e em maiúsculas. Formato de persistência.</summary>
+        public string Value => _normalizado;
+
+        public static bool IsValid(string? value) => Validar(Normalizar(value));
+
+        /// <summary>
+        /// Remove máscara e normaliza para maiúsculas. Preserva caracteres inválidos
+        /// para que <see cref="Validar"/> os rejeite, em vez de descartá-los em silêncio.
+        /// </summary>
+        private static string Normalizar(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return string.Empty;
+
+            Span<char> buffer = stackalloc char[value.Length];
+            var tamanho = 0;
+
+            foreach (var c in value)
             {
-                Valido = false;
-                return;
+                if (c == '.' || c == '/' || c == '-' || c == ' ')
+                    continue;
+
+                buffer[tamanho++] = char.ToUpperInvariant(c);
             }
 
-            var digitosIdenticos = true;
-            var ultimoDigito = -1;
-            var posicao = 0;
+            return new string(buffer[..tamanho]);
+        }
+
+        private static bool ContemLetra(string cnpj)
+        {
+            foreach (var c in cnpj)
+            {
+                if (c >= 'A' && c <= 'Z')
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static bool Validar(string cnpj)
+        {
+            if (cnpj.Length != Tamanho)
+                return false;
+
+            // Posições 1–12: [A-Z0-9]. Posições 13–14: apenas dígitos.
+            for (var i = 0; i < TamanhoBase; i++)
+            {
+                if (!EhAlfanumerico(cnpj[i]))
+                    return false;
+            }
+
+            if (!char.IsDigit(cnpj[12]) || !char.IsDigit(cnpj[13]))
+                return false;
+
+            if (SequenciaHomogenea(cnpj))
+                return false;
+
             var totalDigito1 = 0;
             var totalDigito2 = 0;
 
-            foreach (var c in _value)
+            for (var i = 0; i < TamanhoBase; i++)
             {
-                if (char.IsDigit(c))
-                {
-                    var digito = c - '0';
-                    if (posicao != 0 && ultimoDigito != digito)
-                    {
-                        digitosIdenticos = false;
-                    }
-
-                    ultimoDigito = digito;
-                    if (posicao < 12)
-                    {
-                        totalDigito1 += digito * Multiplicador1[posicao];
-                        totalDigito2 += digito * Multiplicador2[posicao];
-                    }
-                    else if (posicao == 12)
-                    {
-                        var dv1 = (totalDigito1 % 11);
-                        dv1 = dv1 < 2
-                            ? 0
-                            : 11 - dv1;
-
-                        if (digito != dv1)
-                        {
-                            Valido = false;
-                            return;
-                        }
-
-                        totalDigito2 += dv1 * Multiplicador2[12];
-                    }
-                    else if (posicao == 13)
-                    {
-                        var dv2 = (totalDigito2 % 11);
-
-                        dv2 = dv2 < 2
-                            ? 0
-                            : 11 - dv2;
-
-                        if (digito != dv2)
-                        {
-                            Valido = false;
-                            return;
-                        }
-                    }
-
-                    posicao++;
-                }
+                var valor = ValorNumerico(cnpj[i]);
+                totalDigito1 += valor * Multiplicador1[i];
+                totalDigito2 += valor * Multiplicador2[i];
             }
 
-            Valido = (posicao == 14) && !digitosIdenticos;
+            var dv1 = CalcularDigito(totalDigito1);
+            if (cnpj[12] - '0' != dv1)
+                return false;
+
+            totalDigito2 += dv1 * Multiplicador2[TamanhoBase];
+
+            return cnpj[13] - '0' == CalcularDigito(totalDigito2);
+        }
+
+        private static bool EhAlfanumerico(char c)
+            => (c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z');
+
+        /// <summary>Valor do caractere na tabela da RFB: ASCII − 48 ('0'→0, 'A'→17).</summary>
+        private static int ValorNumerico(char c) => c - '0';
+
+        private static int CalcularDigito(int total)
+        {
+            var resto = total % 11;
+            return resto < 2 ? 0 : 11 - resto;
+        }
+
+        /// <summary>
+        /// Rejeita raiz repetida (ex.: "00000000000000", "AAAAAAAAAAAA45"). A verificação
+        /// cobre as 12 primeiras posições: os DVs são derivados da base e não devem
+        /// mascarar a repetição.
+        /// </summary>
+        private static bool SequenciaHomogenea(string cnpj)
+        {
+            for (var i = 1; i < TamanhoBase; i++)
+            {
+                if (cnpj[i] != cnpj[0])
+                    return false;
+            }
+
+            return true;
         }
 
         public static implicit operator Cnpj(string value)
