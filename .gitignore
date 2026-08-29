@@ -362,4 +362,6 @@ FiscalCore.WebPrint/.config/dotnet-tools.json
 /FiscalCore.Testes/bin/
 /FiscalCore.Testes/obj/
 docs/**/*
+!docs/**/*.md
+!docs/**/
 .claudeignore
