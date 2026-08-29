@@ -1,10 +1,10 @@
 ---
-title: "CNPJ alfanumérico e remoção de magic numbers"
+title: "Feature 753 — CNPJ alfanumérico e remoção de magic numbers"
 type: feature
 status: implemented
 created: 2026-08-29
-azure_devops_id:
-azure_devops_url:
+azure_devops_id: 753
+azure_devops_url: https://dev.azure.com/algoplus/ERP/_workitems/edit/753
 ---
 
 # CNPJ alfanumérico e remoção de magic numbers
@@ -64,6 +64,13 @@ tanto ao formato numérico quanto ao alfanumérico e foram preservados.
 A API pública anterior (`Valido`, `ToString()`, `implicit operator`, `ValidarCNPJ`)
 foi mantida; somaram-se `Value`, `IsValid` e `Alfanumerico`.
 
+O buffer da normalização é dimensionado pelo comprimento de um CNPJ, não pelo da
+entrada. A primeira versão usava `stackalloc char[value.Length]`: como o valor chega
+de XML e de certificado, fora do controle desta camada, uma entrada suficientemente
+longa alocaria centenas de KB na pilha e derrubaria o processo com
+`StackOverflowException` — que não é capturável. Verificado com 5.000.000 de
+caracteres.
+
 ### Validação do emitente
 
 `Validar()` passou a delegar ao value object. Como `emit.CpfCnpj` resolve para
@@ -97,7 +104,7 @@ comportamento existente.
 
 ## Cobertura de testes
 
-118 testes verdes, sendo 73 adicionados por esta feature.
+119 testes verdes, sendo 74 adicionados por esta feature.
 
 | Arquivo | Cobre |
 |---|---|
