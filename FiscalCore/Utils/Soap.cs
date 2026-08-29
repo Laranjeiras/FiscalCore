@@ -33,7 +33,7 @@ namespace FiscalCore.Utils
             if (string.IsNullOrEmpty(conteudo))
                 return "<vazio>";
 
-            return conteudo.Length <= 500 ? conteudo : conteudo.Substring(0, 500) + "...";
+            return conteudo.Length <= 500 ? conteudo : string.Concat(conteudo.AsSpan(0, 500), "...");
         }
 
         public static XmlElement LimparEnvelope(string soapResult, string tag)
