@@ -19,7 +19,7 @@ namespace FiscalCore.Danfe.NFCe
             const string pipe = "|";
 
             //Chave de Acesso da NFC-e
-            var chave = nfe.infNFe.Id.Substring(3);
+            var chave = new string(nfe.infNFe.Id.AsSpan(3));
 
             //Identificação do Ambiente (1 – Produção, 2 – Homologação)
             var ambiente = (int)nfe.infNFe.ide.tpAmb;
@@ -49,7 +49,7 @@ namespace FiscalCore.Danfe.NFCe
 
         public static string FormatarChaveAcesso(NFe nfe)
         {
-            string chaveAcesso = nfe.infNFe.Id.Substring(3);
+            string chaveAcesso = new string(nfe.infNFe.Id.AsSpan(3));
             string novaChave = string.Empty;
             int contaChaveAcesso = 0;
 

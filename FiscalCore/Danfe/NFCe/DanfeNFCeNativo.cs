@@ -232,7 +232,7 @@ namespace FiscalCore.Danfe.NFCe
                 nome.Desenhar(x + 50, y);
                 y += nome.Medida.Altura;
 
-                var ucom = detalhe.prod?.uCom?.Length > 3 ? detalhe.prod.uCom.Substring(0, 3) : string.Empty;
+                var ucom = detalhe.prod?.uCom?.Length > 3 ? new string(detalhe.prod.uCom.AsSpan(0, 3)) : string.Empty;
                 AdicionarTexto quantidade = new AdicionarTexto(g, $"{detalhe.prod!.qCom.ToString("N4")}   {ucom}", 7);
                 AdicionarTexto valorUnitario = new AdicionarTexto(g, detalhe.prod.vUnCom.ToString("C"), 7);
                 AdicionarTexto vezesX = new AdicionarTexto(g, "x", 7);

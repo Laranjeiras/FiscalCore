@@ -40,15 +40,15 @@ namespace FiscalCore.ValueObjects
 
                 chave = new string(chave.Where(Char.IsDigit).ToArray());
 
-                this.UF = (eUF)Enum.Parse(typeof(eUF), chave.Substring(0, 2));
-                this.AnoMesEmissao = chave.Substring(2, 4);
-                this.Cnpj = chave.Substring(6, 14);
-                this.Modelo = (eModeloDocumento)Enum.Parse(typeof(eModeloDocumento), chave.Substring(20, 2));
-                this.Serie = int.Parse(chave.Substring(22, 3));
-                this.Numero = long.Parse(chave.Substring(25, 9));
-                this.TipoEmissao = (eTipoEmissao)Enum.Parse(typeof(eTipoEmissao), chave.Substring(34, 1));
-                this.CNF = new Cnf(chave.Substring(35, 8));
-                this.digitoVerificador = byte.Parse(chave.Substring(43, 1));
+                this.UF = Enum.Parse<eUF>(chave.AsSpan(0, 2));
+                this.AnoMesEmissao = new string(chave.AsSpan(2, 4));
+                this.Cnpj = new string(chave.AsSpan(6, 14));
+                this.Modelo = Enum.Parse<eModeloDocumento>(chave.AsSpan(20, 2));
+                this.Serie = int.Parse(chave.AsSpan(22, 3));
+                this.Numero = long.Parse(chave.AsSpan(25, 9));
+                this.TipoEmissao = Enum.Parse<eTipoEmissao>(chave.AsSpan(34, 1));
+                this.CNF = new Cnf(new string(chave.AsSpan(35, 8)));
+                this.digitoVerificador = byte.Parse(chave.AsSpan(43, 1));
                 this.chave = GerarChave();
             }
             catch

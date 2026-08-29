@@ -63,7 +63,7 @@ namespace FiscalCore.Utils
 
             const string pipe = "|";
 
-            var chave = nfe.infNFe.Id.Substring(3);
+            var chave = new string(nfe.infNFe.Id.AsSpan(3));
 
             var ambiente = (int)nfe.infNFe.ide.tpAmb;
 
