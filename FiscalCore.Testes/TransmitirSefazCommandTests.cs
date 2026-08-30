@@ -17,7 +17,7 @@ namespace FiscalCore.Testes;
 public sealed class TransmitirSefazCommandTests
 {
     [Fact]
-    public async Task FluxoMde_WhenLegacySubclassOverridesTwoArguments_UsesTheOverride()
+    public async Task FluxoMde_ComSubclasseLegadaSobrescrevendoDoisArgumentos_DeveUsarASobrescrita()
     {
         // Arrange
         var transmissor = new TransmissorLegado();
@@ -45,7 +45,7 @@ public sealed class TransmitirSefazCommandTests
     }
 
     [Fact]
-    public async Task TransmitirAsync_WhenLegacyOverrideCallsBase_ExecutesCoreOnceWithoutRecursion()
+    public async Task TransmitirAsync_ComSobrescritaLegadaChamandoBase_DeveExecutarNucleoUmaVezSemRecursao()
     {
         // Arrange
         var transmissor = new TransmissorLegadoQueDelegaParaBase();
@@ -69,7 +69,7 @@ public sealed class TransmitirSefazCommandTests
     }
 
     [Fact]
-    public async Task EnviarSoapAsync_WhenCancellationProvided_PassesItToHttpHandler()
+    public async Task EnviarSoapAsync_ComCancellationTokenInformado_DeveRepassarAoHttpHandler()
     {
         // Arrange
         var handler = new CapturadorHttpMessageHandler();

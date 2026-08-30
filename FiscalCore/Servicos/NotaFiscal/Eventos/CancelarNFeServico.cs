@@ -19,7 +19,6 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
     public class CancelarNFeServico : BaseSefazServico<CancelarNFeServico>, IEventoServico
     {
         private const string VERSAO = "1.00";
-        private const string LOG_PATH = "1.00";
 
         public CancelarNFeServico(ConfiguracaoServico cfgServico, IStorageContext storage, ITransmitirSefazCommand transmitir, ILogger<CancelarNFeServico> logger)
             :base(cfgServico, transmitir, logger, storage)
@@ -29,12 +28,12 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
         public async Task<retEnvEvento> Cancelar(InfoNFeCancelar infoNFe, CancellationToken cancellation) =>
             await Cancelar(new List<InfoNFeCancelar> { infoNFe }, cancellation);
 
-        public async Task<retEnvEvento> Cancelar(IList<InfoNFeCancelar> infos, CancellationToken cancellation) 
+        public async Task<retEnvEvento> Cancelar(IList<InfoNFeCancelar> infos, CancellationToken cancellation)
         {
             if (infos == null || infos.Count <= 0)
                 throw new Exception("Informações da NFe não encontrada");
 
-            if (infos.Count > 20)
+            if (infos.Count > LayoutFiscal.MaximoEventosPorLote)
                 throw new Exception("No máximo 20 NFes podem ser canceladas");
 
             var modelo = ExtrairModelo(infos);
@@ -79,7 +78,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             foreach (var eventoTmp in eventos)
             {
                 eventoTmp.infEvento.Id = "ID" + ((int)eventoTmp.infEvento.tpEvento) + eventoTmp.infEvento.chNFe +
-                                      eventoTmp.infEvento.nSeqEvento.ToString().PadLeft(2, '0');
+                                      eventoTmp.infEvento.nSeqEvento.ToString().PadLeft(LayoutFiscal.TamanhoSequenciaEvento, '0');
 
                 var _certificado = configuracao.ConfigCertificado.Certificado;
                 eventoTmp.Assinar(_certificado, configuracao.ConfigCertificado.SignatureMethodSignedXml, configuracao.ConfigCertificado.DigestMethodReference);

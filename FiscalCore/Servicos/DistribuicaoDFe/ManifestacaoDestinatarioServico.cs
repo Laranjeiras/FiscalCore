@@ -23,7 +23,7 @@ namespace FiscalCore.Servicos.DistribuicaoDFe;
 public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDestinatarioServico>
 {
     private const int QuantidadeMinimaLote = 1;
-    private const int QuantidadeMaximaLote = 20;
+    private const int QuantidadeMaximaLote = LayoutFiscal.MaximoEventosPorLote;
     private const int StatusEventoRegistrado = 135;
     private const int StatusEventoRegistradoSemVinculo = 136;
     private const int StatusDuplicidadeEvento = 573;
@@ -167,7 +167,7 @@ public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDest
             tpAmb = configuracao.TipoAmbiente,
             tpEvento = item.TipoEvento,
             verEvento = versao,
-            Id = "ID" + ((int)item.TipoEvento) + item.ChaveNFe.Chave + item.SequenciaEvento.ToString().PadLeft(2, '0'),
+            Id = "ID" + ((int)item.TipoEvento) + item.ChaveNFe.Chave + item.SequenciaEvento.ToString().PadLeft(LayoutFiscal.TamanhoSequenciaEvento, '0'),
             detEvento = new detEvento
             {
                 versao = versao,
@@ -241,7 +241,9 @@ public class ManifestacaoDestinatarioServico : BaseSefazServico<ManifestacaoDest
     {
         if (item.TipoEvento == eTipoEventoNFe.OperacaoNaoRealizada)
         {
-            if (string.IsNullOrWhiteSpace(item.Justificativa) || item.Justificativa.Length < 15 || item.Justificativa.Length > 255)
+            if (string.IsNullOrWhiteSpace(item.Justificativa)
+                || item.Justificativa.Length < LayoutFiscal.JustificativaMinima
+                || item.Justificativa.Length > LayoutFiscal.JustificativaMaxima)
             {
                 throw new ArgumentException("A justificativa de Operação não Realizada deve conter entre 15 e 255 caracteres.", nameof(item));
             }

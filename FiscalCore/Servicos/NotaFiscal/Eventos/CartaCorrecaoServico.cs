@@ -39,12 +39,12 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             return retorno;
         }
 
-        public async Task<retEnvEvento> TransmitirCorrecao(IList<InfoCartaCorrecao> infos, CancellationToken cancellation) 
+        public async Task<retEnvEvento> TransmitirCorrecao(IList<InfoCartaCorrecao> infos, CancellationToken cancellation)
         {
             if (infos == null || infos.Count <= 0)
                 throw new Exception("Informações da NFe não encontrada");
 
-            if (infos.Count > 20)
+            if (infos.Count > LayoutFiscal.MaximoEventosPorLote)
                 throw new Exception("No máximo 20 NFes podem ser Corrigidas");
 
             List<evento> eventos = new List<evento>();
@@ -56,12 +56,12 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
                 var nSeqEvento = item.nSeqEvento;
                 chave = chave.Replace("NFe", "");
 
-                if (item.Correcao.Length < 15 || item.Correcao.Length > 1000)
+                if (item.Correcao.Length < LayoutFiscal.CorrecaoMinima || item.Correcao.Length > LayoutFiscal.CorrecaoMaxima)
                     throw new FalhaValidacaoException("A descrição da correção deve conter entre 15 e 1000 caracteres");
 
                 eModeloDocumento _modeloDocumento = 
                     chave
-                        .AsSpan(20, 2)
+                        .AsSpan(LayoutFiscal.PosicaoChave.Modelo, LayoutFiscal.PosicaoChave.ModeloTamanho)
                         .ToString()
                         .ModeloDocumento();
 
@@ -94,7 +94,7 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             foreach (var eventoTmp in eventos)
             {
                 eventoTmp.infEvento.Id = "ID" + ((int)eventoTmp.infEvento.tpEvento) + eventoTmp.infEvento.chNFe +
-                                      eventoTmp.infEvento.nSeqEvento.ToString().PadLeft(2, '0');
+                                      eventoTmp.infEvento.nSeqEvento.ToString().PadLeft(LayoutFiscal.TamanhoSequenciaEvento, '0');
 
                 var _certificado = cfgServico.ConfigCertificado.Certificado;
                 eventoTmp.Assinar(_certificado, cfgServico.ConfigCertificado.SignatureMethodSignedXml, cfgServico.ConfigCertificado.DigestMethodReference);

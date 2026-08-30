@@ -71,7 +71,9 @@ namespace FiscalCore.Utils
             var extensao = certificado.Extensions[oIdSubjectAlternativeName];
             var texto = Encoding.UTF8.GetString(extensao!.RawData);
 
-            var matches = Regex.Matches(texto, @"(?<!\d)\d{14}(?!\d)");
+            // Posições 1–12 aceitam [A-Z0-9] (CNPJ alfanumérico, IN RFB nº 2.119/2022);
+            // as duas últimas são sempre numéricas. O DV é conferido pelo VO abaixo.
+            var matches = Regex.Matches(texto, @"(?<![A-Z0-9])[A-Z0-9]{12}\d{2}(?![A-Z0-9])");
 
             var cnpjValido = matches.FirstOrDefault(p => new Cnpj(p.Value).Valido);
             return cnpjValido?.Value;
