@@ -1,12 +1,24 @@
 using FiscalCore.NotaFiscal.RetornoServicos.Recepcao.Retorno;
 using FiscalCore.Modelos.Retornos;
 using FiscalCore.Utils;
+using FiscalCore.ValueObjects;
 using Xunit;
 
 namespace FiscalCore.Testes.NotaFiscal.Protocolo;
 
 public sealed class InfProtTests
 {
+    /// <summary>
+    /// Chave usada nos XMLs de exemplo. A desserialização não confere o dígito
+    /// verificador, então um fixture inválido passaria despercebido — daí o teste
+    /// abaixo, que valida a chave pelo próprio value object.
+    /// </summary>
+    private const string ChaveExemplo = "43260829310114000110550010000017401123456786";
+
+    [Fact]
+    public void ChaveDosExemplos_DeveSerUmaChaveDeAcessoValida()
+        => Assert.Equal(ChaveExemplo, new ChaveFiscal(ChaveExemplo).Chave);
+
     [Fact]
     public void XmlStringParaClasse_ProtocoloSemAlertas_RetornaColecaoVazia()
     {
@@ -18,7 +30,7 @@ public sealed class InfProtTests
               <dhRecbto>2026-08-12T10:30:00-03:00</dhRecbto>
               <protNFe versao="4.00"><infProt>
                 <tpAmb>2</tpAmb><verAplic>SVRS20260812</verAplic>
-                <chNFe>43260829310114000110550010000017401123456780</chNFe>
+                <chNFe>43260829310114000110550010000017401123456786</chNFe>
                 <dhRecbto>2026-08-12T10:30:00-03:00</dhRecbto>
                 <nProt>143260000000001</nProt><digVal>YWJjZGVmZ2hpamtsbW5vcHFyc3Q=</digVal>
                 <cStat>100</cStat><xMotivo>Autorizado o uso da NF-e</xMotivo>
@@ -43,7 +55,7 @@ public sealed class InfProtTests
               <dhRecbto>2026-08-11T10:30:00-03:00</dhRecbto>
               <protNFe versao="4.00"><infProt>
                 <tpAmb>2</tpAmb><verAplic>SVRS20260811</verAplic>
-                <chNFe>43260829310114000110550010000017401123456780</chNFe>
+                <chNFe>43260829310114000110550010000017401123456786</chNFe>
                 <dhRecbto>2026-08-11T10:30:00-03:00</dhRecbto>
                 <nProt>143260000000001</nProt><digVal>YWJjZGVmZ2hpamtsbW5vcHFyc3Q=</digVal>
                 <cStat>120</cStat><xMotivo>Autorizado o uso da NF-e, com alerta</xMotivo>
@@ -78,7 +90,7 @@ public sealed class InfProtTests
               <dhRecbto>2026-08-11T10:30:00-03:00</dhRecbto>
               <protNFe versao="4.00"><infProt>
                 <tpAmb>2</tpAmb><verAplic>SVRS</verAplic>
-                <chNFe>43260829310114000110550010000017401123456780</chNFe>
+                <chNFe>43260829310114000110550010000017401123456786</chNFe>
                 <dhRecbto>2026-08-11T10:30:00-03:00</dhRecbto>
                 <nProt>143260000000001</nProt><cStat>120</cStat>
                 <xMotivo>Autorizado com alerta</xMotivo>

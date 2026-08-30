@@ -14,7 +14,7 @@ namespace FiscalCore.Testes;
 public sealed class ManifestacaoDestinatarioServicoTests
 {
     [Fact]
-    public void ValidarItens_WhenLoteIsEmpty_ThrowsArgumentOutOfRangeException()
+    public void ValidarItens_ComLoteVazio_DeveLancarArgumentOutOfRange()
     {
         // Arrange
         IReadOnlyList<ManifestacaoDestinatarioItem> itens = Array.Empty<ManifestacaoDestinatarioItem>();
@@ -29,7 +29,7 @@ public sealed class ManifestacaoDestinatarioServicoTests
     [Theory]
     [InlineData(1)]
     [InlineData(20)]
-    public void ValidarItens_WhenLoteHasSupportedQuantity_DoesNotThrow(int quantidade)
+    public void ValidarItens_ComQuantidadeSuportada_NaoDeveLancar(int quantidade)
     {
         // Arrange
         var itens = CriarItens(quantidade);
@@ -42,7 +42,7 @@ public sealed class ManifestacaoDestinatarioServicoTests
     }
 
     [Fact]
-    public void ValidarItens_WhenLoteHasTwentyOneItems_ThrowsArgumentOutOfRangeException()
+    public void ValidarItens_ComVinteEUmItens_DeveLancarArgumentOutOfRange()
     {
         // Arrange
         var itens = CriarItens(21);
@@ -57,7 +57,7 @@ public sealed class ManifestacaoDestinatarioServicoTests
     [Theory]
     [InlineData(null)]
     [InlineData("curta")]
-    public void ValidarItens_WhenJustificativaIsInvalidForOperacaoNaoRealizada_ThrowsArgumentException(string? justificativa)
+    public void ValidarItens_ComJustificativaInvalidaParaOperacaoNaoRealizada_DeveLancarArgumentException(string? justificativa)
     {
         // Arrange
         var item = new ManifestacaoDestinatarioItem(CriarChave(1), eTipoEventoNFe.OperacaoNaoRealizada, justificativa);
@@ -70,7 +70,7 @@ public sealed class ManifestacaoDestinatarioServicoTests
     }
 
     [Fact]
-    public void ValidarItens_WhenJustificativaIsValidOnlyForOperacaoNaoRealizada_DoesNotThrow()
+    public void ValidarItens_ComJustificativaValidaApenasParaOperacaoNaoRealizada_NaoDeveLancar()
     {
         // Arrange
         var item = new ManifestacaoDestinatarioItem(CriarChave(1), eTipoEventoNFe.OperacaoNaoRealizada, "Justificativa válida com mais de quinze caracteres.");
@@ -83,7 +83,7 @@ public sealed class ManifestacaoDestinatarioServicoTests
     }
 
     [Fact]
-    public void CriarResultados_WhenRetornoIsPartial_MapsEachItemByChaveAndKeepsReconciliationPending()
+    public void CriarResultados_ComRetornoParcial_DeveMapearCadaItemPorChaveEManterConciliacaoPendente()
     {
         // Arrange
         var primeiraChave = CriarChave(1);
@@ -121,7 +121,7 @@ public sealed class ManifestacaoDestinatarioServicoTests
     }
 
     [Fact]
-    public void CriarResultados_WhenSameChaveHasDifferentEventTypes_MapsEachReturnByType()
+    public void CriarResultados_ComMesmaChaveETiposDeEventoDistintos_DeveMapearCadaRetornoPorTipo()
     {
         // Arrange
         var chave = CriarChave(1);
@@ -157,7 +157,7 @@ public sealed class ManifestacaoDestinatarioServicoTests
     }
 
     [Fact]
-    public void Constructor_WhenJustificativaHasOnlyWhitespace_NormalizesToNull()
+    public void Construtor_ComJustificativaApenasEmBranco_DeveNormalizarParaNulo()
     {
         // Arrange
         var chave = CriarChave(1);
@@ -172,7 +172,7 @@ public sealed class ManifestacaoDestinatarioServicoTests
     [Theory]
     [InlineData(0)]
     [InlineData(3)]
-    public void ValidarItens_WhenSequenciaIsInvalid_ThrowsArgumentOutOfRangeException(int sequencia)
+    public void ValidarItens_ComSequenciaInvalida_DeveLancarArgumentOutOfRange(int sequencia)
     {
         // Arrange
         var item = new ManifestacaoDestinatarioItem(CriarChave(1), eTipoEventoNFe.ConfirmacaoOperacao, sequencia);
@@ -185,7 +185,7 @@ public sealed class ManifestacaoDestinatarioServicoTests
     }
 
     [Fact]
-    public void CriarResultados_WhenEvento136_ReturnsRegistradaSemVinculo()
+    public void CriarResultados_ComEvento136_DeveRetornarRegistradaSemVinculo()
     {
         // Arrange
         var chave = CriarChave(1);
@@ -215,7 +215,7 @@ public sealed class ManifestacaoDestinatarioServicoTests
     [InlineData(WebExceptionStatus.SendFailure, false)]
     [InlineData(WebExceptionStatus.ReceiveFailure, false)]
     [InlineData(WebExceptionStatus.ConnectionClosed, false)]
-    public void EhFalhaSeguraAntesDoEnvio_WhenStatusIsClassified_ReturnsExpected(WebExceptionStatus status, bool esperado)
+    public void EhFalhaSeguraAntesDoEnvio_ComStatusClassificado_DeveRetornarOEsperado(WebExceptionStatus status, bool esperado)
     {
         // Arrange
         var exception = new WebException("falha", status);
@@ -228,7 +228,7 @@ public sealed class ManifestacaoDestinatarioServicoTests
     }
 
     [Fact]
-    public void EhFalhaSeguraAntesDoEnvio_WhenCancellationIsAmbiguous_ReturnsFalse()
+    public void EhFalhaSeguraAntesDoEnvio_ComCancelamentoAmbiguo_DeveRetornarFalso()
     {
         // Act
         var resultado = ManifestacaoDestinatarioServico.EhFalhaSeguraAntesDoEnvio(new TaskCanceledException());
