@@ -12,6 +12,15 @@ namespace FiscalCore.Danfe.NFCe
     /// </summary>
     internal static class NfceQrCode
     {
+        // CSC (Código de Segurança do Contribuinte) não participa da autorização da NFe: o
+        // envio ao SEFAZ usa só o XML assinado com o certificado digital, e o SEFAZ nunca vê
+        // o CSC nesse momento — por isso uma NFCe pode autorizar normalmente com o protocolo
+        // certo mesmo com o CSC errado configurado.
+        // O CSC só entra aqui: o QR-Code do DANFE é calculado localmente (sem chamada ao
+        // SEFAZ), concatenando chave+CSC e gerando um hash SHA1 para montar a URL. Se o valor
+        // configurado não for o token CSC real (ex.: um GUID por engano), o Convert.ToInt16
+        // abaixo estoura FormatException e a impressão falha — a nota já autorizada continua
+        // válida, só o QR-Code impresso é que fica comprometido.
         public static string ObterUrlQrCode(NFe nfe, IConfiguracaoDanfe configDanfe, string csc)
         {
             var url = configDanfe.NFCeUrlConsultaQrCodeSefaz;
