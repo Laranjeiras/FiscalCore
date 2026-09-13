@@ -1,4 +1,4 @@
-using FiscalCore.Configuracoes;
+﻿using FiscalCore.Configuracoes;
 using FiscalCore.ValueObjects;
 using Microsoft.Extensions.Logging;
 using System;
@@ -73,10 +73,13 @@ namespace FiscalCore.Servicos
 
         protected virtual HttpMessageHandler CriarHttpMessageHandler(X509Certificate2 certificado)
         {
+            // A validacao do certificado do servidor usa a cadeia de confianca do sistema.
+            // Nao reintroduza um callback que retorne true: o certificado A1 do cliente
+            // acompanha cada requisicao, e aceitar qualquer servidor permite que um
+            // atacante na rede se passe pela SEFAZ.
             var handler = new HttpClientHandler
             {
-                SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13,
-                ServerCertificateCustomValidationCallback = (_, _, _, _) => true
+                SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13
             };
             handler.ClientCertificates.Add(certificado);
             return handler;
