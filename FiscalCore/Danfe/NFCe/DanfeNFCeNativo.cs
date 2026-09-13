@@ -453,7 +453,7 @@ namespace FiscalCore.Danfe.NFCe
         {
             y += 8;
 
-            string urlQrCode = NfceQrCode.ObterUrlQrCode(_nfe, _configDanfe, _csc);
+            string urlQrCode = NfceQrCode.ObterUrlQrCode(_nfe, _configDanfe, _cIdToken, _csc);
 
             using (var qrCodeGenerator = new QRCodeGenerator())
             {
