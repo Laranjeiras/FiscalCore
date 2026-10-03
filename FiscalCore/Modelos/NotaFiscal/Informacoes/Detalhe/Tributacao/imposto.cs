@@ -4,6 +4,7 @@ using FiscalCore.Utils;
 using FiscalCore.NotaFiscal.Informacoes.Detalhe.Tributacao.Estadual;
 using FiscalCore.NotaFiscal.Informacoes.Detalhe.Tributacao.Federal;
 using FiscalCore.NotaFiscal.Informacoes.Detalhe.Tributacao.Municipal;
+using FiscalCore.NotaFiscal.Informacoes.Detalhe.Tributacao.Rtc;
 
 namespace FiscalCore.NotaFiscal.Informacoes.Detalhe.Tributacao
 {
@@ -64,6 +65,11 @@ namespace FiscalCore.NotaFiscal.Informacoes.Detalhe.Tributacao
         ///     NA01 - Informação do ICMS Interestadua
         /// </summary>
         public ICMSUFDest ICMSUFDest { get; set; }
+
+        /// <summary>
+        ///     UB12 - Grupo IBS/CBS (Reforma Tributária do Consumo). Nulo = omitido no XML.
+        /// </summary>
+        public IBSCBS IBSCBS { get; set; }
 
         #endregion
 
