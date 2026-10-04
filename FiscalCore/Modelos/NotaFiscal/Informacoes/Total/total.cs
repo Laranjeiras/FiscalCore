@@ -32,6 +32,11 @@ namespace FiscalCore.NotaFiscal.Informacoes.Total
         /// </summary>
         public retTrib retTrib { get; set; }
 
+        /// <summary>
+        ///     W34 - Totais do IBS e da CBS (Reforma Tributária do Consumo). Nulo = omitido no XML.
+        /// </summary>
+        public IBSCBSTot IBSCBSTot { get; set; }
+
         #endregion
     }
 }
