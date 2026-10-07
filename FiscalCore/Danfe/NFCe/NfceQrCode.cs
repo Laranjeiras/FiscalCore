@@ -12,7 +12,9 @@ namespace FiscalCore.Danfe.NFCe
     /// </summary>
     internal static class NfceQrCode
     {
-        public static string ObterUrlQrCode(NFe nfe, IConfiguracaoDanfe configDanfe, string csc)
+        // O CSC não participa da autorização no SEFAZ, só deste QR-Code calculado localmente.
+        // cIdToken é o ID numérico do CSC (vai na URL); csc é o token (formato GUID na SVRS), usado só no hash.
+        public static string ObterUrlQrCode(NFe nfe, IConfiguracaoDanfe configDanfe, string cIdToken, string csc)
         {
             var url = configDanfe.NFCeUrlConsultaQrCodeSefaz;
 
@@ -25,7 +27,7 @@ namespace FiscalCore.Danfe.NFCe
             var ambiente = (int)nfe.infNFe.ide.tpAmb;
 
             //Identificador do CSC (Código de Segurança do Contribuinte no Banco de Dados da SEFAZ). Informar sem os zeros não significativos
-            var idCsc = Convert.ToInt16(csc);
+            var idCsc = Convert.ToInt32(cIdToken);
 
             string dadosBase;
 
