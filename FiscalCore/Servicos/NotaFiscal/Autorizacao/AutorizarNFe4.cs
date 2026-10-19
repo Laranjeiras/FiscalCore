@@ -41,25 +41,13 @@ namespace FiscalCore.Servicos
 
             var modelo = ModeloDocumentoDaLista(nfes);
 
-            configuracao.ConfigCertificado.Certificado.Validar();
-
-            logger?.LogDebug($"TRATAR NFes");
-            TratarNFeAutorizacao.AplicarPoliticas(nfes);
-            logger?.LogDebug($"NFes TRATADAS");
-            
-            logger?.LogDebug($"VALIDAR NFes");
-            ValidarNFeAutorizacao.ValidarPoliticas(nfes, configuracao);
-            logger?.LogDebug($"NFes VALIDADAS");
+            var nfesAssinadas = PrepararParaEnvio(nfes).ToList();
 
             if (idLote <= 0)
                 idLote = new Random().Next(10000000, 99999999);
 
             logger?.LogDebug($"NUMERO LOTE: {idLote}");
 
-            var nfesAssinadas = nfes
-                .Select(ValidarEAssinar)
-                .ToList();
-                
             var enviNFe = new enviNFe(
                 versaoServico, 
                 idLote, 
@@ -71,7 +59,35 @@ namespace FiscalCore.Servicos
             return retorno;
         }
 
-        public eModeloDocumento ModeloDocumentoDaLista(IList<NFe> nfes) 
+        /// <summary>
+        /// Executa, sem transmitir, os passos que <see cref="Autorizar(IList{NFe}, CancellationToken, int)"/>
+        /// faz antes do envio: valida o certificado, aplica as políticas de autorização, valida as regras
+        /// do lote e assina. Para quem precisa persistir o XML assinado antes de chamar a SEFAZ.
+        /// </summary>
+        /// <returns>A NF-e assinada, pronta para o <c>enviNFe</c>.</returns>
+        public NFe PrepararParaEnvio(NFe nfe)
+            => PrepararParaEnvio(new List<NFe> { nfe })[0];
+
+        /// <inheritdoc cref="PrepararParaEnvio(NFe)"/>
+        /// <returns>As NF-e assinadas, na mesma ordem da lista recebida.</returns>
+        public IList<NFe> PrepararParaEnvio(IList<NFe> nfes)
+        {
+            configuracao.ConfigCertificado.Certificado.Validar();
+
+            logger?.LogDebug($"TRATAR NFes");
+            TratarNFeAutorizacao.AplicarPoliticas(nfes);
+            logger?.LogDebug($"NFes TRATADAS");
+
+            logger?.LogDebug($"VALIDAR NFes");
+            ValidarNFeAutorizacao.ValidarPoliticas(nfes, configuracao);
+            logger?.LogDebug($"NFes VALIDADAS");
+
+            return nfes
+                .Select(ValidarEAssinar)
+                .ToList();
+        }
+
+        public eModeloDocumento ModeloDocumentoDaLista(IList<NFe> nfes)
             => nfes.Select(x => x.infNFe.ide.mod)
                 .Distinct()
                 .SingleOrDefault();
