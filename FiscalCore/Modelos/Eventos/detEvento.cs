@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
+using FiscalCore.Tipos;
 
 namespace FiscalCore.Modelos.Eventos
 {
@@ -52,6 +53,24 @@ namespace FiscalCore.Modelos.Eventos
         }
 
         private IList<string> descricoes => new List<string> { "Carta de Correção", "Carta de Correcao" };
+        #endregion
+
+        #region Eventos RTC
+        public eUF? cOrgaoAutor { get; set; }
+        public bool ShouldSerializecOrgaoAutor() => cOrgaoAutor.HasValue;
+
+        public string tpAutor { get; set; }
+        public bool ShouldSerializetpAutor() => !string.IsNullOrEmpty(tpAutor);
+
+        public string verAplic { get; set; }
+        public bool ShouldSerializeverAplic() => !string.IsNullOrEmpty(verAplic);
+
+        public string indAceitacao { get; set; }
+        public bool ShouldSerializeindAceitacao() => !string.IsNullOrEmpty(indAceitacao);
+
+        [XmlElement("gImobilizacao")]
+        public List<gImobilizacao> gImobilizacao { get; set; }
+        public bool ShouldSerializegImobilizacao() => gImobilizacao != null && gImobilizacao.Count > 0;
         #endregion
     }
 }
