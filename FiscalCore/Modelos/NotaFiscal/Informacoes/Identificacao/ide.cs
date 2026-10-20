@@ -151,6 +151,21 @@ namespace FiscalCore.NotaFiscal.Informacoes.Identificacao
         public eFinalidade finNFe { get; set; }
 
         /// <summary>
+        ///     B25.1 - Tipo de Nota de Débito
+        /// </summary>
+        public eTipoNotaDebito? tpNFDebito { get; set; }
+
+        /// <summary>
+        ///     B25.2 - Tipo de Nota de Crédito
+        /// </summary>
+        public eTipoNotaCredito? tpNFCredito { get; set; }
+
+        /// <summary>
+        ///     NB01 - Informações de ICMS Previsto
+        /// </summary>
+        public NB01 NB01 { get; set; }
+
+        /// <summary>
         ///     B25a - Indica operação com consumidor final
         /// </summary>
         public eConsumidorFinal? indFinal { get; set; } //Nulable por conta da v2.00
@@ -215,6 +230,16 @@ namespace FiscalCore.NotaFiscal.Informacoes.Identificacao
         public bool ShouldSerializeindPres()
         {
             return indPres.HasValue;
+        }
+
+        public bool ShouldSerializetpNFDebito()
+        {
+            return tpNFDebito.HasValue;
+        }
+
+        public bool ShouldSerializetpNFCredito()
+        {
+            return tpNFCredito.HasValue;
         }
     }
 }

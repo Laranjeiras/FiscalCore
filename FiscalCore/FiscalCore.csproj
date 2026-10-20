@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -7,7 +7,7 @@
     <RepositoryUrl>github.com/Laranjeiras/FiscalCore</RepositoryUrl>
     <Authors>Carlos Alexandre Laranjeiras</Authors>
     <PackageTags>NuGet;Classlib;GitHub;Actions</PackageTags>
-    <Version>2.2.0</Version>
+    <Version>2.3.0</Version>
     <Title>FiscalCore</Title>
     <PackageProjectUrl>github.com/Laranjeiras/FiscalCore</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
