@@ -1,4 +1,4 @@
-﻿using System.Xml.Serialization;
+using System.Xml.Serialization;
 
 namespace FiscalCore.Tipos
 {
@@ -11,6 +11,10 @@ namespace FiscalCore.Tipos
         [XmlEnum("3")]
         Ajuste = 3,
         [XmlEnum("4")]
-        Devolucao = 4
+        Devolucao = 4,
+        [XmlEnum("5")]
+        NFeCredito = 5,
+        [XmlEnum("6")]
+        NFeDebito = 6
     }
 }

@@ -103,6 +103,16 @@ namespace FiscalCore.Tipos
 
         [Description("Eventos de Cancelamento de MDF-e CT-e")]
         [XmlEnum("610615")]
-        EventosCancelamentoMDFeCTe = 610615
+        EventosCancelamentoMDFeCTe = 610615,
+
+        #region Eventos RTC
+        [Description("Aceite de Débito da NF-e de Crédito")]
+        [XmlEnum("211128")]
+        AceiteDebitoNFeCredito = 211128,
+
+        [Description("Imobilização de Item da NF-e")]
+        [XmlEnum("211130")]
+        ImobilizacaoItemNFe = 211130
+        #endregion
     }
 }
