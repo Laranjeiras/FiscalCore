@@ -15,4 +15,9 @@
   <ItemGroup>
     <ProjectReference Include="..\FiscalCore\FiscalCore.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Schemas\Eventos_RTC\*.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

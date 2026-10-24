@@ -2,6 +2,7 @@ using AlgoPlus.Storage.Services;
 using FiscalCore.Configuracoes;
 using FiscalCore.Exceptions;
 using FiscalCore.Extensions;
+using FiscalCore.Fabrica;
 using FiscalCore.Modelos.Eventos;
 using FiscalCore.Modelos.Retornos;
 using FiscalCore.Tipos;
@@ -17,8 +18,6 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
 {
     public class EventoAdquirenteRtcServico : BaseSefazServico<EventoAdquirenteRtcServico>
     {
-        private readonly ConfiguracaoServico cfgServico;
-        private readonly new ITransmitirSefazCommand transmitir;
         private const string VERSAO = "1.00";
 
         public EventoAdquirenteRtcServico(
@@ -28,8 +27,6 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             ILogger<EventoAdquirenteRtcServico> logger)
             : base(cfgServico, transmitir, logger, storageContext)
         {
-            this.cfgServico = cfgServico;
-            this.transmitir = transmitir;
         }
 
         public async Task<retEnvEvento> TransmitirEventoAsync(InfoEventoAdquirenteRtc info, CancellationToken cancellation = default)
@@ -48,36 +45,48 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
 
             var chave = info.ChaveAcesso.Replace("NFe", "");
 
+            var verAplic = !string.IsNullOrWhiteSpace(info.VersaoAplicativo)
+                ? info.VersaoAplicativo
+                : (!string.IsNullOrWhiteSpace(this.configuracao.VersaoProc) ? this.configuracao.VersaoProc : "1.00");
+
             var detEvento = new detEvento
             {
                 versao = VERSAO,
-                cOrgaoAutor = cfgServico.UF,
+                cOrgaoAutor = this.configuracao.UF,
                 tpAutor = "2",
-                verAplic = "1.00"
+                verAplic = verAplic
             };
 
             if (info.TipoEvento == eTipoEventoNFe.AceiteDebitoNFeCredito)
             {
+                if (string.IsNullOrWhiteSpace(info.IndAceitacao))
+                    throw new FalhaValidacaoException("Indicador de aceitação (indAceitacao) é obrigatório para o evento 211128");
+
+                if (info.IndAceitacao != "0" && info.IndAceitacao != "1")
+                    throw new FalhaValidacaoException("Indicador de aceitação deve ser 0 (não aceite) ou 1 (aceite)");
+
                 detEvento.descEvento = "Aceite de débito na apuração por emissão de nota de crédito";
-                detEvento.indAceitacao = string.IsNullOrEmpty(info.IndAceitacao) ? "1" : info.IndAceitacao;
+                detEvento.indAceitacao = info.IndAceitacao;
             }
-            else
+
+            if (info.TipoEvento == eTipoEventoNFe.ImobilizacaoItemNFe)
             {
-                detEvento.descEvento = "Imobilização de Item";
                 if (info.ItensImobilizados == null || info.ItensImobilizados.Count == 0)
                     throw new FalhaValidacaoException("Evento de imobilização exige ao menos um item em gImobilizacao");
+
+                detEvento.descEvento = "Imobilização de Item";
                 detEvento.gImobilizacao = info.ItensImobilizados;
             }
 
             var infEvento = new infEventoEnv
             {
                 chNFe = chave,
-                CNPJ = cfgServico.Emitente!.CNPJ,
-                CPF = cfgServico.Emitente.CPF,
-                cOrgao = eUF.AN,
+                CNPJ = this.configuracao.Emitente!.CNPJ,
+                CPF = this.configuracao.Emitente.CPF,
+                cOrgao = this.configuracao.UF,
                 dhEvento = DateTime.Now,
                 nSeqEvento = info.nSeqEvento,
-                tpAmb = cfgServico.TipoAmbiente,
+                tpAmb = this.configuracao.TipoAmbiente,
                 tpEvento = info.TipoEvento,
                 verEvento = VERSAO,
                 detEvento = detEvento
@@ -92,28 +101,34 @@ namespace FiscalCore.Servicos.NotaFiscal.Eventos
             evento.infEvento.Id = "ID" + ((int)evento.infEvento.tpEvento) + evento.infEvento.chNFe +
                                   evento.infEvento.nSeqEvento.ToString().PadLeft(LayoutFiscal.TamanhoSequenciaEvento, '0');
 
-            var certificado = cfgServico.ConfigCertificado.Certificado;
-            evento.Assinar(certificado, cfgServico.ConfigCertificado.SignatureMethodSignedXml, cfgServico.ConfigCertificado.DigestMethodReference);
+            var certificado = this.configuracao.ConfigCertificado.Certificado;
+            evento.Assinar(certificado, this.configuracao.ConfigCertificado.SignatureMethodSignedXml, this.configuracao.ConfigCertificado.DigestMethodReference);
 
+            var idLote = info.IdLote > 0 ? info.IdLote : (info.nSeqEvento > 0 ? info.nSeqEvento : 1);
             var pedEvento = new envEvento
             {
                 versao = VERSAO,
-                idLote = 1,
+                idLote = idLote,
                 evento = new List<evento> { evento }
             };
 
             var xmlEvento = XmlUtils.ClasseParaXmlString<envEvento>(pedEvento);
 
-            var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ped-eve-rtc.xml", cfgServico));
+            var arqEnv = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ped-eve-rtc.xml", this.configuracao));
             await SalvarLog(arqEnv, xmlEvento, cancellation);
 
-            var sefazUrl = Fabrica.FabricarUrl.ObterUrl(eTipoServico.ManifestacaoDestinatario, cfgServico.TipoAmbiente, eModeloDocumento.NFe, eUF.AN);
-            var envelope = Fabrica.SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.ManifestacaoDestinatario, xmlEvento);
+            var sefazUrl = SefazEndpointResolver.ObterUrlEvento(
+                info.TipoEvento,
+                this.configuracao.TipoAmbiente,
+                eModeloDocumento.NFe,
+                this.configuracao.UF);
 
-            var retornoXmlString = await transmitir.TransmitirAsync(sefazUrl, envelope!);
+            var envelope = SoapEnvelopeFabrica.FabricarEnvelope(eTipoServico.CancelarNFe, xmlEvento);
+
+            var retornoXmlString = await this.transmitir.TransmitirAsync(sefazUrl, envelope!, cancellation);
             var retornoXmlStringLimpa = Soap.LimparEnvelope(retornoXmlString, "retEnvEvento").OuterXml;
 
-            var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ret-eve-rtc.xml", cfgServico));
+            var arqRet = Path.Combine("Logs", Arquivo.MontarNomeArquivo("ret-eve-rtc.xml", this.configuracao));
             await SalvarLog(arqRet, retornoXmlStringLimpa, cancellation);
 
             var retorno = new retEnvEvento().CarregarDeXmlString(retornoXmlStringLimpa, xmlEvento);
