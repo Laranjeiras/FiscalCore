@@ -11,5 +11,7 @@ namespace FiscalCore.Modelos.Eventos
         public eTipoEventoNFe TipoEvento { get; set; }
         public string IndAceitacao { get; set; }
         public List<gImobilizacao> ItensImobilizados { get; set; }
+        public string VersaoAplicativo { get; set; }
+        public int IdLote { get; set; } = 1;
     }
 }
