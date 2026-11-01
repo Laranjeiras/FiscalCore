@@ -8,7 +8,6 @@ using System.Runtime.Versioning;
 
 namespace FiscalCore.Configuracoes
 {
-    [SupportedOSPlatform("windows")]
     public class ConfiguracaoDanfe : IConfiguracaoDanfe
     {
         public eVersaoQrCode VersaoQrCode { get; set; } = eVersaoQrCode.QrCodeVersao2;
@@ -24,6 +23,7 @@ namespace FiscalCore.Configuracoes
             set => DefinirDiretorioSalvarDanfe(value);  
         }
 
+        [SupportedOSPlatform("windows")]
         public FontFamily CarregarFontePadraoNfceNativa(string? font = null)
         {
             if (font != null)
